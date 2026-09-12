@@ -30,9 +30,33 @@
 </script>
 
 <div class="panel arena" class:compact>
-  {#if wild && def}
+  {#if wild && def && compact}
+    <!-- phone bar: one line — art, name + HP, and a tall Attack button; a tiny status line below -->
+    <div class="crow">
+      <PalIcon palId={wild.palId} size={44} lucky={wild.lucky} render />
+      <div class="grow info">
+        <div class="name">
+          {#if wild.kind === 'alpha'}<span class="tag">ALPHA</span>{/if}
+          {#if wild.kind === 'tower'}<span class="tag">TOWER</span>{/if}
+          {#if wild.kind === 'dungeon' && run && runDef}<span class="tag realm">W{run.wave + 1}/{runDef.waves}</span>{/if}
+          {#if wild.kind === 'dungeonBoss'}<span class="tag realm">GUARDIAN</span>{/if}
+          {#if wild.kind === 'raid'}<span class="tag raid">RAID</span>{/if}
+          {#if wild.lucky}<span class="tag lucky">LUCKY</span>{/if}
+          {def.name} <span class="muted">Lv {wild.level}</span>
+        </div>
+        <div class="bar hp"><span style:width="{hpPct}%"></span></div>
+        <div class="muted tiny">
+          {fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)}{#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
+          · DPS <b>{game.dps.toFixed(1)}</b>
+          {#if wild.kind === 'wild'} · {Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}
+          {:else} · <button class="tiny flee" onclick={() => game.flee()}>{run ? 'Leave' : wild.kind === 'raid' ? 'Give up' : 'Retreat'}</button>{/if}
+        </div>
+      </div>
+      <button class="primary attack-c" onclick={() => game.click()} aria-label="Attack">⚔<span class="dmg">+{game.clickDmg.toFixed(1)}</span></button>
+    </div>
+  {:else if wild && def}
     <div class="row">
-      <PalIcon palId={wild.palId} size={compact ? 64 : 110} lucky={wild.lucky} render />
+      <PalIcon palId={wild.palId} size={110} lucky={wild.lucky} render />
       <div class="grow">
         <div class="name">
           {#if wild.kind === 'alpha'}<span class="tag">ALPHA</span>{/if}
@@ -80,9 +104,16 @@
   .bar.hp > span { background: var(--danger); }
   .attack { width: 100%; padding: 0.9rem; font-size: 1.2rem; font-weight: 900; border-radius: var(--radius); box-shadow: var(--shadow); margin: 0.75rem 0 0.5rem; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .small { font-size: 0.85rem; }
-  .compact { padding: 0.6rem 0.75rem; }
-  .compact .name { font-size: 1rem; }
-  .compact .attack { padding: 0.7rem; margin: 0.5rem 0 0.35rem; }
+  .compact { padding: 0.45rem 0.6rem; --c: 8px; }
+  .compact .name { font-size: 0.95rem; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .compact .tag { font-size: 0.6rem; padding: 0.05rem 0.3rem; margin-right: 0.2rem; }
+  .crow { display: flex; gap: 0.5rem; align-items: center; }
+  .info { min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+  .compact .bar.hp { margin: 0; height: 8px; }
+  .tiny { font-size: 0.72rem; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .flee { padding: 0 0.35rem; font-size: 0.7rem; min-height: 0; vertical-align: baseline; }
+  .attack-c { flex: 0 0 auto; width: 4.6rem; min-height: 3.4rem; padding: 0.2rem 0.4rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; font-size: 1.3rem; line-height: 1; margin: 0; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .attack-c .dmg { font-size: 0.7rem; font-weight: 800; opacity: 0.8; }
   .here { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1.5px solid var(--border-soft); }
   button.active { border-color: var(--accent); color: var(--accent); }
 </style>

@@ -42,8 +42,9 @@ Safari) the same events also give short haptic buzzes — toggle in Settings.
 
 Works on phones: below 800 px the header collapses to a two-line strip (title · region · level with a thin
 exp bar, 🔍 / 🔔 / Save, then a scrolling row of chips for gold, effigies, tech points, trophies, relics and
-spheres; the search unfolds behind 🔍 or the / shortcut), the arena becomes a sticky bar under it and the
-routes, bosses and log move into a World tab group; touch targets are enlarged.
+spheres; the search unfolds behind 🔍 or the / shortcut), the arena becomes a one-line sticky bar under it
+(art, name and HP with a tiny status line, and a tall ⚔ Attack button on the right) and the routes, bosses
+and log move into a World tab group; touch targets are enlarged.
 
 ## Run
 
