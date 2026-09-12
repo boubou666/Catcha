@@ -4,7 +4,7 @@ import { newBase } from './base';
 import { newStats } from './achievements';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 14;
+export const SAVE_VERSION = 15;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -18,7 +18,7 @@ export function newState(): SaveState {
     base: newBase(),
     tech: [],
     progress: { route: STARTING_ROUTE, routeKills: {}, alphas: [], towers: [], dungeons: {}, raids: {} },
-    settings: { sphereForNew: 'pal', sphereForDupe: 'none' },
+    settings: { sphereForNew: 'pal', sphereForDupe: 'none', dailyReset: 'utc' },
     stats: newStats(),
     achievements: [],
     daily: null,
@@ -108,6 +108,10 @@ export function migrate(raw: unknown): SaveState | null {
     s.stats.defeatedByElement ??= {};
     s.daily ??= null;
     s.version = 14;
+  }
+  if (s.version === 14 && s.settings) {
+    s.settings.dailyReset ??= 'utc';
+    s.version = 15;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

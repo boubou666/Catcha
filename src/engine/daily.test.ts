@@ -95,6 +95,21 @@ describe('progress and claiming', () => {
   });
 });
 
+describe('local reset', () => {
+  it('keys days by the local calendar and rolls at local midnight', () => {
+    const local = new Date(2026, 8, 12, 23, 30); // 23:30 local
+    expect(dayKey(local.getTime(), 'local')).toBe('2026-09-12');
+    expect(dayKey(local.getTime() + 60 * 60 * 1000, 'local')).toBe('2026-09-13');
+    expect(msUntilRollover(local.getTime(), 'local')).toBe(30 * 60 * 1000);
+    const save = newState();
+    save.settings.dailyReset = 'local';
+    rollDaily(save, local.getTime());
+    expect(save.daily!.date).toBe('2026-09-12');
+    expect(rollDaily(save, local.getTime() + 60 * 60 * 1000)).toBe(true);
+    expect(save.daily!.date).toBe('2026-09-13');
+  });
+});
+
 describe('migration v13 → v14', () => {
   it('adds the element counter and daily slot', () => {
     const v13 = { ...newState(), version: 13 } as Record<string, unknown>;

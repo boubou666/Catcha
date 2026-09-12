@@ -1,4 +1,4 @@
-import type { DailyQuest, DailyState, Element, SaveState } from '../data/types';
+import type { DailyQuest, DailyReset, DailyState, Element, SaveState } from '../data/types';
 import { ELEMENTS } from '../data/types';
 import { REGIONS } from '../data/regions';
 import { DUNGEONS } from '../data/dungeons';
@@ -12,14 +12,21 @@ import { addItem, earnGold } from './inventory';
 export const DAILY_COUNT = 3;
 export const BONUS_EFFIGIES = 1;
 
-/** UTC calendar day, so everyone rolls over at the same moment and the seed is stable. */
-export function dayKey(now = Date.now()): string {
-  return new Date(now).toISOString().slice(0, 10);
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/** Calendar day as YYYY-MM-DD, in UTC or the browser's local zone. Also the quest seed. */
+export function dayKey(now = Date.now(), mode: DailyReset = 'utc'): string {
+  const d = new Date(now);
+  return mode === 'utc'
+    ? d.toISOString().slice(0, 10)
+    : `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
-export function msUntilRollover(now = Date.now()): number {
+export function msUntilRollover(now = Date.now(), mode: DailyReset = 'utc'): number {
   const d = new Date(now);
-  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1) - now;
+  return mode === 'utc'
+    ? Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1) - now
+    : new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime() - now;
 }
 
 /** Small deterministic PRNG (mulberry32) seeded from the day key. */
@@ -120,7 +127,7 @@ export function generateDaily(save: SaveState, key: string): DailyState {
 
 /** Make sure today's quests exist; regenerate on a new day (unclaimed quests are lost). Returns true if rolled. */
 export function rollDaily(save: SaveState, now = Date.now()): boolean {
-  const key = dayKey(now);
+  const key = dayKey(now, save.settings.dailyReset ?? 'utc');
   if (save.daily?.date === key) return false;
   save.daily = generateDaily(save, key);
   return true;

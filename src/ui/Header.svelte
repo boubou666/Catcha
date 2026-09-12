@@ -13,18 +13,6 @@
       .filter((s) => s.n > 0),
   );
 
-  function doExport() {
-    const str = game.exportString();
-    navigator.clipboard?.writeText(str).catch(() => {});
-    window.prompt('Save string (copied to clipboard):', str);
-  }
-  function doImport() {
-    const str = window.prompt('Paste save string:');
-    if (str && !game.importString(str)) window.alert('Could not read that save.');
-  }
-  function doReset() {
-    if (window.confirm('Delete your save and start over?')) game.reset();
-  }
 </script>
 
 <header class="panel row">
@@ -54,9 +42,6 @@
 
   <div class="row">
     <button class="small" onclick={() => game.persist()}>Save</button>
-    <button class="small" onclick={doExport}>Export</button>
-    <button class="small" onclick={doImport}>Import</button>
-    <button class="small danger" onclick={doReset}>Reset</button>
   </div>
 </header>
 

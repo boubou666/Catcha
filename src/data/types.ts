@@ -113,6 +113,7 @@ export interface PalInstance {
 }
 
 export type SpherePolicy = SphereTier | 'none';
+export type DailyReset = 'utc' | 'local';
 
 export interface CraftJob {
   recipeId: string;
@@ -185,6 +186,7 @@ export interface SaveState {
   settings: {
     sphereForNew: SpherePolicy;          // sphere to throw at a Pal not yet in the Paldeck
     sphereForDupe: SpherePolicy;         // sphere to throw at an already-caught species
+    dailyReset: DailyReset;              // which midnight rolls the daily quests
   };
   stats: {
     defeated: number; clicks: number; caught: number; luckyCaught: number;

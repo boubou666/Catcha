@@ -14,14 +14,15 @@
     const id = setInterval(() => (now = Date.now()), 1000);
     return () => clearInterval(id);
   });
-  const untilReset = $derived(formatDuration(msUntilRollover(now)));
+  const mode = $derived(save.settings.dailyReset ?? 'utc');
+  const untilReset = $derived(formatDuration(msUntilRollover(now, mode)));
   const claimedCount = $derived(daily ? daily.quests.filter((q) => q.claimed).length : 0);
   const fmt = (n: number) => n.toLocaleString();
 </script>
 
 <div class="row">
   <h2 class="grow">Daily Quests <span class="muted">{claimedCount} / {daily?.quests.length ?? 0}</span></h2>
-  <span class="muted small">Resets in {untilReset} (UTC midnight) · tier {tier}</span>
+  <span class="muted small">Resets in {untilReset} ({mode === 'utc' ? 'UTC' : 'local'} midnight · Settings) · tier {tier}</span>
 </div>
 <p class="muted small">Three quests a day, scaled to how far you've come. Progress counts from the moment the quest appeared; unclaimed quests vanish at reset.</p>
 

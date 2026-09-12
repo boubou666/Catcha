@@ -9,7 +9,7 @@ Design notes: [DESIGN.md](DESIGN.md).
 Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Catcha/**
 
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
-**Import** on the other to move a save.
+**Import** on the other (Settings tab) to move a save.
 
 ## Run
 
@@ -120,7 +120,7 @@ Legendary Sphere chance and the boss's egg, which inherits passives from the par
 (same rule as breeding, with your five fighters as the parent pool) and has a 10% / 15% / 25% chance to
 be Lucky. Data in `src/data/raids.ts`.
 
-Daily quests: three per UTC day (defeat / catch / earn gold / craft / element kills / a specific route,
+Daily quests: three per day (UTC or local midnight — Settings tab) (defeat / catch / earn gold / craft / element kills / a specific route,
 plus hatch, expedition and Sealed Realm once those are unlocked), scaled to your furthest region and
 seeded by the date, so refreshing never rerolls. Claim for gold, spheres and Paldium; claim all three
 for an Effigy. Engine in `src/engine/daily.ts`.

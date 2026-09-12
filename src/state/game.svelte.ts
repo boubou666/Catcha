@@ -1,4 +1,4 @@
-import type { RouteDef, SaveState, SpherePolicy, SphereTier } from '../data/types';
+import type { DailyReset, RouteDef, SaveState, SpherePolicy, SphereTier } from '../data/types';
 import { palById } from '../data/pals';
 import { alphaById, regionById, REGIONS, routeById, towerById } from '../data/regions';
 import { SPHERES } from '../data/spheres';
@@ -341,6 +341,11 @@ export class Game {
     this.save.player.gold -= cost;
     this.save.inventory[s.itemId] = (this.save.inventory[s.itemId] ?? 0) + n;
     return true;
+  }
+
+  setDailyReset(mode: DailyReset) {
+    this.save.settings.dailyReset = mode;
+    if (rollDaily(this.save)) this.push('Daily quests re-rolled for the new reset time.');
   }
 
   setSpherePolicy(kind: 'new' | 'dupe', policy: SpherePolicy) {
