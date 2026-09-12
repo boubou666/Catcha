@@ -3,7 +3,7 @@ import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -20,6 +20,20 @@ export function newState(): SaveState {
     settings: { sphereForNew: 'pal', sphereForDupe: 'none' },
     lastSavedAt: Date.now(),
   };
+}
+
+/** Renumber every Pal reference at once (box, eggs, Paldeck), merging Paldeck rows that collide. */
+function remapPalIds(s: SaveState, map: Record<number, number>): void {
+  const fix = (id: number) => map[id] ?? id;
+  for (const p of s.box) p.palId = fix(p.palId);
+  for (const e of s.base.eggs) e.palId = fix(e.palId);
+  const deck: SaveState['paldeck'] = {};
+  for (const [k, v] of Object.entries(s.paldeck)) {
+    const id = fix(Number(k));
+    const prev = deck[id];
+    deck[id] = prev ? { seen: prev.seen || v.seen, caught: prev.caught + v.caught } : v;
+  }
+  s.paldeck = deck;
 }
 
 /** Bring an older save up to SAVE_VERSION. Add a case per version bump. */
@@ -48,18 +62,13 @@ export function migrate(raw: unknown): SaveState | null {
   }
   if (s.version === 4 && s.base) {
     // Two Paldeck numbers were wrong in early data: Chillet is #41 (was 55), Grizzbolt #88 (was 103).
-    const remap: Record<number, number> = { 55: 41, 103: 88 };
-    const fix = (id: number) => remap[id] ?? id;
-    for (const p of s.box ?? []) p.palId = fix(p.palId);
-    for (const e of s.base.eggs ?? []) e.palId = fix(e.palId);
-    const deck: SaveState['paldeck'] = {};
-    for (const [k, v] of Object.entries(s.paldeck ?? {})) {
-      const id = fix(Number(k));
-      const prev = deck[id];
-      deck[id] = prev ? { seen: prev.seen || v.seen, caught: prev.caught + v.caught } : v;
-    }
-    s.paldeck = deck;
+    remapPalIds(s as SaveState, { 55: 41, 103: 88 });
     s.version = 5;
+  }
+  if (s.version === 5 && s.base) {
+    // v5 got the numbering wrong; this is the corrected Paldeck (Chillet #55, Grizzbolt #103, region 2 shifted).
+    remapPalIds(s as SaveState, {36:50,37:51,38:52,39:53,40:54,41:55,42:56,46:60,47:61,48:62,49:63,50:64,51:65,52:66,53:67,54:68,55:69,56:70,66:81,71:86,74:89,78:93,88:103,89:104});
+    s.version = 6;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

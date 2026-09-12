@@ -21,15 +21,15 @@ const windswept: RegionDef = {
     ['cove',     'Small Cove',                 7,  'Water',   [[25, 25], [23, 20], [16, 15], [6, 15], [27, 15], [29, 10]],     { kind: 'alpha', id: 'chillet' }, 40],
     ['bridge',   'Bridge of the Twin Knights', 9,  'Ground',  [[20, 25], [22, 20], [21, 20], [19, 20], [26, 15]],             { kind: 'routeCleared', id: 'cove' }, 50],
     ['church',   'Abandoned Church',           11, 'Dark',    [[24, 15], [15, 25], [18, 20], [28, 20], [30, 20]],             { kind: 'routeCleared', id: 'bridge' }, 60],
-    ['icewind',  'Ice Wind Island',            13, 'Ice',     [[10, 35], [11, 15], [29, 25], [41, 10], [9, 15]],              { kind: 'alpha', id: 'penking' }, 75],
+    ['icewind',  'Ice Wind Island',            13, 'Ice',     [[10, 35], [11, 15], [29, 25], [55, 10], [9, 15]],              { kind: 'alpha', id: 'penking' }, 75],
   ] as RouteArgs[]).map((a) => route(R1, a)),
   alphas: [
-    { id: 'chillet', regionId: R1, palId: 41, level: 11, hpMult: 12, unlock: { kind: 'routeCleared', id: 'fort' },   reward: { gold: 500, effigies: 2 } },
+    { id: 'chillet', regionId: R1, palId: 55, level: 11, hpMult: 12, unlock: { kind: 'routeCleared', id: 'fort' },   reward: { gold: 500, effigies: 2 } },
     { id: 'penking', regionId: R1, palId: 11, level: 15, hpMult: 15, unlock: { kind: 'routeCleared', id: 'church' }, reward: { gold: 1500, effigies: 3 } },
   ],
   tower: {
     id: 'rayne', regionId: R1,
-    name: 'Rayne Syndicate Tower', boss: 'Zoe & Grizzbolt', palId: 88, level: 15,
+    name: 'Rayne Syndicate Tower', boss: 'Zoe & Grizzbolt', palId: 103, level: 15,
     hp: 30_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'penking' }, { kind: 'routeCleared', id: 'icewind' }] },
   },
@@ -43,28 +43,57 @@ const R2 = 'marsh';
 const marsh: RegionDef = {
   id: R2, name: 'Marsh & Bamboo Groves',
   routes: ([
-    ['seabreeze', 'Sea Breeze Archipelago',    15, 'Water',    [[31, 30], [66, 30], [25, 15], [51, 10], [34, 15]],            { kind: 'tower', id: 'rayne' }, 50],
-    ['marsh',     'Marsh Island',              17, 'Ground',   [[32, 25], [34, 20], [35, 20], [39, 20], [54, 15]],            { kind: 'routeCleared', id: 'seabreeze' }, 60],
-    ['bamboo',    'Bamboo Groves',             19, 'Grass',    [[36, 30], [35, 20], [33, 10], [37, 5], [50, 15], [49, 20]],   { kind: 'routeCleared', id: 'marsh' }, 70],
-    ['ravine',    'Ravine Entrance',           21, 'Ground',   [[53, 15], [38, 20], [52, 20], [46, 20], [48, 25]],            { kind: 'alpha', id: 'grintale' }, 80],
-    ['lake',      'Lake Center',               23, 'Electric', [[42, 20], [46, 25], [56, 20], [55, 15], [40, 10], [39, 10]],  { kind: 'routeCleared', id: 'ravine' }, 90],
-    ['forest',    'Mossanda Forest',           24, 'Grass',    [[33, 20], [71, 10], [78, 10], [74, 10], [36, 25], [47, 10]],  { kind: 'alpha', id: 'elizabee' }, 100],
-    ['alliance',  'Free Pal Alliance Grounds', 25, 'Neutral',  [[74, 15], [78, 15], [38, 20], [49, 20], [54, 15], [37, 10]],  { kind: 'alpha', id: 'kingpaca' }, 120],
+    ['seabreeze', 'Sea Breeze Archipelago',    15, 'Water',    [[31, 30], [81, 30], [25, 15], [65, 10], [34, 15]],            { kind: 'tower', id: 'rayne' }, 50],
+    ['marsh',     'Marsh Island',              17, 'Ground',   [[32, 25], [34, 20], [35, 20], [53, 20], [68, 15]],            { kind: 'routeCleared', id: 'seabreeze' }, 60],
+    ['bamboo',    'Bamboo Groves',             19, 'Grass',    [[50, 30], [35, 20], [33, 10], [51, 5], [64, 15], [63, 20]],   { kind: 'routeCleared', id: 'marsh' }, 70],
+    ['ravine',    'Ravine Entrance',           21, 'Ground',   [[67, 15], [52, 20], [66, 20], [60, 20], [62, 25]],            { kind: 'alpha', id: 'grintale' }, 80],
+    ['lake',      'Lake Center',               23, 'Electric', [[56, 20], [60, 25], [70, 20], [69, 15], [54, 10], [53, 10]],  { kind: 'routeCleared', id: 'ravine' }, 90],
+    ['forest',    'Mossanda Forest',           24, 'Grass',    [[33, 20], [86, 10], [93, 10], [89, 10], [50, 25], [61, 10]],  { kind: 'alpha', id: 'elizabee' }, 100],
+    ['alliance',  'Free Pal Alliance Grounds', 25, 'Neutral',  [[89, 15], [93, 15], [52, 20], [63, 20], [68, 15], [51, 10]],  { kind: 'alpha', id: 'kingpaca' }, 120],
   ] as RouteArgs[]).map((a) => route(R2, a)),
   alphas: [
-    { id: 'grintale', regionId: R2, palId: 38, level: 17, hpMult: 15, unlock: { kind: 'routeCleared', id: 'marsh' },  reward: { gold: 2000, effigies: 3 } },
-    { id: 'elizabee', regionId: R2, palId: 37, level: 21, hpMult: 18, unlock: { kind: 'routeCleared', id: 'lake' },   reward: { gold: 3500, effigies: 3 } },
-    { id: 'kingpaca', regionId: R2, palId: 74, level: 24, hpMult: 20, unlock: { kind: 'routeCleared', id: 'forest' }, reward: { gold: 5000, effigies: 4 } },
+    { id: 'grintale', regionId: R2, palId: 52, level: 17, hpMult: 15, unlock: { kind: 'routeCleared', id: 'marsh' },  reward: { gold: 2000, effigies: 3 } },
+    { id: 'elizabee', regionId: R2, palId: 51, level: 21, hpMult: 18, unlock: { kind: 'routeCleared', id: 'lake' },   reward: { gold: 3500, effigies: 3 } },
+    { id: 'kingpaca', regionId: R2, palId: 89, level: 24, hpMult: 20, unlock: { kind: 'routeCleared', id: 'forest' }, reward: { gold: 5000, effigies: 4 } },
   ],
   tower: {
     id: 'lily', regionId: R2,
-    name: 'Free Pal Alliance Tower', boss: 'Lily & Lyleen', palId: 89, level: 25,
+    name: 'Free Pal Alliance Tower', boss: 'Lily & Lyleen', palId: 104, level: 25,
     hp: 60_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'kingpaca' }, { kind: 'routeCleared', id: 'alliance' }] },
   },
 };
 
-export const REGIONS: RegionDef[] = [windswept, marsh];
+// ---------------------------------------------------------------------------
+// Region 3 — Twilight Dunes (Lv 25–35) · Axel & Orserk
+
+const R3 = 'dunes';
+
+const dunes: RegionDef = {
+  id: R3, name: 'Twilight Dunes',
+  routes: ([
+    ['dunes',    'Twilight Dunes',              26, 'Ground',   [[42, 25], [43, 20], [37, 15], [38, 15], [46, 15], [49, 10]],  { kind: 'tower', id: 'lily' }, 130],
+    ['oasis',    'Dessicated Desert Oasis',     28, 'Dark',     [[44, 25], [45, 20], [43, 20], [75, 20], [94, 10], [40, 5]],   { kind: 'routeCleared', id: 'dunes' }, 140],
+    ['ruins',    'Ancient Ruins',               29, 'Neutral',  [[48, 20], [47, 20], [40, 15], [46, 15], [37, 15], [36, 15]],  { kind: 'routeCleared', id: 'oasis' }, 150],
+    ['pyre',     'Eternal Pyre Approach',       31, 'Fire',     [[41, 25], [39, 15], [76, 20], [72, 15], [58, 15], [38, 10]],  { kind: 'alpha', id: 'elphidran' }, 160],
+    ['canyon',   'Sealed Canyon',               32, 'Electric', [[73, 25], [71, 20], [74, 20], [95, 10], [85, 10], [76, 15]],  { kind: 'routeCleared', id: 'pyre' }, 170],
+    ['crater',   'Obsidian Crater Rim',         34, 'Fire',     [[84, 20], [88, 15], [74, 20], [72, 15], [58, 20], [80, 10]],  { kind: 'alpha', id: 'mammorest' }, 180],
+    ['brothers', 'Eternal Pyre Encampment',     35, 'Dark',     [[75, 20], [94, 15], [45, 20], [71, 15], [84, 15], [95, 15]],  { kind: 'alpha', id: 'anubis' }, 200],
+  ] as RouteArgs[]).map((a) => route(R3, a)),
+  alphas: [
+    { id: 'elphidran', regionId: R3, palId: 80,  level: 28, hpMult: 20, unlock: { kind: 'routeCleared', id: 'ruins' },  reward: { gold: 8000, effigies: 4 } },
+    { id: 'mammorest', regionId: R3, palId: 90,  level: 32, hpMult: 24, unlock: { kind: 'routeCleared', id: 'canyon' }, reward: { gold: 12000, effigies: 4 } },
+    { id: 'anubis',    regionId: R3, palId: 100, level: 35, hpMult: 28, unlock: { kind: 'routeCleared', id: 'crater' }, reward: { gold: 20000, effigies: 5 } },
+  ],
+  tower: {
+    id: 'axel', regionId: R3,
+    name: 'Brothers of the Eternal Pyre Tower', boss: 'Axel & Orserk', palId: 106, level: 35,
+    hp: 100_000, timeLimitSec: 600,
+    unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'anubis' }, { kind: 'routeCleared', id: 'brothers' }] },
+  },
+};
+
+export const REGIONS: RegionDef[] = [windswept, marsh, dunes];
 
 const ROUTES = new Map(REGIONS.flatMap((r) => r.routes).map((r) => [r.id, r]));
 const ALPHAS = new Map(REGIONS.flatMap((r) => r.alphas).map((a) => [a.id, a]));

@@ -114,6 +114,8 @@ export const RECIPES: RecipeDef[] = [
     inputs: { ingot: 1, paldium: 5, wood: 5, stone: 5 }, work: 180, unlock: { kind: 'alpha', id: 'chillet' } },
   { id: 'sphere_giga', name: 'Giga Sphere', output: { kind: 'item', itemId: 'sphere_giga', n: 1 },
     inputs: { ingot: 2, paldium: 8, wood: 8, stone: 8 }, work: 400, unlock: { kind: 'tower', id: 'rayne' } },
+  { id: 'sphere_hyper', name: 'Hyper Sphere', output: { kind: 'item', itemId: 'sphere_hyper', n: 1 },
+    inputs: { ingot: 4, paldium: 12, wood: 12, stone: 12, high_quality_pal_oil: 2 }, work: 800, unlock: { kind: 'tower', id: 'lily' } },
   { id: 'cake', name: 'Cake', output: { kind: 'item', itemId: 'cake', n: 1 },
     inputs: { red_berries: 8, egg: 8, milk: 5 }, work: 120, unlock: { kind: 'none' } },
   { id: 'wooden_club', name: 'Wooden Club', output: { kind: 'weapon', tier: 2, name: 'Wooden Club' },

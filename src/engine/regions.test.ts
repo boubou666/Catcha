@@ -60,11 +60,11 @@ describe('regions', () => {
   it('tower bosses are real Pals with the expected ids', () => {
     expect(palById(towerById('rayne').palId).name).toBe('Grizzbolt');
     expect(palById(towerById('lily').palId).name).toBe('Lyleen');
-    expect(palById(alphaById('chillet').palId).id).toBe(41);
+    expect(palById(alphaById('chillet').palId).id).toBe(55);
   });
 });
 
-describe('migration v4 → v5', () => {
+describe('migration v4 → v6', () => {
   it('renumbers Chillet and Grizzbolt everywhere and merges Paldeck entries', () => {
     const s = newState() as unknown as Record<string, unknown>;
     s.version = 4;
@@ -73,11 +73,30 @@ describe('migration v4 → v5', () => {
     (s.base as { eggs: unknown[] }).eggs = [{ palId: 55, remaining: 10 }];
     const out = migrate(s)!;
     expect(out.version).toBe(SAVE_VERSION);
-    expect(out.box.map((p) => p.palId)).toEqual([41, 88]);
-    expect(out.base.eggs[0].palId).toBe(41);
-    expect(out.paldeck[41]).toEqual({ seen: true, caught: 3 });
-    expect(out.paldeck[88]).toEqual({ seen: true, caught: 0 });
-    expect(out.paldeck[55]).toBeUndefined();
+    // v4 ids were right (55/103); v5 moved them to 41/88; v6 moves them back. Net: unchanged.
+    expect(out.box.map((p) => p.palId)).toEqual([55, 103]);
+    expect(out.base.eggs[0].palId).toBe(55);
+    expect(out.paldeck[55]).toEqual({ seen: true, caught: 3 });
+    expect(out.paldeck[103]).toEqual({ seen: true, caught: 0 });
+    expect(out.paldeck[41]).toBeUndefined();
     expect(out.paldeck[1].caught).toBe(5);
+  });
+});
+
+describe('region 3', () => {
+  it('opens after the Lily tower and chains through Elphidran, Mammorest and Anubis', () => {
+    const save = newState();
+    expect(isUnlocked(save, routeById('dunes').unlock)).toBe(false);
+    save.progress.towers.push('lily');
+    expect(isUnlocked(save, routeById('dunes').unlock)).toBe(true);
+    expect(isUnlocked(save, alphaById('elphidran').unlock)).toBe(false);
+    save.progress.routeKills.ruins = 150;
+    expect(isUnlocked(save, alphaById('elphidran').unlock)).toBe(true);
+    save.progress.alphas.push('elphidran', 'mammorest', 'anubis');
+    expect(isUnlocked(save, routeById('brothers').unlock)).toBe(true);
+    expect(isUnlocked(save, towerById('axel').unlock)).toBe(false);
+    save.progress.routeKills.brothers = 200;
+    expect(isUnlocked(save, towerById('axel').unlock)).toBe(true);
+    expect(palById(towerById('axel').palId).name).toBe('Orserk');
   });
 });

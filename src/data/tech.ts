@@ -63,6 +63,10 @@ export const TECHS: TechDef[] = [
   R('metal_spear', 'Metal Spear', 12, 3, 'A weapon: click damage tier 4.', ['r_stone_spear', 's_furnace']),
   R('sphere_giga', 'Giga Sphere', 12, 3, 'A great sphere: ×2.2 catch rate.', ['r_sphere_mega']),
   M('labor_2', 'Efficient Labor II', 12, 3, 'base', 1.2, '+20% base output.', ['labor_1']),
+  // level 20
+  R('sphere_hyper', 'Hyper Sphere', 20, 4, 'A superb sphere: ×3.2 catch rate.', ['r_sphere_giga']),
+  M('training_3', 'Pal Training III', 20, 4, 'attack', 1.2, '+20% party attack.', ['training_2']),
+  M('labor_3', 'Efficient Labor III', 20, 4, 'base', 1.25, '+25% base output.', ['labor_2']),
 ];
 
 const BY_ID = new Map(TECHS.map((t) => [t.id, t]));
