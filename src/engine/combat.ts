@@ -14,7 +14,7 @@ export interface Wild {
   hp: number;
   maxHp: number;
   lucky: boolean;
-  kind: 'wild' | 'alpha' | 'tower' | 'dungeon' | 'dungeonBoss';
+  kind: 'wild' | 'alpha' | 'tower' | 'dungeon' | 'dungeonBoss' | 'raid';
   refId?: string;      // alpha / tower id
   deadlineAt?: number; // epoch ms, tower time limit
 }
@@ -61,7 +61,7 @@ export interface DefeatSummary {
 /** Apply gold / exp / item drops / Paldeck "seen" for a defeated Pal. */
 export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random): DefeatSummary {
   const def = palById(wild.palId);
-  const bossMult = { wild: 1, dungeon: 2, alpha: 10, dungeonBoss: 12, tower: 25 }[wild.kind];
+  const bossMult = { wild: 1, dungeon: 2, alpha: 10, dungeonBoss: 12, tower: 25, raid: 40 }[wild.kind];
   const luckyMult = wild.lucky ? 5 : 1;
 
   const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold'));

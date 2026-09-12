@@ -6,6 +6,10 @@
   import PalIcon from './PalIcon.svelte';
   import { dungeonsOf, dungeonById } from '../data/dungeons';
   import { bossName, dungeonClears, dungeonUnlocked } from '../engine/dungeon';
+  import { RAIDS, ALTAR } from '../data/raids';
+  import { raidWins, summonBlocker, type SummonBlock } from '../engine/raid';
+  import { countOf } from '../engine/inventory';
+  import { itemName } from '../data/items';
 
   const wild = $derived(game.wild);
   const def = $derived(wild ? palById(wild.palId) : null);
@@ -24,6 +28,8 @@
 
   const tower = $derived(game.region.tower);
   const run = $derived(game.run);
+  const hasAltar = $derived((game.save.base.structures[ALTAR] ?? 0) > 0);
+  const RAID_BLOCK: Record<SummonBlock, string> = { 'no-altar': 'Build the Summoning Altar', 'locked': '', 'no-slab': 'Craft a slab first' };
   const runDef = $derived(run ? dungeonById(run.id) : null);
   const towerUnlocked = $derived(isUnlocked(game.save, tower.unlock));
   const towerDone = $derived(game.save.progress.towers.includes(tower.id));
@@ -66,6 +72,7 @@
           {#if wild.kind === 'tower'}<span class="tag">TOWER</span>{/if}
           {#if wild.kind === 'dungeon' && run && runDef}<span class="tag realm">WAVE {run.wave + 1}/{runDef.waves}</span>{/if}
           {#if wild.kind === 'dungeonBoss'}<span class="tag realm">GUARDIAN</span>{/if}
+          {#if wild.kind === 'raid'}<span class="tag raid">RAID</span>{/if}
           {#if wild.lucky}<span class="tag lucky">LUCKY</span>{/if}
           {def.name} <span class="muted">Lv {wild.level}</span>
         </div>
@@ -86,7 +93,7 @@
       {#if wild.kind === 'wild'}
         <span>· Route progress: <b>{Math.min(kills, game.route.killsToClear)} / {game.route.killsToClear}</b></span>
       {:else}
-        <button class="small" onclick={() => game.flee()}>{run ? 'Leave realm' : 'Retreat'}</button>
+        <button class="small" onclick={() => game.flee()}>{run ? 'Leave realm' : wild.kind === 'raid' ? 'Give up (slab lost)' : 'Retreat'}</button>
       {/if}
     </div>
   {/if}
@@ -109,6 +116,19 @@
       {tower.boss}{towerDone ? ' ✓' : ''}
     </button>
   </div>
+  {#if hasAltar}
+    <div class="row realm-row">
+      {#each RAIDS as r (r.id)}
+        {@const block = summonBlocker(game.save, r.id)}
+        {@const wins = raidWins(game.save, r.id)}
+        {@const slabs = countOf(game.save, r.slabItemId)}
+        <button class="raid-btn" class:primary={!block && wins === 0} disabled={!game.canSummon(r.id)} onclick={() => game.summonRaid(r.id)}
+          title={block === 'locked' ? describeRequirement(r.unlock) : block ? RAID_BLOCK[block] : `${(r.hp / 1000).toLocaleString()}k HP in ${r.timeLimitSec / 60} minutes. Win: ${r.reward.gold.toLocaleString()} gold, loot, and a ${r.name} egg.`}>
+          🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>
+        </button>
+      {/each}
+    </div>
+  {/if}
   {#each dungeonsOf(game.region.id) as d (d.id)}
     {@const unlocked = dungeonUnlocked(game.save, d.id)}
     {@const clears = dungeonClears(game.save, d.id)}
@@ -138,6 +158,8 @@
   .tag { font-size: 0.7rem; padding: 0.1rem 0.35rem; border-radius: 4px; background: var(--danger); color: #fff; margin-right: 0.3rem; vertical-align: middle; }
   .tag.lucky { background: var(--accent); color: #111; }
   .tag.realm { background: var(--accent-2); }
+  .tag.raid { background: #7b2cbf; }
+  .raid-btn { text-align: left; }
   .realm-row { margin-top: 0.5rem; }
   .realm-btn { text-align: left; }
   .bar.hp { margin: 0.35rem 0; }

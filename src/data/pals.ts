@@ -576,6 +576,9 @@ export const PALS: PalDef[] = [
   { id: 1141, name: 'Ghangler Ignis',   variantOf: 141, elements: ['Fire', 'Dark'],   rarity: 'rare',     baseHp: 110, baseAttack: 110, baseDefense: 100, breedPower: 550,
     work: { Kindling: 2, Mining: 2 },
     drops: [d('flame_organ', 1, 2, 4), d('small_pal_soul', 0.5)], partnerSkill: 'Angler Lure' },
+  { id: 1142, name: 'Bellanoir Libero', variantOf: 142, elements: ['Dark'],  rarity: 'legendary', baseHp: 150, baseAttack: 160, baseDefense: 130, breedPower: 10,
+    work: { Handiwork: 3, Medicine: 4 },
+    drops: [d('small_pal_soul', 1, 5, 8), d('diamond', 0.8, 1, 2)], partnerSkill: 'Unbound Sorcery' },
 ];
 
 /** Paldeck label: "#031" for base species, "#031B" for a subspecies. */

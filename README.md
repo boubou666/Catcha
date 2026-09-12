@@ -88,4 +88,9 @@ destinations (10 min → 8 h). Success odds depend on members' levels, stars and
 a full party at the recommended level; success pays a chest, failure a quarter of the gold; members
 gain exp either way and are locked until they return. Resolves offline. Data in `src/data/expeditions.ts`.
 
-Next: raids, balance pass — see DESIGN.md §10.
+Raids: build the Summoning Altar (tech Lv 35), assemble a slab from Slab Fragments (Sealed Realms
+from region 3, long expeditions), and summon Bellanoir (500k HP), Xenolord (1.5M) or Bellanoir Libero
+(3M) for a ten-minute DPS check. The slab is spent on summon. Winning pays Diamonds, Ingots, a
+Legendary Sphere chance and the boss's egg. Data in `src/data/raids.ts`.
+
+Every system in DESIGN.md is now built. Next: a balance pass once regions 2+ have been played.

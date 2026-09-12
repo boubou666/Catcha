@@ -73,6 +73,11 @@ export const TECHS: TechDef[] = [
   M('capture_2', 'Capture Technique II', 25, 4, 'catch', 1.2, '+20% catch rate.', ['capture']),
   R('sphere_ultra', 'Ultra Sphere', 30, 5, 'An exceptional sphere: ×4.5 catch rate.', ['r_sphere_hyper']),
   M('training_4', 'Pal Training IV', 30, 5, 'attack', 1.25, '+25% party attack.', ['training_3']),
+  // level 35–55: raids
+  S('altar', 'Summoning Altar', 35, 4, 'Summon raid bosses at your base.'),
+  R('slab_bellanoir', 'Bellanoir Slab', 35, 3, 'Assemble 4 Slab Fragments into a Bellanoir summoning slab.', ['s_altar']),
+  R('slab_xenolord', 'Xenolord Slab', 45, 4, 'Assemble 8 Slab Fragments into a Xenolord summoning slab.', ['r_slab_bellanoir']),
+  R('slab_libero', 'Bellanoir Libero Slab', 55, 5, 'The ultimate raid. 6 fragments and 2 Diamonds.', ['r_slab_bellanoir']),
   // level 40
   R('sphere_legendary', 'Legendary Sphere', 40, 6, 'The ultimate sphere: ×6.5 catch rate. Needs a Diamond.', ['r_sphere_ultra']),
   M('labor_4', 'Efficient Labor IV', 40, 6, 'base', 1.3, '+30% base output.', ['labor_3']),

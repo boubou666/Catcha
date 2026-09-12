@@ -30,11 +30,11 @@ export const EXPEDITIONS: ExpeditionDef[] = [
   { id: 'desert_caravan', name: 'Escort a Desert Caravan', level: 30, size: 4, durationSec: 2 * H, unlock: { kind: 'tower', id: 'lily' },
     loot: { gold: 6000, items: [d('paldium', 1, 40, 80), d('ingot', 1, 5, 10), d('high_quality_pal_oil', 1, 2, 5), d('sphere_giga', 0.6, 2, 4), d('diamond', 0.02, 1, 1)] }, exp: 3000 },
   { id: 'volcano_delve', name: 'Delve into Mount Obsidian', level: 40, size: 5, durationSec: 4 * H, unlock: { kind: 'tower', id: 'axel' },
-    loot: { gold: 20000, items: [d('ingot', 1, 10, 20), d('high_quality_pal_oil', 1, 4, 8), d('sphere_hyper', 0.6, 2, 4), d('flame_organ', 1, 10, 20), d('diamond', 0.08, 1, 1)] }, exp: 10000 },
+    loot: { gold: 20000, items: [d('ingot', 1, 10, 20), d('high_quality_pal_oil', 1, 4, 8), d('sphere_hyper', 0.6, 2, 4), d('flame_organ', 1, 10, 20), d('diamond', 0.08, 1, 1), d('slab_fragment', 0.5, 1, 2)] }, exp: 10000 },
   { id: 'astral_climb', name: 'Climb the Astral Mountains', level: 50, size: 5, durationSec: 6 * H, unlock: { kind: 'tower', id: 'marcus' },
-    loot: { gold: 60000, items: [d('ingot', 1, 20, 35), d('high_quality_pal_oil', 1, 6, 12), d('sphere_ultra', 0.6, 2, 4), d('high_quality_cloth', 0.5, 1, 3), d('diamond', 0.2, 1, 1)] }, exp: 30000 },
+    loot: { gold: 60000, items: [d('ingot', 1, 20, 35), d('high_quality_pal_oil', 1, 6, 12), d('sphere_ultra', 0.6, 2, 4), d('high_quality_cloth', 0.5, 1, 3), d('diamond', 0.2, 1, 1), d('slab_fragment', 0.7, 1, 3)] }, exp: 30000 },
   { id: 'far_isles', name: 'Voyage to the Far Isles', level: 60, size: 5, durationSec: 8 * H, unlock: { kind: 'tower', id: 'victor' },
-    loot: { gold: 200000, items: [d('ingot', 1, 30, 50), d('high_quality_pal_oil', 1, 10, 20), d('sphere_legendary', 0.4, 1, 2), d('diamond', 0.4, 1, 2)] }, exp: 80000 },
+    loot: { gold: 200000, items: [d('ingot', 1, 30, 50), d('high_quality_pal_oil', 1, 10, 20), d('sphere_legendary', 0.4, 1, 2), d('diamond', 0.4, 1, 2), d('slab_fragment', 1, 2, 4)] }, exp: 80000 },
 ];
 
 const BY_ID = new Map(EXPEDITIONS.map((e) => [e.id, e]));

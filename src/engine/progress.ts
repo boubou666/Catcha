@@ -1,6 +1,7 @@
 import type { Requirement, RouteDef, SaveState } from '../data/types';
 import { alphaById, routeById, towerById } from '../data/regions';
 import { palById } from '../data/pals';
+import { raidById } from '../data/raids';
 
 export function routeKills(save: SaveState, routeId: string): number {
   return save.progress.routeKills[routeId] ?? 0;
@@ -16,6 +17,7 @@ export function isUnlocked(save: SaveState, req: Requirement): boolean {
     case 'routeCleared': return routeCleared(save, routeById(req.id));
     case 'alpha': return save.progress.alphas.includes(req.id);
     case 'tower': return save.progress.towers.includes(req.id);
+    case 'raid': return (save.progress.raids[req.id] ?? 0) > 0;
     case 'level': return save.player.level >= req.n;
     case 'all': return req.of.every((r) => isUnlocked(save, r));
   }
@@ -27,6 +29,7 @@ export function describeRequirement(req: Requirement): string {
     case 'routeCleared': return `Clear ${routeById(req.id).name}`;
     case 'alpha': return `Defeat Alpha ${palById(alphaById(req.id).palId).name}`;
     case 'tower': return `Clear ${towerById(req.id).name}`;
+    case 'raid': return `Defeat the ${raidById(req.id).name} raid`;
     case 'level': return `Reach level ${req.n}`;
     case 'all': return req.of.map(describeRequirement).join(' + ');
   }

@@ -21,7 +21,7 @@ A PokéClicker-style incremental game themed on Palworld. Browser-only, no backe
 | —                      | Condensing (dupes → stars)                   | gives duplicates value |
 | —                      | Lifmunk Effigies → Capture Power             | catch-rate upgrade collectible |
 | —                      | Expeditions                                  | send box Pals away for timed loot — implemented in `data/expeditions.ts` |
-| —                      | Raids (Bellanoir, Xenolord)                  | endgame DPS check |
+| —                      | Raids (Bellanoir, Xenolord)                  | endgame DPS check — implemented in `data/raids.ts` |
 
 ## 2. Core loop
 

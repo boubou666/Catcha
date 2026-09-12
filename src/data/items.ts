@@ -37,6 +37,10 @@ export const ITEMS: ItemDef[] = [
   M('suspicious_juice', 'Suspicious Juice'),
   M('high_quality_cloth', 'High Quality Cloth'),
   M('diamond', 'Diamond'),
+  M('slab_fragment', 'Slab Fragment'),
+  M('slab_bellanoir', 'Bellanoir Slab'),
+  M('slab_xenolord', 'Xenolord Slab'),
+  M('slab_libero', 'Bellanoir Libero Slab'),
   // food
   F('red_berries', 'Red Berries'),
   F('cake', 'Cake'),

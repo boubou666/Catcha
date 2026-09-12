@@ -46,6 +46,7 @@ export type Requirement =
   | { kind: 'routeCleared'; id: string }
   | { kind: 'alpha'; id: string }
   | { kind: 'tower'; id: string }
+  | { kind: 'raid'; id: string }
   | { kind: 'level'; n: number }
   | { kind: 'all'; of: Requirement[] };
 
@@ -176,6 +177,7 @@ export interface SaveState {
     alphas: string[];
     towers: string[];
     dungeons: Record<string, number>;    // dungeonId -> clears
+    raids: Record<string, number>;       // raidId -> wins
   };
   settings: {
     sphereForNew: SpherePolicy;          // sphere to throw at a Pal not yet in the Paldeck

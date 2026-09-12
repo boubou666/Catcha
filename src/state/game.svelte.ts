@@ -17,6 +17,8 @@ import { dungeonById } from '../data/dungeons';
 import { itemName } from '../data/items';
 import { clearReports, send } from '../engine/expedition';
 import { expeditionById } from '../data/expeditions';
+import { completeRaid, describeRaidChest, summon, summonBlocker } from '../engine/raid';
+import { raidById } from '../data/raids';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
@@ -99,6 +101,7 @@ export class Game {
     if (w) {
       if (w.deadlineAt && Date.now() > w.deadlineAt) {
         if (this.run) this.endRun('Time ran out');
+        else if (w.kind === 'raid') { this.push(`${palById(w.palId).name} withdrew — the slab is spent.`); this.spawn(); }
         else { this.push(`Time's up — ${palById(w.palId).name} retreats.`); this.spawn(); }
       } else {
         this.hit((this.dps * dtMs) / 1000);
@@ -161,6 +164,10 @@ export class Game {
       const tower = towerById(w.refId);
       if (!save.progress.towers.includes(w.refId)) save.progress.towers.push(w.refId);
       this.push(`${tower.boss} defeated — ${tower.name} cleared!`);
+    } else if (w.kind === 'raid' && w.refId) {
+      const raid = raidById(w.refId);
+      const chest = completeRaid(save, raid);
+      this.push(`${raid.name} defeated! ${describeRaidChest(chest, raid.name, itemName)}.`);
     }
     this.spawn();
   }
@@ -202,6 +209,7 @@ export class Game {
 
   flee() {
     if (this.run) { this.endRun('Retreated'); return; }
+    if (this.wild?.kind === 'raid') { this.push(`Retreated from ${palById(this.wild.palId).name} — the slab is spent.`); this.spawn(); return; }
     this.push('Retreated.');
     this.spawn();
   }
@@ -215,6 +223,19 @@ export class Game {
   }
 
   clearReports() { clearReports(this.save); }
+
+  // ---- raids -------------------------------------------------------------
+
+  canSummon(raidId: string): boolean { return !this.run && !this.inBossFight && summonBlocker(this.save, raidId) === null; }
+
+  summonRaid(raidId: string) {
+    if (!this.canSummon(raidId)) return;
+    const boss = summon(this.save, raidId);
+    if (!boss) return;
+    this.wild = boss;
+    const def = raidById(raidId);
+    this.push(`${def.name} answers the altar — ${(def.hp / 1000).toLocaleString()}k HP, ${def.timeLimitSec / 60} minutes.`);
+  }
 
   // ---- dungeons ----------------------------------------------------------
 

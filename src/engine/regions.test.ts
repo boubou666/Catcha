@@ -4,6 +4,8 @@ import { PALS, palById } from '../data/pals';
 import type { Requirement } from '../data/types';
 import { newState, migrate, SAVE_VERSION } from './save';
 import { isUnlocked } from './progress';
+import { RAIDS } from '../data/raids';
+import { DUNGEONS } from '../data/dungeons';
 
 function refsResolve(req: Requirement): void {
   switch (req.kind) {
@@ -32,8 +34,10 @@ describe('regions', () => {
     }
   });
 
-  it('every Pal in the roster appears somewhere (route, alpha or tower)', () => {
+  it('every Pal in the roster appears somewhere (route, alpha, tower, dungeon or raid)', () => {
     const used = new Set<number>();
+    for (const r of RAIDS) used.add(r.palId);
+    for (const d of DUNGEONS) { used.add(d.boss.palId); d.pool.forEach((s) => used.add(s.palId)); }
     for (const r of REGIONS) {
       r.routes.forEach((x) => x.spawns.forEach((s) => used.add(s.palId)));
       r.alphas.forEach((a) => used.add(a.palId));
