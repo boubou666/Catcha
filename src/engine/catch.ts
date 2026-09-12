@@ -6,6 +6,7 @@ import { addToBox, makeInstance } from './party';
 import { techMult } from './tech';
 import { prestigeMult } from './prestige';
 import { rollWildPassives } from './passives';
+import { isUnlocked } from './progress';
 import type { Rng, Wild } from './combat';
 
 export function catchChance(rarity: Rarity, tier: SphereTier, effigies: number, lucky: boolean, mult = 1, alpha = false): number {
@@ -56,6 +57,22 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
     return { outcome: 'caught', tier, chance };
   }
   return { outcome: 'failed', tier, chance };
+}
+
+export interface CatchTableRow { tier: SphereTier; stock: number; chance: number; alpha: number }
+
+/** Odds for this species with every sphere the merchant has unlocked so far (wild, and as an Alpha), with what's in the bag. */
+export function catchTable(save: SaveState, palId: number): CatchTableRow[] {
+  const rarity = palById(palId).rarity;
+  const mult = techMult(save, 'catch') * prestigeMult(save, 'catch');
+  return SPHERE_TIERS
+    .filter((t) => isUnlocked(save, SPHERES[t].unlock))
+    .map((tier) => ({
+      tier,
+      stock: save.inventory[SPHERES[tier].itemId] ?? 0,
+      chance: catchChance(rarity, tier, save.player.effigies, false, mult),
+      alpha: catchChance(rarity, tier, save.player.effigies, false, mult, true),
+    }));
 }
 
 export type CatchPreview =

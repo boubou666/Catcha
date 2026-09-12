@@ -4,7 +4,7 @@ import { PALS, palById } from '../data/pals';
 import { REGIONS, routeById } from '../data/regions';
 import { itemById } from '../data/items';
 import { newState } from './save';
-import { catchChance, catchPreview, chooseSphere, tryCatch } from './catch';
+import { catchChance, catchPreview, catchTable, chooseSphere, tryCatch } from './catch';
 import { ALPHA_CATCH_PENALTY } from '../data/spheres';
 import { applyDefeat, partyDps, spawnWild } from './combat';
 import { addToBox, grantExp, makeInstance } from './party';
@@ -157,5 +157,21 @@ describe('catch preview', () => {
     expect(catchPreview(save, 1)).toMatchObject({ throws: true, tier: 'pal', dupe: true });
     save.inventory.sphere_pal = 0;
     expect(catchPreview(save, 1)).toEqual({ throws: false, reason: 'no-spheres', dupe: true });
+  });
+});
+
+describe('catch table', () => {
+  it('lists only unlocked spheres, with stock and the Alpha penalty applied', () => {
+    const s = newState();
+    s.inventory.sphere_pal = 4;
+    let rows = catchTable(s, 1);   // Lamball, common
+    expect(rows.map((r) => r.tier)).toEqual(['pal']);
+    expect(rows[0]).toMatchObject({ stock: 4, chance: catchChance('common', 'pal', 0, false) });
+    expect(rows[0].alpha).toBeCloseTo(rows[0].chance * ALPHA_CATCH_PENALTY);
+    s.progress.alphas.push('chillet');
+    rows = catchTable(s, 1);
+    expect(rows.map((r) => r.tier)).toEqual(['pal', 'mega']);
+    expect(rows[1].chance).toBeGreaterThan(rows[0].chance);
+    expect(rows[1].stock).toBe(0);
   });
 });

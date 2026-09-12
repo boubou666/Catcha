@@ -9,6 +9,10 @@
   import { isUnlocked, describeRequirement } from '../engine/progress';
   import { dungeonById } from '../data/dungeons';
   import { raidById } from '../data/raids';
+  import { ui } from '../state/ui.svelte';
+  import { catchPreview, catchTable } from '../engine/catch';
+  import { catchText } from './catchText';
+  import { LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
   import PalIcon from './PalIcon.svelte';
   import ItemIcon from './ItemIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
@@ -21,6 +25,10 @@
   const caught = $derived((save.paldeck[palId]?.caught ?? 0) > 0);
   let filter = $state<DetailFilter>({ ...DEFAULT_DETAIL_FILTER });
   const allHabitat = $derived(habitatOf(palId));
+  const preview = $derived(catchPreview(save, palId));
+  const alphaPreview = $derived(catchPreview(save, palId, false, true));
+  const table = $derived(catchTable(save, palId));
+  const isAlpha = $derived(allHabitat.alphas.length > 0);
   const allBreeding = $derived(breedingInfoFor(save, palId));
   const habitat = $derived(filterHabitat(save, allHabitat, filter));
   const breeding = $derived(filterBreedingInfo(save, allBreeding, filter));
@@ -70,6 +78,18 @@
           <div class="small drops">{#if caught}{#each def.drops as d (d.itemId)}<span class="drop"><ItemIcon id={d.itemId} size={16} label />{#if d.chance < 1}<span class="muted"> ({pct(d.chance)})</span>{/if}</span>{/each}{:else}<span class="muted">catch one to learn</span>{/if}</div>
         </div>
       </section>
+      <section>
+        <h3>Catching</h3>
+        <div class="small">
+          <button class="link catchline" class:no={!preview.throws} onclick={() => { ui.requestTab = 'settings'; onclose(); }} title="Catch settings">🎯 Right now: {catchText(preview)}</button>
+          <div class="tiers">
+            {#each table as t (t.tier)}
+              <span class="tier" class:none={t.stock === 0} title={`${SPHERES[t.tier].name} — ${t.stock} in the bag`}><ItemIcon id={SPHERES[t.tier].itemId} size={16} /> {pct(t.chance)}{#if isAlpha}<span class="muted"> · Alpha {pct(t.alpha)}</span>{/if}</span>
+            {/each}
+          </div>
+          <div class="muted tiny">Per sphere, on a wild one at your Effigy and tech bonuses{isAlpha ? '; the Alpha figure includes the boss penalty' : ''}. Lucky Pals are caught at ×{LUCKY_CATCH_PENALTY}. Greyed spheres are out of stock.</div>
+        </div>
+      </section>
     {/if}
 
     {#if showControls}
@@ -96,7 +116,7 @@
           <li class:locked={!open}>{r.routeName} <span class="muted">({r.regionName}, Lv {r.level}) · {pct(r.chance)} of spawns{open ? '' : ` · 🔒 ${describeRequirement(routeById(r.routeId).unlock)}`}</span>
             {#if open && !game.inBossFight && game.route.id !== r.routeId}<button class="tiny" onclick={() => { game.travel(r.routeId); onclose(); }}>Go</button>{/if}</li>
         {/each}
-        {#each habitat.alphas as a}<li>Alpha in {a.regionName} <span class="muted">(Lv {a.level})</span></li>{/each}
+        {#each habitat.alphas as a}<li>Alpha in {a.regionName} <span class="muted">(Lv {a.level})</span> <span class="odds" class:no={!alphaPreview.throws} title={`Catch: ${catchText(alphaPreview)}`}>🎯 {alphaPreview.throws ? pct(alphaPreview.chance) : '—'}</span></li>{/each}
         {#each habitat.towers as t}<li>{t.boss} — {t.name} <span class="muted">(tower boss, not catchable)</span></li>{/each}
         {#each habitat.realms as d}<li>{d.name} <span class="muted">({d.role === 'guardian' ? 'guardian' : `${pct(d.chance)} of waves`}{isUnlocked(save, dungeonById(d.dungeonId).unlock) ? '' : ` · 🔒 ${describeRequirement(dungeonById(d.dungeonId).unlock)}`})</span></li>{/each}
         {#each habitat.raids as r}<li>{r.name} raid <span class="muted">(egg on victory{isUnlocked(save, raidById(r.raidId).unlock) ? '' : ` · 🔒 ${describeRequirement(raidById(r.raidId).unlock)}`})</span></li>{/each}
@@ -137,6 +157,15 @@
   .drops { display: flex; flex-wrap: wrap; gap: 0.25rem 0.6rem; }
   .drop { white-space: nowrap; }
   .tiny { font-size: 0.75rem; padding: 0.05rem 0.4rem; margin-left: 0.3rem; }
+  div.tiny { padding: 0; margin: 0.3rem 0 0; }
+  .catchline { text-decoration: none; font-weight: 700; }
+  .catchline:hover { text-decoration: underline; }
+  .catchline.no { color: var(--muted); }
+  .tiers { display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; margin-top: 0.35rem; }
+  .tier { display: inline-flex; align-items: center; gap: 0.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tier.none { opacity: 0.5; font-weight: 400; }
+  .odds { color: var(--accent-2); font-weight: 700; margin-left: 0.3rem; }
+  .odds.no { color: var(--muted); font-weight: 400; }
   .link { background: none; border: none; padding: 0; color: var(--accent-2); cursor: pointer; font: inherit; text-decoration: underline; }
   .controls { margin-top: 1rem; }
   .controls input[type='search'] { min-width: 8rem; flex: 1; max-width: 14rem; font-size: 0.85rem; }

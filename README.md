@@ -84,7 +84,8 @@ a caught Alpha keeps its boss level. Tower bosses (a human and their Pal) cannot
 give an egg instead of a throw — the arena line and the Bosses buttons say so, with the egg's Lucky odds.
 Sealed Realm waves and guardians are caught at normal wild odds; the realm button shows the guardian's
 and lists the waves', and "Who lives here?" during a run shows the wave pool with spawn share and catch odds.
-The route spawn list has the same 🎯 column.
+The route spawn list has the same 🎯 column, and so does every seen Paldeck card; a Pal's detail
+has a Catching section with the odds per unlocked sphere (wild and as an Alpha) and what's in the bag.
 
 ## Data
 

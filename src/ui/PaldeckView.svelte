@@ -9,6 +9,8 @@
   import PalDetail from './PalDetail.svelte';
 
   import { ui } from '../state/ui.svelte';
+  import { catchPreview } from '../engine/catch';
+  import { catchText } from './catchText';
   let selected = $state<number | null>(null);
   // global search may ask for an entry to open
   $effect(() => { const id = ui.paldeckSelect; if (id !== null) selected = ui.takePaldeck(); });
@@ -68,11 +70,12 @@
 
 <div class="grid">
   {#each shown as { def, seen, caught } (def.id)}
-    <button class="entry" class:caught={caught > 0} class:seen={seen && caught === 0} onclick={() => (selected = def.id)}>
+    {@const pv = seen ? catchPreview(game.save, def.id) : null}
+    <button class="entry" class:caught={caught > 0} class:seen={seen && caught === 0} onclick={() => (selected = def.id)} title={pv ? `Catch: ${catchText(pv)}` : undefined}>
       <PalIcon palId={def.id} size={44} unknown={!seen} />
       <div class="num">{paldeckNumber(def)}</div>
       <div class="name">{seen ? def.name : '???'}</div>
-      {#if caught > 0}<div class="muted small">×{caught}</div>{/if}
+      <div class="small foot">{#if caught > 0}<span class="muted">×{caught}</span>{/if}{#if pv}<span class="odds" class:no={!pv.throws}>🎯 {pv.throws ? `${Math.round(pv.chance * 100)}%` : '—'}</span>{/if}</div>
     </button>
   {/each}
 </div>
@@ -86,6 +89,9 @@
   .num { font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; }
   .name { font-size: 0.85rem; }
   .small { font-size: 0.75rem; }
+  .foot { display: flex; gap: 0.4rem; min-height: 1em; }
+  .odds { color: var(--accent-2); font-weight: 700; }
+  .odds.no { color: var(--muted); font-weight: 400; }
   input[type='search'] { min-width: 10rem; flex: 1; max-width: 16rem; }
   h2 { white-space: nowrap; }
   button.active { border-color: var(--accent); color: var(--accent); }
