@@ -30,6 +30,7 @@ import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
 import { buy, sell } from '../engine/shop';
 import { classifyLog, type LogEntry } from '../engine/logfilter';
+import { loadToastPref, NOTICE_CAP, TOAST_PREF_KEY, type Notice, type NoticeKind, type ToastPref } from '../engine/notices';
 import { advanceTutorial, currentStep, finishTutorial } from '../engine/tutorial';
 import { condense } from '../engine/condense';
 import { instanceByUid } from '../engine/party';
@@ -43,7 +44,7 @@ function loadWatched(): Set<number> {
   try { const raw = localStorage.getItem(WATCH_KEY); return new Set(raw ? (JSON.parse(raw) as number[]) : []); } catch { return new Set(); }
 }
 
-export type ToastKind = 'info' | 'success' | 'gold' | 'warn';
+export type ToastKind = NoticeKind;
 
 export type GameEvent =
   | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
@@ -57,12 +58,24 @@ export class Game {
   /** Transient notifications shown by the Toasts component. */
   toasts = $state<{ id: number; text: string; kind: ToastKind }[]>([]);
   private toastSeq = 0;
+  /** Every notice is kept in the history; only kinds enabled in the toast preference pop up. */
+  notices = $state<Notice[]>([]);
+  toastPref = $state<ToastPref>(loadToastPref(typeof localStorage === 'undefined' ? null : localStorage));
   notify(text: string, kind: ToastKind = 'info', ms = 4000) {
     const id = ++this.toastSeq;
+    this.notices = [{ id, at: Date.now(), text, kind, read: false }, ...this.notices].slice(0, NOTICE_CAP);
+    if (!this.toastPref[kind]) return;
     this.toasts = [...this.toasts, { id, text, kind }].slice(-4);
     setTimeout(() => this.dismissToast(id), ms);
   }
   dismissToast(id: number) { this.toasts = this.toasts.filter((t) => t.id !== id); }
+  get unreadNotices(): number { return this.notices.filter((n) => !n.read).length; }
+  markNoticesRead() { if (this.notices.some((n) => !n.read)) this.notices = this.notices.map((n) => (n.read ? n : { ...n, read: true })); }
+  clearNotices() { this.notices = []; }
+  setToastPref(kind: NoticeKind, on: boolean) {
+    this.toastPref = { ...this.toastPref, [kind]: on };
+    try { localStorage.setItem(TOAST_PREF_KEY, JSON.stringify(this.toastPref)); } catch { /* ignore */ }
+  }
 
   /** Game events for the UI layer (sounds, toasts). Handlers must not throw. */
   private listeners = new Set<(e: GameEvent) => void>();

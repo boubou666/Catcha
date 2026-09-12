@@ -4,6 +4,7 @@
   import { SPHERES } from '../data/spheres';
   import { SPHERE_TIERS } from '../data/types';
   import { achievementPoints } from '../engine/achievements';
+  import NotificationCenter from './NotificationCenter.svelte';
 
   const player = $derived(game.save.player);
   const expPct = $derived((player.exp / expToLevel(player.level + 1)) * 100);
@@ -41,6 +42,7 @@
   </div>
 
   <div class="row">
+    <NotificationCenter />
     <button class="small" onclick={() => game.persist()}>Save</button>
   </div>
 </header>

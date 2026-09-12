@@ -118,6 +118,11 @@ time away, capped at 24 h, and a summary shows the deltas. Combat never runs off
 more than six lines it gets a search, an Everything / Gained / Consumed / Events view and a sort (biggest
 change, with events last, or name) — `offlineRows` / `filterOfflineRows` in `src/engine/offline.ts`.
 
+Notifications: every toast is also kept in a session history (last 100) behind the 🔔 in the header, with an
+unread badge, search, kind filter (info / success / gold & rewards / warnings & Lucky), unread-only, mark all
+read and clear; the same panel chooses which kinds still pop up as toasts (per device, `catcha.toasts`).
+`src/engine/notices.ts`.
+
 Condensing: build the Pal Essence Condenser, then feed 4 / 16 / 32 / 64 idle duplicates into a Pal
 from the Box for ★1–★4 (+10% attack and work per star). Lucky, starred, party and base Pals are never
 consumed.
