@@ -66,7 +66,7 @@
   .bell { position: relative; }
   .badge { position: absolute; top: -0.4rem; right: -0.4rem; background: var(--danger); color: #fff; border-radius: 999px; font-size: 0.65rem; padding: 0.05rem 0.35rem; font-weight: 700; }
   .backdrop { position: fixed; inset: 0; z-index: 14; }
-  .center { position: fixed; top: 4.5rem; right: 1rem; z-index: 15; width: min(420px, calc(100vw - 2rem)); max-height: 75vh; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: var(--shadow-float); }
+  .center { position: fixed; top: 4.5rem; right: 1rem; z-index: 15; background: rgba(var(--navy), 0.98); backdrop-filter: blur(10px); width: min(420px, calc(100vw - 2rem)); max-height: 75vh; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: var(--shadow-float); }
   .head h3 { margin: 0; }
   .small { font-size: 0.8rem; }
   .tiny { font-size: 0.75rem; margin-top: 0.25rem; }

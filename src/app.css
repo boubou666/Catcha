@@ -44,6 +44,7 @@
 
 /* Light HUD: the same shapes over cream glass with ink text. Picked in Settings → Appearance (or follows the system). */
 :root[data-theme='light'] {
+  --navy: 255, 250, 240;
   --panel: rgba(255, 250, 240, 0.9);
   --panel-2: rgba(31, 42, 68, 0.06);
   --panel-3: rgba(31, 42, 68, 0.12);
@@ -137,8 +138,9 @@ input[type='range'] { accent-color: var(--accent); padding: 0; border: none; bac
 /* cyan light along the top edge */
 .panel::before { content: ''; position: absolute; left: var(--c); right: 0; top: 0; height: 2px; background: linear-gradient(90deg, var(--accent-2), transparent 70%); pointer-events: none; }
 .panel .panel { backdrop-filter: none; box-shadow: none; --c: 10px; }
-/* the header holds the search dropdown: no clipping there */
-header.panel { clip-path: none; }
+/* the header holds the search dropdown and the notification centre: no clipping, no blur (a backdrop-filter
+   would trap their fixed/absolute popovers inside the header), and it sits above the columns below */
+header.panel { clip-path: none; backdrop-filter: none; z-index: 20; }
 header.panel::before { left: 0; }
 
 .muted { color: var(--muted); }

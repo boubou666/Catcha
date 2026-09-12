@@ -65,7 +65,7 @@
   .box { gap: 0.3rem; flex-wrap: nowrap; }
   input[type='search'] { flex: 1; min-width: 0; font-size: 0.9rem; }
   select { font-size: 0.8rem; max-width: 8rem; }
-  .results { position: absolute; top: calc(100% + 0.3rem); left: 0; right: 0; z-index: 30; max-height: 60vh; overflow-y: auto; padding: 0.3rem; display: flex; flex-direction: column; gap: 0.15rem; box-shadow: var(--shadow-float); }
+  .results { position: absolute; top: calc(100% + 0.3rem); left: 0; right: 0; z-index: 30; background: rgba(var(--navy), 0.98); max-height: 60vh; overflow-y: auto; padding: 0.3rem; display: flex; flex-direction: column; gap: 0.15rem; box-shadow: var(--shadow-float); }
   .result { display: flex; gap: 0.5rem; align-items: center; text-align: left; border-color: transparent; background: transparent; padding: 0.35rem 0.5rem; }
   .result.active { background: var(--panel-2); border-color: var(--accent); }
   .icon { width: 1.4rem; text-align: center; }
