@@ -6,7 +6,7 @@ import { isAway } from './party';
 import { isBreeding } from './breeding';
 
 export type BoxStatus = 'any' | 'idle' | 'party' | 'base' | 'breeding' | 'expedition';
-export type BoxSort = 'stars' | 'level' | 'attack' | 'name' | 'species' | 'newest';
+export type BoxSort = 'stars' | 'level' | 'attack' | 'work' | 'name' | 'species' | 'newest';
 
 export interface BoxFilter {
   query: string;
@@ -25,8 +25,14 @@ export const STATUS_LABEL: Record<BoxStatus, string> = {
   any: 'Any status', idle: 'Idle', party: 'In party', base: 'At base', breeding: 'Breeding', expedition: 'On expedition',
 };
 export const SORT_LABEL: Record<BoxSort, string> = {
-  stars: 'Stars, then level', level: 'Level', attack: 'Attack', name: 'Name', species: 'Paldeck number', newest: 'Newest',
+  stars: 'Stars, then level', level: 'Level', attack: 'Attack', work: 'Work suitability', name: 'Name', species: 'Paldeck number', newest: 'Newest',
 };
+
+/** Sum of a species' work levels, or just one job's level when asked. */
+export function workScore(inst: PalInstance, job: WorkType | 'any' = 'any'): number {
+  const work = palById(inst.palId).work;
+  return job === 'any' ? Object.values(work).reduce((s, n) => s + (n ?? 0), 0) : (work[job] ?? 0);
+}
 
 export function statusOf(save: SaveState, uid: string): Exclude<BoxStatus, 'any'> {
   if (save.party.includes(uid)) return 'party';
@@ -54,7 +60,7 @@ function matchesQuery(inst: PalInstance, query: string): boolean {
 export function filterBox(save: SaveState, f: BoxFilter): PalInstance[] {
   const counts = new Map<number, number>();
   for (const p of save.box) counts.set(p.palId, (counts.get(p.palId) ?? 0) + 1);
-  const cmp = comparator(f.sort, save);
+  const cmp = comparator(f.sort, save, f.work);
   return save.box
     .filter((p) => {
       const def = palById(p.palId);
@@ -69,13 +75,15 @@ export function filterBox(save: SaveState, f: BoxFilter): PalInstance[] {
     .sort(cmp);
 }
 
-function comparator(sort: BoxSort, save: SaveState): (a: PalInstance, b: PalInstance) => number {
+function comparator(sort: BoxSort, save: SaveState, job: WorkType | 'any'): (a: PalInstance, b: PalInstance) => number {
   const byName = (a: PalInstance, b: PalInstance) => palById(a.palId).name.localeCompare(palById(b.palId).name);
   const bySpecies = (a: PalInstance, b: PalInstance) => a.palId - b.palId || b.level - a.level;
   switch (sort) {
     case 'stars': return (a, b) => b.stars - a.stars || b.level - a.level || bySpecies(a, b);
     case 'level': return (a, b) => b.level - a.level || b.stars - a.stars || bySpecies(a, b);
     case 'attack': return (a, b) => instanceAttack(b) - instanceAttack(a) || bySpecies(a, b);
+    // the job being filtered on when there is one, else overall suitability; stars and level break ties
+    case 'work': return (a, b) => workScore(b, job) - workScore(a, job) || workScore(b) - workScore(a) || b.stars - a.stars || b.level - a.level || bySpecies(a, b);
     case 'name': return (a, b) => byName(a, b) || b.level - a.level;
     case 'species': return bySpecies;
     case 'newest': {

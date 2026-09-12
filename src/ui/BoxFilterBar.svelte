@@ -4,8 +4,8 @@
   import { ELEMENTS } from '../data/types';
   import { JOBS } from '../data/base';
 
-  let { filter = $bindable(), heading, label = 'Search the Box', defaults = DEFAULT_FILTER }:
-    { filter: BoxFilter; heading: Snippet; label?: string; defaults?: BoxFilter } = $props();
+  let { filter = $bindable(), heading, label = 'Search the Box', defaults = DEFAULT_FILTER, hideStatus = false }:
+    { filter: BoxFilter; heading: Snippet; label?: string; defaults?: BoxFilter; hideStatus?: boolean } = $props();
 
   let open = $state(false);
   // relative to this bar's own defaults (the Party picker starts on idle Pals)
@@ -29,9 +29,11 @@
       <option value="any">Any work</option>
       {#each JOBS as j}<option value={j.type}>{j.icon} {j.type}</option>{/each}
     </select>
-    <select bind:value={filter.status} aria-label="Status">
-      {#each Object.entries(STATUS_LABEL) as [k, text]}<option value={k}>{text}</option>{/each}
-    </select>
+    {#if !hideStatus}
+      <select bind:value={filter.status} aria-label="Status">
+        {#each Object.entries(STATUS_LABEL) as [k, text]}<option value={k}>{text}</option>{/each}
+      </select>
+    {/if}
     <select bind:value={filter.sort} aria-label="Sort">
       {#each Object.entries(SORT_LABEL) as [k, text]}<option value={k}>Sort: {text}</option>{/each}
     </select>

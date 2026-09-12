@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { newState } from './save';
 import { addToBox, makeInstance } from './party';
-import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, type BoxFilter } from './boxfilter';
+import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, workScore, type BoxFilter } from './boxfilter';
 
 // Lamball (1, Neutral, Handiwork/Transporting/Farming), Chikipi (3, Neutral), Foxparks (5, Fire),
 // Penking (11, Water/Ice, Mining 3 …)
@@ -92,5 +92,18 @@ describe('isFiltering against custom defaults', () => {
     expect(isFiltering({ ...picker, sort: 'name' }, picker)).toBe(false);
     expect(isFiltering({ ...picker, status: 'any' }, picker)).toBe(true);
     expect(isFiltering({ ...picker, query: 'x' }, picker)).toBe(true);
+  });
+});
+
+describe('work sort', () => {
+  it('ranks by the filtered job when one is set, else by total suitability', () => {
+    const { s } = setup();
+    // Penking (Mining 3, total 12) > Lamballs (total 3) > Foxparks (Kindling 1)/Chikipi (Gathering 1, Farming 1)
+    expect(names(s, { sort: 'work' })[0]).toBe('11@15');
+    expect(names(s, { sort: 'work' }).slice(1, 3)).toEqual(['1@12', '1@5']);
+    expect(names(s, { sort: 'work', work: 'Farming' }).slice(0, 3)).toEqual(['1@12', '1@5', '3@9']);
+    expect(workScore(makeInstance(11, 1))).toBe(12);
+    expect(workScore(makeInstance(11, 1), 'Mining')).toBe(3);
+    expect(workScore(makeInstance(11, 1), 'Kindling')).toBe(0);
   });
 });

@@ -1,12 +1,13 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { palById } from '../data/pals';
   import { itemName } from '../data/items';
   import { JOBS, STRUCTURES, FOOD_ITEM } from '../data/base';
   import { baseWorkers, computeRates, isHungry, MEDICINE_ITEM, nextCost, sanStatus, structureLevel, workLevels } from '../engine/base';
   import { canAfford, countOf } from '../engine/inventory';
   import PalCard from './PalCard.svelte';
   import CostLine from './CostLine.svelte';
+  import BoxFilterBar from './BoxFilterBar.svelte';
+  import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
   import { structureUnlocked } from '../engine/tech';
   import { structureTech } from '../data/tech';
 
@@ -20,16 +21,20 @@
   const sick = $derived(workers.filter((w) => sanStatus(w.san ?? 100) === 'sick').length);
   const stressed = $derived(workers.filter((w) => sanStatus(w.san ?? 100) !== 'fine').length);
 
-  let query = $state('');
-  const candidates = $derived(
-    save.box
-      .filter((p) => !save.base.workers.includes(p.uid))
-      .filter((p) => palById(p.palId).name.toLowerCase().includes(query.toLowerCase()))
-      .sort((a, b) => workScore(b.palId) - workScore(a.palId) || b.level - a.level),
-  );
-  function workScore(palId: number) {
-    return Object.values(palById(palId).work).reduce((s, n) => s + (n ?? 0), 0);
-  }
+  // Workers list: same filter bar, pinned to the base and sorted by work.
+  const WORKER_DEFAULTS: BoxFilter = { ...DEFAULT_FILTER, status: 'base', sort: 'work' };
+  let workerFilter = $state<BoxFilter>({ ...WORKER_DEFAULTS });
+  const shownWorkers = $derived(filterBox(save, workerFilter));
+  const workerFiltering = $derived(isFiltering(workerFilter, WORKER_DEFAULTS));
+
+  // Assign picker: everyone not already working (party Pals included — assigning pulls them), best workers first.
+  const PICK_DEFAULTS: BoxFilter = { ...DEFAULT_FILTER, sort: 'work' };
+  let pickFilter = $state<BoxFilter>({ ...PICK_DEFAULTS });
+  const candidates = $derived(filterBox(save, pickFilter).filter((p) => !save.base.workers.includes(p.uid)));
+  const others = $derived(save.box.length - workers.length);
+  const pickFiltering = $derived(isFiltering(pickFilter, PICK_DEFAULTS));
+  const clearPick = () => { pickFilter = { ...PICK_DEFAULTS, sort: pickFilter.sort }; };
+  const full = $derived(workers.length >= save.base.slots);
   const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2));
 </script>
 
@@ -48,12 +53,21 @@
 </div>
 
 <section>
-  <h3>Workers</h3>
   {#if workers.length === 0}
+    <h3>Workers</h3>
     <p class="muted">Nobody's working. Assign Pals from your box below — a Pal can't be in the party and at the base at once.</p>
+  {:else}
+    <BoxFilterBar bind:filter={workerFilter} defaults={WORKER_DEFAULTS} label="Search workers" hideStatus>
+      {#snippet heading()}
+        <h3 class="grow">Workers <span class="muted">{workerFiltering ? `${shownWorkers.length} of ${workers.length}` : workers.length}</span></h3>
+      {/snippet}
+    </BoxFilterBar>
+    {#if shownWorkers.length === 0}
+      <p class="muted">No worker matches. <button class="small" onclick={() => (workerFilter = { ...WORKER_DEFAULTS, sort: workerFilter.sort })}>Clear filters</button></p>
+    {/if}
   {/if}
   <div class="list">
-    {#each workers as inst (inst.uid)}
+    {#each shownWorkers as inst (inst.uid)}
       <PalCard {inst} showWork showSan>
         <button class="small" onclick={() => game.unassignWorker(inst.uid)}>Dismiss</button>
       </PalCard>
@@ -112,15 +126,23 @@
 </section>
 
 <section>
-  <div class="row">
-    <h3 class="grow">Assign from box</h3>
-    <input placeholder="Filter…" bind:value={query} />
-  </div>
+  <BoxFilterBar bind:filter={pickFilter} defaults={PICK_DEFAULTS} label="Search Pals to assign">
+    {#snippet heading()}
+      <h3 class="grow">Assign from the Box <span class="muted">{pickFiltering ? `${candidates.length} of ${others}` : candidates.length}</span></h3>
+    {/snippet}
+  </BoxFilterBar>
+  <p class="muted small">Pick a work type under Filters to sort by that job's level. Assigning a party Pal pulls it out of the party.</p>
+  {#if full}<p class="muted small">All {save.base.slots} slots are taken — dismiss a worker or build a Palbox Expansion.</p>{/if}
+  {#if candidates.length === 0 && others > 0}
+    <p class="muted">No Pal matches. <button class="small" onclick={clearPick}>Clear filters</button></p>
+  {/if}
   <div class="list scroll">
     {#each candidates as inst (inst.uid)}
+      {@const status = statusOf(save, inst.uid)}
       <PalCard {inst} showWork>
-        {#if save.party.includes(inst.uid)}<span class="muted small">in party</span>{/if}
-        <button class="small" disabled={workers.length >= save.base.slots} onclick={() => game.assignWorker(inst.uid)}>Assign</button>
+        {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
+        <button class="small" disabled={full || status === 'expedition'} onclick={() => game.assignWorker(inst.uid)}
+          title={status === 'expedition' ? 'Away until the expedition returns' : status === 'party' ? 'Removes it from the party' : status === 'breeding' ? 'Breaks up the breeding pair' : ''}>Assign</button>
       </PalCard>
     {/each}
   </div>
