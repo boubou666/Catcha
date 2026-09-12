@@ -178,7 +178,9 @@ match by number and region, and sort last, so the filters don't reveal what a "?
 Items (Base → Items) lists what you hold with where each item comes from (Pals that drop or farm it, base
 jobs, the merchant, recipes) and what consumes it (recipes, structures); search matches all of that, and
 filters cover category, "used in crafting or building", "show items I don't have" and sort by name / count /
-category (`src/engine/itemsfilter.ts`).
+category (`src/engine/itemsfilter.ts`). Craft has the same treatment (`src/engine/craftfilter.ts`): search by
+recipe, output or ingredient; filter by kind (spheres / materials / food / weapons) and status (craftable now,
+unlocked, locked); hide owned weapons; sort by work needed or name.
 
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,

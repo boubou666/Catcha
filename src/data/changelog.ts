@@ -22,6 +22,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Breeding: parents are picked from a searchable, filterable list; with one parent chosen, every candidate shows the offspring it would give and the search matches that too.',
       'Compare: Pals are added from a searchable, filterable list instead of a dropdown.',
       'Items: each item now shows where it comes from and what uses it; search and filter by category, usage, missing items, and sort.',
+      'Craft: search recipes by name, output or ingredient; filter by kind and status (craftable now / unlocked / locked); sort by work or name.',
       'Fix: Low Grade Medical Supplies dropped by Pals were a separate item from the Medicine consumable — merged, so drops now treat workers.',
     ],
   },
