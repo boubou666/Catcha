@@ -3,7 +3,7 @@ import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -45,6 +45,21 @@ export function migrate(raw: unknown): SaveState | null {
       if (t && !s.tech.includes(t.id)) s.tech.push(t.id);
     }
     s.version = 4;
+  }
+  if (s.version === 4 && s.base) {
+    // Two Paldeck numbers were wrong in early data: Chillet is #41 (was 55), Grizzbolt #88 (was 103).
+    const remap: Record<number, number> = { 55: 41, 103: 88 };
+    const fix = (id: number) => remap[id] ?? id;
+    for (const p of s.box ?? []) p.palId = fix(p.palId);
+    for (const e of s.base.eggs ?? []) e.palId = fix(e.palId);
+    const deck: SaveState['paldeck'] = {};
+    for (const [k, v] of Object.entries(s.paldeck ?? {})) {
+      const id = fix(Number(k));
+      const prev = deck[id];
+      deck[id] = prev ? { seen: prev.seen || v.seen, caught: prev.caught + v.caught } : v;
+    }
+    s.paldeck = deck;
+    s.version = 5;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

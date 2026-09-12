@@ -32,6 +32,9 @@ export const ITEMS: ItemDef[] = [
   M('ruby', 'Ruby'),
   M('gold_coin', 'Gold Coin'),
   M('low_grade_medical', 'Low Grade Medical Supplies'),
+  M('horn', 'Horn'),
+  M('beautiful_flower', 'Beautiful Flower'),
+  M('suspicious_juice', 'Suspicious Juice'),
   // food
   F('red_berries', 'Red Berries'),
   F('cake', 'Cake'),
@@ -43,6 +46,12 @@ export const ITEMS: ItemDef[] = [
   F('chikipi_poultry', 'Chikipi Poultry'),
   F('rushoar_pork', 'Rushoar Pork'),
   F('mozzarina_meat', 'Mozzarina Meat'),
+  F('honey', 'Honey'),
+  F('cotton_candy', 'Cotton Candy'),
+  F('caprity_meat', 'Caprity Meat'),
+  F('broncherry_meat', 'Broncherry Meat'),
+  F('tomato_seeds', 'Tomato Seeds'),
+  F('wheat_seeds', 'Wheat Seeds'),
 ];
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));

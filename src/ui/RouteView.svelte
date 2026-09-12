@@ -26,6 +26,13 @@
 </script>
 
 <div class="panel">
+  {#if game.regions.length > 1}
+    <div class="regions row">
+      {#each game.regions as r (r.id)}
+        <button class="small" class:active={r.id === game.region.id} disabled={game.inBossFight} onclick={() => game.travelToRegion(r.id)}>{r.name}</button>
+      {/each}
+    </div>
+  {/if}
   <h3>Routes — {game.region.name}</h3>
   <div class="routes">
     {#each game.region.routes as r}
@@ -105,6 +112,8 @@
 
 <style>
   .panel + .panel { margin-top: 1rem; }
+  .regions { margin-bottom: 0.6rem; }
+  .regions button.active { border-color: var(--accent); color: var(--accent); }
   .routes { display: flex; flex-direction: column; gap: 0.25rem; }
   .routes button { display: flex; justify-content: space-between; text-align: left; }
   .routes button.active { border-color: var(--accent); color: var(--accent); }

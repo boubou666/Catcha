@@ -1,6 +1,6 @@
 import type { RouteDef, SaveState, SpherePolicy, SphereTier } from '../data/types';
 import { palById } from '../data/pals';
-import { alphaById, regionById, routeById, towerById } from '../data/regions';
+import { alphaById, regionById, REGIONS, routeById, towerById } from '../data/regions';
 import { SPHERES } from '../data/spheres';
 import { clearSave, exportSave, importSave, loadState, newState, persist } from '../engine/save';
 import { applyDefeat, partyDps, spawnBoss, spawnWild, type Wild } from '../engine/combat';
@@ -147,6 +147,15 @@ export class Game {
   // ---- navigation --------------------------------------------------------
 
   canTravel(routeId: string): boolean { return isUnlocked(this.save, routeById(routeId).unlock); }
+
+  /** Regions whose first route is reachable. */
+  get regions() { return REGIONS.filter((r) => this.canTravel(r.routes[0].id)); }
+
+  /** Jump to a region: its furthest unlocked route. */
+  travelToRegion(regionId: string) {
+    const open = regionById(regionId).routes.filter((r) => this.canTravel(r.id));
+    if (open.length) this.travel(open[open.length - 1].id);
+  }
 
   travel(routeId: string) {
     if (!this.canTravel(routeId)) return;

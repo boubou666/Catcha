@@ -34,8 +34,8 @@ describe('childOf', () => {
     expect(childOf(1, 2, pals, {})).toBe(20);
   });
   it('special combos override the formula', () => {
-    expect(childOf(1, 2, PALS, { '1+2': 103 })).toBe(103);
-    expect(childOf(2, 1, PALS, { '1+2': 103 })).toBe(103);
+    expect(childOf(1, 2, PALS, { '1+2': 88 })).toBe(88);
+    expect(childOf(2, 1, PALS, { '1+2': 88 })).toBe(88);
   });
 });
 

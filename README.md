@@ -42,8 +42,9 @@ that includes them.
 
 ## Status
 
-Region 1 (Windswept Hills) is playable: 7 routes, 2 Alphas, the Rayne Syndicate Tower, 32 Pals,
-catching, party, Paldeck, merchant, save/export/import.
+Two regions: Windswept Hills (Lv 1–15, Zoe & Grizzbolt) and Marsh & Bamboo Groves (Lv 15–25,
+Lily & Lyleen), 14 routes, 5 Alphas, 59 Pals. Catching, party, Paldeck, merchant, save/export/import.
+Region 2 opens once the Rayne Syndicate Tower is cleared; a region switcher appears above the routes.
 
 Base building is in: assign box Pals as workers (party and base are exclusive), each work
 suitability produces something — Lumbering/Mining raw materials, Planting+Watering+Gathering
@@ -67,4 +68,4 @@ Tech tree: 2 tech points per level. Structures and recipes must be researched (l
 prerequisites) before they can be built or crafted; passive techs multiply click damage, party attack,
 base output, catch rate, exp and gold. Tree lives in `src/data/tech.ts`.
 
-Next: passives, more regions, dungeons — see DESIGN.md §10.
+Next: passives, region 3 (Twilight Dunes), dungeons — see DESIGN.md §10.

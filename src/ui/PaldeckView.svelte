@@ -4,7 +4,7 @@
   import PalIcon from './PalIcon.svelte';
 
   const entries = $derived(
-    PALS.map((def) => {
+    [...PALS].sort((a, b) => a.id - b.id).map((def) => {
       const e = game.save.paldeck[def.id];
       return { def, seen: !!e?.seen, caught: e?.caught ?? 0 };
     }),
