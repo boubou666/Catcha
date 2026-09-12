@@ -31,6 +31,7 @@ import { applyOffline, type OfflineReport } from '../engine/offline';
 import { buy, sell } from '../engine/shop';
 import { classifyLog, type LogEntry } from '../engine/logfilter';
 import { applyLoadout, deleteLoadout, renameLoadout, saveLoadout, updateLoadout } from '../engine/loadouts';
+import { bulkAssign, bulkParty, bulkRelease, describeBulk, type BulkResult } from '../engine/bulk';
 import { loadToastPref, NOTICE_CAP, TOAST_PREF_KEY, type Notice, type NoticeKind, type ToastPref } from '../engine/notices';
 import { advanceTutorial, currentStep, finishTutorial } from '../engine/tutorial';
 import { condense } from '../engine/condense';
@@ -410,6 +411,17 @@ export class Game {
   }
   removeFromParty(uid: string) { removeFromParty(this.save, uid); }
   release(uid: string) { release(this.save, uid); }
+
+  // ---- bulk actions on a Box selection --------------------------------------
+
+  bulkRelease(uids: string[]) { const r = bulkRelease(this.save, uids); this.bulkReport(r, 'released', 'warn'); return r; }
+  bulkAssign(uids: string[]) { const r = bulkAssign(this.save, uids); this.bulkReport(r, 'sent to the base', 'success'); return r; }
+  bulkParty(uids: string[]) { const r = bulkParty(this.save, uids); this.bulkReport(r, 'added to the party', 'success'); return r; }
+  private bulkReport(r: BulkResult, verb: string, kind: ToastKind) {
+    const text = describeBulk(r, verb);
+    this.push(`Bulk: ${text}.`);
+    this.notify(`${r.done.length ? (kind === 'warn' ? '🗑' : '✅') : '⚠️'} ${text}`, r.done.length ? kind : 'warn', 4000);
+  }
 
   // ---- base --------------------------------------------------------------
 

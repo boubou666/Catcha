@@ -178,6 +178,10 @@ are tracked from save v13 onward. Defined in `src/data/achievements.ts`.
 Box search and filters: the search box matches name, Paldeck number, element and passive names (every word
 must match); Filters adds element, work suitability, status (idle / party / base / breeding / expedition),
 Lucky-only, starred-only, duplicates-only, and sort (stars, level, attack, name, Paldeck number, newest).
+Bulk actions: "Select…" in the Box adds a checkbox per card and an "All N shown" toggle over the filtered
+list; the selection can be sent to the party or the base (in list order until full), added to the
+comparison, or released — bulk release never touches party members, workers, breeding or away Pals, Lucky or
+starred Pals, and every skip is reported in the toast and log (`src/engine/bulk.ts`).
 Logic in `src/engine/boxfilter.ts`; the bar itself is `src/ui/BoxFilterBar.svelte`. The Party tab reuses it as
 an "Add from the Box" picker under the slots — idle Pals sorted by attack by default, with Add buttons (base
 workers and breeding pairs can be pulled; expedition members can't). Party loadouts (Pals → Party): save the current party under a name (up to 12), then Load swaps the whole
