@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { newState } from './save';
 import { addToBox, makeInstance } from './party';
 import { assignWorker } from './base';
-import { compareRows, effectiveWork, statusOf } from './compare';
+import { compareRows, DEFAULT_COMPARE_FILTER, effectiveWork, filterCompareRows, isCompareFiltering, rowGroup, statusOf } from './compare';
 import { palById } from '../data/pals';
 
 describe('comparison', () => {
@@ -50,5 +50,29 @@ describe('comparison', () => {
     expect(rows.find((r) => r.label === 'Attack')!.best).toEqual([]);
     expect(compareRows(save, [a]).every((r) => r.best.length === 0)).toBe(true);
     expect(palById(1).name).toBe('Lamball');
+  });
+});
+
+describe('compare row filter', () => {
+  it('groups rows and filters by text, group and differences', () => {
+    const save = newState();
+    const a = makeInstance(1, 10), b = makeInstance(1, 20);            // two Lamballs, different level
+    addToBox(save, a); addToBox(save, b);
+    const rows = compareRows(save, [a, b]);
+    expect(rowGroup(rows[0])).toBe('identity');
+    expect(rowGroup(rows.find((r) => r.label === 'Attack')!)).toBe('combat');
+    expect(rowGroup(rows.find((r) => r.label.endsWith('Handiwork'))!)).toBe('work');
+    expect(rowGroup(rows.find((r) => r.label === 'SAN')!)).toBe('other');
+    expect(isCompareFiltering(DEFAULT_COMPARE_FILTER)).toBe(false);
+    expect(filterCompareRows(rows, DEFAULT_COMPARE_FILTER)).toEqual(rows);
+    expect(filterCompareRows(rows, { ...DEFAULT_COMPARE_FILTER, group: 'work' }).every((r) => rowGroup(r) === 'work')).toBe(true);
+    const diff = filterCompareRows(rows, { ...DEFAULT_COMPARE_FILTER, differencesOnly: true }).map((r) => r.label);
+    expect(diff).toContain('Level');
+    expect(diff).toContain('Attack');
+    expect(diff).not.toContain('Species');
+    expect(diff).not.toContain('Element');
+    expect(filterCompareRows(rows, { ...DEFAULT_COMPARE_FILTER, query: 'lamball' }).map((r) => r.label)).toEqual(['Species']);   // values are searchable too
+    expect(filterCompareRows(rows, { ...DEFAULT_COMPARE_FILTER, query: 'base' }).map((r) => r.label)).toEqual(['Base HP', 'Base DEF']);
+    expect(filterCompareRows(rows, { ...DEFAULT_COMPARE_FILTER, query: 'zzz' })).toEqual([]);
   });
 });

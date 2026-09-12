@@ -2,7 +2,7 @@
   import { game } from '../state/game.svelte';
   import { compare } from '../state/compare.svelte';
   import { palById } from '../data/pals';
-  import { compareRows, MAX_COMPARE } from '../engine/compare';
+  import { compareRows, DEFAULT_COMPARE_FILTER, filterCompareRows, isCompareFiltering, MAX_COMPARE, ROW_GROUP_LABEL, type CompareFilter } from '../engine/compare';
   import PalIcon from './PalIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
   import PalCard from './PalCard.svelte';
@@ -12,7 +12,11 @@
   const save = $derived(game.save);
   // drop anything that left the box (released / ascended)
   const insts = $derived(compare.uids.map((u) => save.box.find((p) => p.uid === u)).filter((p): p is NonNullable<typeof p> => !!p));
-  const rows = $derived(compareRows(save, insts));
+  const allRows = $derived(compareRows(save, insts));
+  let rowFilter = $state<CompareFilter>({ ...DEFAULT_COMPARE_FILTER });
+  const rows = $derived(filterCompareRows(allRows, rowFilter));
+  const rowFiltering = $derived(isCompareFiltering(rowFilter));
+  const clearRows = () => { rowFilter = { ...DEFAULT_COMPARE_FILTER }; };
   // Picker: the whole Box minus the selection, strongest first. Duplicates-only is handy for picking which copy to keep.
   const PICK_DEFAULTS: BoxFilter = { ...DEFAULT_FILTER, sort: 'attack' };
   let filter = $state<BoxFilter>({ ...PICK_DEFAULTS });
@@ -31,6 +35,16 @@
 {#if insts.length === 0}
   <p class="muted">Nothing selected yet — add Pals from the list below.</p>
 {:else}
+  <div class="row rowbar">
+    <input type="search" placeholder="Search rows…" bind:value={rowFilter.query} aria-label="Search comparison rows" />
+    <select bind:value={rowFilter.group} aria-label="Row group">
+      {#each Object.entries(ROW_GROUP_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    </select>
+    <label class="chk"><input type="checkbox" bind:checked={rowFilter.differencesOnly} /> Differences only</label>
+    <span class="muted small">{rowFiltering ? `${rows.length} of ${allRows.length} rows` : `${allRows.length} rows`}</span>
+    {#if rowFiltering}<button class="small" onclick={clearRows}>Clear</button>{/if}
+  </div>
+  {#if rows.length === 0}<p class="muted small">No row matches.</p>{/if}
   <div class="scroll">
     <table>
       <thead>
@@ -92,6 +106,11 @@
   td.label { text-align: left; color: var(--muted); white-space: nowrap; }
   td.best { color: var(--ok); font-weight: 600; }
   .tiny { font-size: 0.7rem; padding: 0 0.35rem; margin-top: 0.25rem; }
+  .rowbar { margin-top: 0.75rem; }
+  .rowbar input[type='search'] { min-width: 7rem; flex: 1; max-width: 12rem; font-size: 0.85rem; }
+  .rowbar select { font-size: 0.85rem; }
+  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
+  .chk input { min-height: 0; width: auto; }
   .picker { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
   .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 45vh; overflow-y: auto; }
   h3 { margin: 0; }

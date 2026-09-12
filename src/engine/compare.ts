@@ -69,3 +69,36 @@ export function compareRows(save: SaveState, insts: PalInstance[]): CompareRow[]
   );
   return rows;
 }
+
+// ---- row filtering ----------------------------------------------------------------------
+
+export type RowGroup = 'identity' | 'combat' | 'work' | 'other';
+export interface CompareFilter { query: string; group: RowGroup | 'any'; differencesOnly: boolean }
+export const DEFAULT_COMPARE_FILTER: CompareFilter = { query: '', group: 'any', differencesOnly: false };
+export const ROW_GROUP_LABEL: Record<RowGroup | 'any', string> = { any: 'All rows', identity: 'Identity', combat: 'Combat', work: 'Work', other: 'Other' };
+
+const IDENTITY = new Set(['Species', 'Element', 'Status', 'Level', 'Stars', 'Lucky']);
+const COMBAT = new Set(['Attack', 'Base HP', 'Base DEF', 'Expedition score']);
+const JOB_LABELS = new Set(JOBS.map((j) => `${j.icon} ${j.type}`));
+
+export function rowGroup(row: CompareRow): RowGroup {
+  if (IDENTITY.has(row.label)) return 'identity';
+  if (COMBAT.has(row.label)) return 'combat';
+  if (JOB_LABELS.has(row.label)) return 'work';
+  return 'other';
+}
+
+export function isCompareFiltering(f: CompareFilter): boolean {
+  return f.query.trim() !== '' || f.group !== 'any' || f.differencesOnly;
+}
+
+/** Rows whose label or any value matches every search word; optionally one group, optionally only rows where the Pals differ. */
+export function filterCompareRows(rows: CompareRow[], f: CompareFilter): CompareRow[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return rows.filter((r) => {
+    if (f.group !== 'any' && rowGroup(r) !== f.group) return false;
+    if (f.differencesOnly && new Set(r.values).size < 2) return false;
+    const hay = [r.label, ...r.values].join(' ').toLowerCase();
+    return words.every((w) => hay.includes(w));
+  });
+}

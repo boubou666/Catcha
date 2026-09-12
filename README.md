@@ -236,7 +236,9 @@ device, `catcha.watch` in localStorage; `src/engine/arenafilter.ts`). The Log ke
 inferred from the message (`classifyLog` in `src/engine/logfilter.ts`); it shows the recent dozen, expands
 on demand, and has a search plus a category select.
 
-Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
+Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab);
+the table itself has a row search (labels and values), a group select (identity / combat / work / other) and
+a "differences only" toggle that hides rows where every Pal reads the same (`filterCompareRows`) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
 breeding rank, status — with the best value per row highlighted.
 
