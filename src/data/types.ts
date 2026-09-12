@@ -111,6 +111,19 @@ export interface PalInstance {
 
 export type SpherePolicy = SphereTier | 'none';
 
+export interface CraftJob {
+  recipeId: string;
+  remaining: number;                     // Handiwork units left on this unit
+}
+
+export interface BaseState {
+  slots: number;                         // worker capacity
+  workers: string[];                     // PalInstance uids (never also in the party)
+  structures: Record<string, number>;    // structureId -> level (absent = not built)
+  queue: CraftJob[];                     // head is being worked on
+  acc: Record<string, number>;           // fractional production carry, keyed by item / 'food' / 'smelt'
+}
+
 export interface SaveState {
   version: number;
   player: {
@@ -125,6 +138,7 @@ export interface SaveState {
   party: string[];                       // PalInstance uids, max 5
   box: PalInstance[];
   inventory: Record<string, number>;     // itemId -> count (spheres are items: sphere_<tier>)
+  base: BaseState;
   tech: string[];
   progress: {
     route: string;

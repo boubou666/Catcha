@@ -5,9 +5,13 @@
   import PalIcon from './PalIcon.svelte';
   import type { Snippet } from 'svelte';
 
-  let { inst, children }: { inst: PalInstance; children?: Snippet } = $props();
+  import { JOB_ICON } from '../data/base';
+  import type { WorkType } from '../data/types';
+
+  let { inst, showWork = false, children }: { inst: PalInstance; showWork?: boolean; children?: Snippet } = $props();
   const def = $derived(palById(inst.palId));
   const expPct = $derived((inst.exp / expToLevel(inst.level + 1)) * 100);
+  const work = $derived(Object.entries(def.work) as [WorkType, number][]);
 </script>
 
 <div class="card row">
@@ -18,7 +22,12 @@
       {#if inst.stars > 0}<span class="stars">{'★'.repeat(inst.stars)}</span>{/if}
       {#if inst.lucky}<span class="lucky">✨</span>{/if}
     </div>
-    <div class="muted small">{def.elements.join('/')} · ATK {instanceAttack(inst).toFixed(1)}</div>
+    <div class="muted small">
+      {def.elements.join('/')} · ATK {instanceAttack(inst).toFixed(1)}
+      {#if showWork}
+        · {#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}
+      {/if}
+    </div>
     <div class="bar exp"><span style:width="{expPct}%"></span></div>
   </div>
   {#if children}<div class="row">{@render children()}</div>{/if}
@@ -29,4 +38,5 @@
   .small { font-size: 0.8rem; }
   .stars { color: var(--accent); }
   .bar { height: 4px; margin-top: 0.25rem; }
+  .job { margin-right: 0.25rem; white-space: nowrap; }
 </style>

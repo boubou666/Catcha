@@ -25,7 +25,8 @@
 <div class="list">
   {#each sorted as inst (inst.uid)}
     {@const inParty = game.save.party.includes(inst.uid)}
-    <PalCard {inst}>
+    <PalCard {inst} showWork>
+      {#if game.save.base.workers.includes(inst.uid)}<span class="muted small">at base</span>{/if}
       {#if inParty}
         <button class="small" onclick={() => game.removeFromParty(inst.uid)}>In party ✓</button>
       {:else}

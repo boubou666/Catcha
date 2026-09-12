@@ -2,6 +2,7 @@ import type { RouteDef, SaveState } from '../data/types';
 import { palById } from '../data/pals';
 import { elementMult } from '../data/elements';
 import { partyInstances, grantExp } from './party';
+import { addItem } from './inventory';
 import { expReward, goldReward, instanceAttack, LUCKY_CHANCE, LUCKY_HP_MULT, wildHp } from './formulas';
 
 export type Rng = () => number;
@@ -72,7 +73,7 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
     if (rand() < drop.chance) {
       const n = drop.min + Math.floor(rand() * (drop.max - drop.min + 1));
       drops[drop.itemId] = (drops[drop.itemId] ?? 0) + n;
-      save.inventory[drop.itemId] = (save.inventory[drop.itemId] ?? 0) + n;
+      addItem(save, drop.itemId, n);
     }
   }
 

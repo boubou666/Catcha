@@ -15,6 +15,7 @@ export const ITEMS: ItemDef[] = [
   M('wood', 'Wood'),
   M('stone', 'Stone'),
   M('ore', 'Ore'),
+  M('ingot', 'Ingot'),
   M('paldium', 'Paldium Fragment'),
   M('fiber', 'Fiber'),
   M('wool', 'Wool'),

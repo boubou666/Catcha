@@ -43,5 +43,12 @@ that includes them.
 ## Status
 
 Region 1 (Windswept Hills) is playable: 7 routes, 2 Alphas, the Rayne Syndicate Tower, 32 Pals,
-catching, party, Paldeck, merchant, save/export/import. Base building, breeding, condensing and
-the tech tree are next — see DESIGN.md §10.
+catching, party, Paldeck, merchant, save/export/import.
+
+Base building is in: assign box Pals as workers (party and base are exclusive), each work
+suitability produces something — Lumbering/Mining raw materials, Planting+Watering+Gathering
+berries, Kindling smelts, Handiwork crafts spheres and weapons, Farming yields Pal produce,
+Transporting/Electricity multiply, Cooling cuts food use. Structures gate and multiply jobs;
+workers eat Red Berries and slow down when hungry. Knobs: `src/data/base.ts` (RATES).
+
+Next: offline progress, breeding, condensing, tech tree — see DESIGN.md §10.

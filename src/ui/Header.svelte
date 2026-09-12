@@ -39,7 +39,7 @@
   </div>
 
   <div class="stat">
-    <div class="label">🪙 {Math.floor(player.gold).toLocaleString()}</div>
+    <div class="label">💰 {Math.floor(player.gold).toLocaleString()}</div>
     <div class="muted small">Effigies: {player.effigies} · Tech pts: {player.techPoints}</div>
   </div>
 

@@ -51,8 +51,10 @@ export function grantExp(save: SaveState, amount: number): PalInstance[] {
   return levelled;
 }
 
+/** Add a box Pal to the party. Pulls it off base duty if it was working. */
 export function addToParty(save: SaveState, uid: string): boolean {
   if (save.party.length >= PARTY_SIZE || save.party.includes(uid) || !instanceByUid(save, uid)) return false;
+  save.base.workers = save.base.workers.filter((u) => u !== uid);
   save.party.push(uid);
   return true;
 }
@@ -63,5 +65,6 @@ export function removeFromParty(save: SaveState, uid: string): void {
 
 export function release(save: SaveState, uid: string): void {
   removeFromParty(save, uid);
+  save.base.workers = save.base.workers.filter((u) => u !== uid);
   save.box = save.box.filter((p) => p.uid !== uid);
 }

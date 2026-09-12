@@ -8,6 +8,8 @@ import { tryCatch } from '../engine/catch';
 import { isUnlocked } from '../engine/progress';
 import { addToParty, release, removeFromParty } from '../engine/party';
 import { clickDamage, wildHp } from '../engine/formulas';
+import { assignWorker, build, cancelCraft, enqueue, tickBase, unassignWorker } from '../engine/base';
+import { recipeById, structureById } from '../data/base';
 
 const AUTOSAVE_MS = 30_000;
 const TICK_MS = 100;
@@ -71,6 +73,7 @@ export class Game {
         this.hit((this.dps * dtMs) / 1000);
       }
     }
+    tickBase(this.save, dtMs / 1000);
     this.sinceSave += dtMs;
     if (this.sinceSave >= AUTOSAVE_MS) this.persist();
   }
@@ -150,6 +153,24 @@ export class Game {
   addToParty(uid: string) { addToParty(this.save, uid); }
   removeFromParty(uid: string) { removeFromParty(this.save, uid); }
   release(uid: string) { release(this.save, uid); }
+
+  // ---- base --------------------------------------------------------------
+
+  assignWorker(uid: string) { assignWorker(this.save, uid); }
+  unassignWorker(uid: string) { unassignWorker(this.save, uid); }
+
+  build(id: string) {
+    if (!build(this.save, id)) return;
+    const level = this.save.base.structures[id];
+    this.push(`Built ${structureById(id).name}${level > 1 ? ` Lv ${level}` : ''}.`);
+  }
+
+  craft(recipeId: string, n: number) {
+    const queued = enqueue(this.save, recipeId, n);
+    if (queued > 0) this.push(`Queued ${queued}× ${recipeById(recipeId).name}.`);
+  }
+
+  cancelCraft(index: number) { cancelCraft(this.save, index); }
 
   // ---- merchant / settings ----------------------------------------------
 

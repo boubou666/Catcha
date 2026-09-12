@@ -1,7 +1,8 @@
 import type { SaveState } from '../data/types';
 import { STARTING_ROUTE } from '../data/regions';
+import { newBase } from './base';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -11,7 +12,8 @@ export function newState(): SaveState {
     paldeck: {},
     party: [],
     box: [],
-    inventory: { sphere_pal: 20 },
+    inventory: { sphere_pal: 20, red_berries: 30 },
+    base: newBase(),
     tech: [],
     progress: { route: STARTING_ROUTE, routeKills: {}, alphas: [], towers: [] },
     settings: { sphereForNew: 'pal', sphereForDupe: 'none' },
@@ -24,7 +26,10 @@ export function migrate(raw: unknown): SaveState | null {
   if (!raw || typeof raw !== 'object') return null;
   const s = raw as Partial<SaveState> & { version?: number };
   if (typeof s.version !== 'number') return null;
-  // Future: if (s.version === 1) { ...; s.version = 2; }
+  if (s.version === 1) {
+    s.base = newBase();
+    s.version = 2;
+  }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;
 }
