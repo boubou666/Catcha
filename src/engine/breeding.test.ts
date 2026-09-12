@@ -5,10 +5,11 @@ import { assignWorker } from './base';
 import { condenseCandidates } from './condense';
 import { applyOffline } from './offline';
 import {
-  BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, SPECIAL_COMBOS, breedable, childOf, clearPair, comboKey,
+  BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, LUCKY_PER_LUCKY_PARENT, SPECIAL_COMBOS, breedable, childOf, clearPair, comboKey, luckyEggChance,
   pairBlocker, setPair, tickBreeding,
 } from './breeding';
 import { PALS, palById } from '../data/pals';
+import { LUCKY_CHANCE } from './formulas';
 
 const R = () => 0.99; // deterministic: no egg mutations
 
@@ -89,7 +90,7 @@ describe('tick', () => {
     expect(save.inventory[CAKE]).toBe(1);
     expect(save.base.breeding!.progress).toBeCloseTo(0.5);
     tickBreeding(save, BREED_SEC / 2, R);
-    expect(save.base.eggs).toEqual([{ palId: 1, remaining: INCUBATION_SEC.common, passives: [] }]);
+    expect(save.base.eggs).toEqual([{ palId: 1, remaining: INCUBATION_SEC.common, passives: [], lucky: false }]);
     expect(save.base.breeding!.progress).toBeNull(); // next cake is taken when time resumes
     const hatched = tickBreeding(save, INCUBATION_SEC.common, R);
     expect(hatched).toEqual([1]);
@@ -172,5 +173,29 @@ describe('Lux / Aqua combos', () => {
     expect(palById(childOf(103, 33)).name).toBe('Mossanda Lux');
     expect(palById(childOf(7, 85)).name).toBe('Relaxaurus Lux');
     expect(palById(childOf(104, 99)).name).toBe('Lyleen Noct');
+  });
+});
+
+describe('Lucky breeding', () => {
+  it('odds: base wild chance plus 10% per Lucky parent', () => {
+    const plain = makeInstance(1, 1); const lucky = makeInstance(1, 1, true, ['lucky']);
+    expect(luckyEggChance(plain, plain)).toBeCloseTo(LUCKY_CHANCE);
+    expect(luckyEggChance(lucky, plain)).toBeCloseTo(LUCKY_CHANCE + LUCKY_PER_LUCKY_PARENT);
+    expect(luckyEggChance(lucky, lucky)).toBeCloseTo(LUCKY_CHANCE + 2 * LUCKY_PER_LUCKY_PARENT);
+  });
+  it('a Lucky egg hatches as a Lucky Pal with the Lucky passive', () => {
+    const { save, insts: [a, b] } = farm(1, 1);
+    a.lucky = true; a.passives = ['lucky', 'brave'];
+    setPair(save, a.uid, b.uid);
+    save.inventory[CAKE] = 1;
+    // lucky roll 0 → lucky; shuffle (pool of 1: none); rollCount 0.999; mutation 0.99 → stop
+    const seq = (...v: number[]) => { let i = 0; return () => v[Math.min(i++, v.length - 1)]; };
+    tickBreeding(save, BREED_SEC, seq(0, 0.999, 0.99));
+    expect(save.base.eggs[0].lucky).toBe(true);
+    expect(save.base.eggs[0].passives).toEqual(['lucky', 'brave']);
+    tickBreeding(save, INCUBATION_SEC.common, R);
+    const child = save.box[2];
+    expect(child.lucky).toBe(true);
+    expect(child.passives).toEqual(['lucky', 'brave']);
   });
 });

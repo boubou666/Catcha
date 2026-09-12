@@ -68,7 +68,8 @@ describe('winning', () => {
     expect(save.base.eggs[0].passives[0]).toBe('legend');
     expect(chest.passives).toEqual(save.base.eggs[0].passives);
     expect(raidWins(save, 'bellanoir')).toBe(1);
-    expect(describeRaidChest(chest, def.name, itemName)).toContain('a Bellanoir egg');
+    expect(chest.lucky).toBe(true); // rand 0 < 10%
+    expect(describeRaidChest(chest, def.name, itemName)).toContain('Lucky Bellanoir egg');
   });
 });
 
@@ -90,8 +91,9 @@ describe('raid egg inheritance', () => {
     const save = newState();
     addToBox(save, makeInstance(111, 70, true, ['legend', 'lucky', 'brave']));
     addToBox(save, makeInstance(111, 70, false, ['artisan']));
-    // 4 drops × (hit, min) = 8 zeros; shuffle 1 call; rollCount 0.999 → keep both; mutation 0.99 → stop
-    const chest = completeRaid(save, raidById('bellanoir'), seq(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.999, 0.99));
+    // 4 drops × (hit, min) = 8 zeros; lucky 0.99 → no; shuffle 1 call; rollCount 0.999 → keep both; mutation 0.99 → stop
+    const chest = completeRaid(save, raidById('bellanoir'), seq(0, 0, 0, 0, 0, 0, 0, 0, 0.99, 0, 0.999, 0.99));
+    expect(chest.lucky).toBe(false);
     expect(chest.passives[0]).toBe('legend');
     expect([...chest.passives.slice(1)].sort()).toEqual(['artisan', 'brave']);
     expect(chest.passives).not.toContain('lucky');
@@ -99,7 +101,21 @@ describe('raid egg inheritance', () => {
   });
   it('an empty party yields Legend plus mutations only', () => {
     const save = newState();
-    const chest = completeRaid(save, raidById('bellanoir'), seq(0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.99));
+    const chest = completeRaid(save, raidById('bellanoir'), seq(0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.99));
     expect(chest.passives).toEqual(['legend']);
+  });
+});
+
+describe('Lucky raid eggs', () => {
+  const seq = (...v: number[]) => { let i = 0; return () => v[Math.min(i++, v.length - 1)]; };
+  it('roll per raid and carry the Lucky passive into the egg', () => {
+    for (const raid of RAIDS) expect(raid.luckyChance).toBeGreaterThan(0);
+    const save = newState();
+    // drops 8 rolls; lucky 0.05 < 10%; shuffle none; rollCount 0.5; mutation 0.99
+    const chest = completeRaid(save, raidById('bellanoir'), seq(0, 0, 0, 0, 0, 0, 0, 0, 0.05, 0.5, 0.99));
+    expect(chest.lucky).toBe(true);
+    expect(chest.passives).toEqual(['legend', 'lucky']);
+    expect(save.base.eggs[0].lucky).toBe(true);
+    expect(describeRaidChest(chest, 'Bellanoir', itemName)).toContain('✨ Lucky Bellanoir egg (Legend, Lucky)');
   });
 });

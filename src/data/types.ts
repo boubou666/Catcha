@@ -129,6 +129,7 @@ export interface Egg {
   palId: number;
   remaining: number;                     // incubation seconds left
   passives: string[];                    // decided when laid
+  lucky: boolean;                        // hatches as a Lucky Pal (carries the Lucky passive)
 }
 
 export interface Expedition {

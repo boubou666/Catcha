@@ -5,7 +5,7 @@
   import { structureLevel } from '../engine/base';
   import { countOf } from '../engine/inventory';
   import {
-    BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, breedable, breedingParents, childOf, pairBlocker,
+    BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, breedable, breedingParents, childOf, luckyEggChance, pairBlocker,
   } from '../engine/breeding';
   import { formatDuration } from './format';
   import PalIcon from './PalIcon.svelte';
@@ -42,6 +42,12 @@
   const activePool = $derived(parents ? inheritable(parents[0], parents[1]) : []);
   const previewPool = $derived(inheritable(save.box.find((p) => p.uid === aUid), save.box.find((p) => p.uid === bUid)));
   const eggEta = (remaining: number) => formatDuration(Math.max(0, remaining) * 1000);
+  const pct = (n: number) => (n * 100 < 1 ? `${(n * 100).toFixed(1)}%` : `${Math.round(n * 100)}%`);
+  const activeLucky = $derived(parents ? luckyEggChance(parents[0], parents[1]) : 0);
+  const previewLucky = $derived.by(() => {
+    const a = save.box.find((p) => p.uid === aUid); const b = save.box.find((p) => p.uid === bUid);
+    return a && b ? luckyEggChance(a, b) : 0;
+  });
 </script>
 
 <h2>Breeding Farm</h2>
@@ -58,7 +64,7 @@
     <div class="row child">
       <span class="muted">Offspring:</span>
       {#if activeChild !== null}<PalIcon palId={activeChild} size={28} /> <b>{palById(activeChild).name}</b>{/if}
-      <span class="muted small">· incubates {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)}</span>
+      <span class="muted small">· incubates {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)} · ✨ {pct(activeLucky)} Lucky</span>
     </div>
     <div class="row child muted small">
       <span>Passives it can inherit:</span>
@@ -89,6 +95,7 @@
     {#if preview !== null}
       <span class="muted">Offspring:</span> <PalIcon palId={preview} size={28} /> <b>{palById(preview).name}</b>
       {#if previewPool.length}<span class="muted small">· may inherit</span> <PassiveChips ids={previewPool} />{/if}
+      <span class="muted small">· ✨ {pct(previewLucky)} Lucky</span>
     {/if}
     <span class="grow"></span>
     <button class="primary small" disabled={!aUid || !bUid || !!block} title={block ? BLOCK_TEXT[block] : ''}
@@ -107,7 +114,7 @@
       {@const total = INCUBATION_SEC[palById(egg.palId).rarity]}
       <div class="egg row">
         <PalIcon palId={egg.palId} size={32} />
-        <span class="grow">{palById(egg.palId).name} egg</span>
+        <span class="grow">{#if egg.lucky}<span class="lucky-tag">✨ Lucky</span> {/if}{palById(egg.palId).name} egg{#if egg.passives.length} <PassiveChips ids={egg.passives} />{/if}</span>
         <div class="bar egg-bar"><span style:width="{(1 - Math.max(0, egg.remaining) / total) * 100}%"></span></div>
         <span class="muted small eta">{eggEta(egg.remaining)}</span>
       </div>
@@ -130,4 +137,5 @@
   .egg-bar { width: 120px; }
   .egg-bar > span { background: var(--accent-2); }
   .eta { min-width: 3.5rem; text-align: right; }
+  .lucky-tag { color: var(--accent); font-weight: 600; }
 </style>

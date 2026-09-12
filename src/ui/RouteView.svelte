@@ -123,7 +123,7 @@
         {@const wins = raidWins(game.save, r.id)}
         {@const slabs = countOf(game.save, r.slabItemId)}
         <button class="raid-btn" class:primary={!block && wins === 0} disabled={!game.canSummon(r.id)} onclick={() => game.summonRaid(r.id)}
-          title={block === 'locked' ? describeRequirement(r.unlock) : block ? RAID_BLOCK[block] : `${(r.hp / 1000).toLocaleString()}k HP in ${r.timeLimitSec / 60} minutes. Win: ${r.reward.gold.toLocaleString()} gold, loot, and a ${r.name} egg that inherits passives from your party.`}>
+          title={block === 'locked' ? describeRequirement(r.unlock) : block ? RAID_BLOCK[block] : `${(r.hp / 1000).toLocaleString()}k HP in ${r.timeLimitSec / 60} minutes. Win: ${r.reward.gold.toLocaleString()} gold, loot, and a ${r.name} egg that inherits passives from your party (${Math.round(r.luckyChance * 100)}% Lucky).`}>
           🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>
         </button>
       {/each}

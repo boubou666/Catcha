@@ -5,10 +5,17 @@ export { SPECIAL_COMBOS };
 import { countOf } from './inventory';
 import { addToBox, instanceByUid, isAway, makeInstance } from './party';
 import { inheritPassives, type Rng } from './passives';
+import { LUCKY_CHANCE } from './formulas';
+
+/** Odds an egg from these parents is Lucky. */
+export function luckyEggChance(a: PalInstance, b: PalInstance): number {
+  return Math.min(1, LUCKY_CHANCE + LUCKY_PER_LUCKY_PARENT * ((a.lucky ? 1 : 0) + (b.lucky ? 1 : 0)));
+}
 
 export const BREEDING_FARM = 'breeding_farm';
 export const CAKE = 'cake';
 export const BREED_SEC = 300;                       // one Cake → one egg
+export const LUCKY_PER_LUCKY_PARENT = 0.1;          // added to the base wild Lucky chance per Lucky parent
 export const INCUBATION_SEC: Record<Rarity, number> = {
   common: 120, uncommon: 300, rare: 600, epic: 1200, legendary: 2400,
 };
@@ -106,8 +113,9 @@ export function tickBreeding(save: SaveState, dtSec: number, rand: Rng = Math.ra
           left -= need;
           b.progress = null;
           const palId = childOf(parents[0].palId, parents[1].palId);
-          const passives = inheritPassives(parents[0], parents[1], palById(palId), rand);
-          base.eggs.push({ palId, remaining: INCUBATION_SEC[palById(palId).rarity] - left, passives });
+          const lucky = rand() < luckyEggChance(parents[0], parents[1]);
+          const passives = inheritPassives(parents[0], parents[1], palById(palId), rand, lucky);
+          base.eggs.push({ palId, remaining: INCUBATION_SEC[palById(palId).rarity] - left, passives, lucky });
         }
       }
     }
@@ -115,7 +123,7 @@ export function tickBreeding(save: SaveState, dtSec: number, rand: Rng = Math.ra
 
   const hatched: number[] = [];
   for (const egg of base.eggs.filter((e) => e.remaining <= 0)) {
-    addToBox(save, makeInstance(egg.palId, 1, false, egg.passives));
+    addToBox(save, makeInstance(egg.palId, 1, egg.lucky ?? false, egg.passives));
     hatched.push(egg.palId);
   }
   if (hatched.length) base.eggs = base.eggs.filter((e) => e.remaining > 0);

@@ -91,7 +91,8 @@ consumed.
 Breeding: build the Breeding Farm, bake Cake at the Workbench (8 Red Berries, 8 Eggs, 5 Milk), pair two
 idle Pals. One Cake → one egg every 5 min; eggs incubate by rarity (2–40 min) and hatch into the box at
 level 1. Same species breeds true, otherwise the child is the species with breeding power closest to the
-parents' average (`SPECIAL_COMBOS` in `engine/breeding.ts` for fixed pairs). Works offline.
+parents' average (`src/data/combos.ts` for fixed pairs). Every egg has the wild Lucky chance plus 10% per
+Lucky parent; a Lucky egg hatches as a Lucky Pal. Works offline.
 
 Tech tree: 2 tech points per level. Structures and recipes must be researched (level-gated, some with
 prerequisites) before they can be built or crafted; passive techs multiply click damage, party attack,
@@ -116,7 +117,8 @@ Raids: build the Summoning Altar (tech Lv 35), assemble a slab from Slab Fragmen
 from region 3, long expeditions), and summon Bellanoir (500k HP), Xenolord (1.5M) or Bellanoir Libero
 (3M) for a ten-minute DPS check. The slab is spent on summon. Winning pays Diamonds, Ingots, a
 Legendary Sphere chance and the boss's egg, which inherits passives from the party that won
-(same rule as breeding, with your five fighters as the parent pool). Data in `src/data/raids.ts`.
+(same rule as breeding, with your five fighters as the parent pool) and has a 10% / 15% / 25% chance to
+be Lucky. Data in `src/data/raids.ts`.
 
 Every system in DESIGN.md is built and the numbers have been through a model-based balance pass
 (`npm run balance`): on-level kills sit at 4–6 s from region 1 to 7, Alphas at 2–4 min, towers at

@@ -3,7 +3,7 @@ import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -90,6 +90,10 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 10 && s.box) {
     for (const p of s.box) p.san ??= 100;
     s.version = 11;
+  }
+  if (s.version === 11 && s.base) {
+    for (const e of s.base.eggs) e.lucky ??= false;
+    s.version = 12;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

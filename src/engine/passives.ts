@@ -53,14 +53,15 @@ export function rollWildPassives(def: PalDef, lucky: boolean, rand: Rng = Math.r
  * same odds as a wild slot roll), then a small mutation chance per remaining slot.
  * Legend follows the child's species, never the parents.
  */
-export function inheritPassives(a: PalInstance, b: PalInstance, childDef: PalDef, rand: Rng = Math.random): string[] {
-  return inheritFromParents([a, b], childDef, rand);
+export function inheritPassives(a: PalInstance, b: PalInstance, childDef: PalDef, rand: Rng = Math.random, lucky = false): string[] {
+  return inheritFromParents([a, b], childDef, rand, lucky);
 }
 
 /** Same rule for any number of "parents" — a raid egg draws from the party that won it. */
-export function inheritFromParents(parents: PalInstance[], childDef: PalDef, rand: Rng = Math.random): string[] {
+export function inheritFromParents(parents: PalInstance[], childDef: PalDef, rand: Rng = Math.random, lucky = false): string[] {
   const out: string[] = [];
   if (childDef.rarity === 'legendary') out.push('legend');
+  if (lucky) out.push('lucky');
   const pool = [...new Set(parents.flatMap((p) => p.passives))].filter((id) => id !== 'legend' && id !== 'lucky');
   // shuffle parents' pool, keep up to the rolled count (at least one if any are available)
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
