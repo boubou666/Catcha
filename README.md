@@ -157,6 +157,11 @@ Achievements: 63 across combat, collection, base, breeding, exploration and econ
 every point is a permanent +1% gold from defeated Pals. Lifetime stats (defeats, catches, crafts, gold…)
 are tracked from save v13 onward. Defined in `src/data/achievements.ts`.
 
+Box search and filters: the search box matches name, Paldeck number, element and passive names (every word
+must match); Filters adds element, work suitability, status (idle / party / base / breeding / expedition),
+Lucky-only, starred-only, duplicates-only, and sort (stars, level, attack, name, Paldeck number, newest).
+Logic in `src/engine/boxfilter.ts`.
+
 Compare: pick up to four Pals (⚖ in the Box, or the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
 breeding rank, status — with the best value per row highlighted.

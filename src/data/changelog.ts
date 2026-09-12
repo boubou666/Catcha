@@ -15,6 +15,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'A Stats tab under Progress: time played, gold, defeats by kind and element, catch rates per sphere, Paldeck, base and world completion.',
       'A ten-step tutorial for new saves that follows what you actually do — attack, catch, clear a route, research, put a Pal to work, build, craft, beat an Alpha.',
       'Skip it any time; replay it from Settings → About.',
+      'Box search now matches Paldeck numbers, elements and passives; a Filters bar adds element, work, status, Lucky, starred and duplicate filters plus sort options.',
     ],
   },
   {
