@@ -25,6 +25,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Craft: search recipes by name, output or ingredient; filter by kind and status (craftable now / unlocked / locked); sort by work or name.',
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
+      'Daily quests: search and filter by status and kind, like every other list.',
       'Fix: Low Grade Medical Supplies dropped by Pals were a separate item from the Medicine consumable — merged, so drops now treat workers.',
     ],
   },

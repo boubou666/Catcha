@@ -185,7 +185,8 @@ description, what it unlocks (structure / recipe name) or prerequisite; filter b
 (researchable now / not researched / researched) and hide levels above yours; the level grouping is kept.
 Achievements (`src/engine/achievementfilter.ts`): search name / description / category; filter by category
 and status (unlocked, locked, "almost there" ≥ 50%); sort by closest first, points or name (sorted views are
-flat, the default keeps category sections).
+flat, the default keeps category sections). Daily quests get the same bar (search text / kind / reward,
+status ready / in progress / claimed, kind) — thin with three quests a day, but consistent.
 
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,

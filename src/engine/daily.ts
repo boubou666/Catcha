@@ -1,4 +1,4 @@
-import type { DailyQuest, DailyReset, DailyState, Element, SaveState } from '../data/types';
+import type { DailyKind, DailyQuest, DailyReset, DailyState, Element, SaveState } from '../data/types';
 import { ELEMENTS } from '../data/types';
 import { REGIONS } from '../data/regions';
 import { DUNGEONS } from '../data/dungeons';
@@ -8,6 +8,7 @@ import { EXPEDITION_POST } from '../data/expeditions';
 import { BREEDING_FARM } from './breeding';
 import { isUnlocked } from './progress';
 import { addItem, earnGold } from './inventory';
+import { itemName } from '../data/items';
 
 export const DAILY_COUNT = 3;
 export const BONUS_EFFIGIES = 1;
@@ -166,4 +167,42 @@ export function describeQuest(q: DailyQuest, routeName: (id: string) => string):
     case 'element': return `Defeat ${q.target} ${q.param}-element Pals`;
     case 'route': return `Defeat ${q.target} Pals on ${routeName(q.param!)}`;
   }
+}
+
+// ---- filtering ----------------------------------------------------------------------
+
+export type QuestStatus = 'ready' | 'progress' | 'claimed';
+export type QuestStatusFilter = 'any' | QuestStatus;
+
+export interface QuestFilter {
+  query: string;
+  status: QuestStatusFilter;
+  kind: DailyKind | 'any';
+}
+
+export const DEFAULT_QUEST_FILTER: QuestFilter = { query: '', status: 'any', kind: 'any' };
+export const QUEST_STATUS_LABEL: Record<QuestStatusFilter, string> = { any: 'Any status', ready: 'Ready to claim', progress: 'In progress', claimed: 'Claimed' };
+export const QUEST_KIND_LABEL: Record<DailyKind, string> = {
+  defeat: 'Defeat Pals', catch: 'Catch Pals', gold: 'Earn gold', hatch: 'Hatch eggs', craft: 'Craft items',
+  expedition: 'Expedition', realm: 'Sealed Realm', element: 'Element defeats', route: 'Route defeats',
+};
+
+export function questStatus(save: SaveState, q: DailyQuest): QuestStatus {
+  return q.claimed ? 'claimed' : questDone(save, q) ? 'ready' : 'progress';
+}
+
+export function isQuestFiltering(f: QuestFilter): boolean {
+  return f.query.trim() !== '' || f.status !== 'any' || f.kind !== 'any';
+}
+
+/** Every word must match the quest text, its kind label, or a reward item name. */
+export function filterQuests(save: SaveState, f: QuestFilter, routeName: (id: string) => string): DailyQuest[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return (save.daily?.quests ?? []).filter((q) => {
+    if (f.kind !== 'any' && q.kind !== f.kind) return false;
+    if (f.status !== 'any' && questStatus(save, q) !== f.status) return false;
+    if (words.length === 0) return true;
+    const hay = [describeQuest(q, routeName), QUEST_KIND_LABEL[q.kind], ...Object.keys(q.reward.items).map(itemName), 'gold'].join(' ').toLowerCase();
+    return words.every((w) => hay.includes(w));
+  });
 }

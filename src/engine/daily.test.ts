@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
-import { bonusReady, claimBonus, claimQuest, dayKey, generateDaily, msUntilRollover, progressTier, questDone, questProgress, rollDaily, DAILY_COUNT, BONUS_EFFIGIES } from './daily';
+import { bonusReady, claimBonus, claimQuest, dayKey, generateDaily, msUntilRollover, progressTier, questDone, questProgress, rollDaily, DAILY_COUNT, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterQuests, isQuestFiltering, questStatus, QUEST_KIND_LABEL, type QuestFilter } from './daily';
 import { applyDefeat } from './combat';
 import { routeById } from '../data/regions';
 import { itemById } from '../data/items';
@@ -119,5 +119,31 @@ describe('migration v13 → v14', () => {
     expect(s.version).toBe(SAVE_VERSION);
     expect(s.stats.defeatedByElement).toEqual({});
     expect(s.daily).toBeNull();
+  });
+});
+
+describe('quest filter', () => {
+  it('filters by status, kind and text', () => {
+    const s = newState();
+    rollDaily(s, Date.UTC(2026, 8, 12, 12));
+    const quests = s.daily!.quests;
+    const name = (id: string) => routeById(id).name;
+    const f = (over: Partial<QuestFilter>): QuestFilter => ({ ...DEFAULT_QUEST_FILTER, ...over });
+    expect(filterQuests(s, DEFAULT_QUEST_FILTER, name)).toEqual(quests);
+    expect(isQuestFiltering(DEFAULT_QUEST_FILTER)).toBe(false);
+    expect(filterQuests(s, f({ status: 'progress' }), name)).toEqual(quests);
+    expect(filterQuests(s, f({ status: 'claimed' }), name)).toEqual([]);
+
+    const q = quests[0];
+    expect(filterQuests(s, f({ kind: q.kind }), name).every((x) => x.kind === q.kind)).toBe(true);
+    expect(filterQuests(s, f({ query: QUEST_KIND_LABEL[q.kind].toLowerCase() }), name)).toContain(q);
+    expect(filterQuests(s, f({ query: 'gold' }), name)).toEqual(quests);       // every reward pays gold
+    expect(filterQuests(s, f({ query: 'zzz' }), name)).toEqual([]);
+
+    // finish and claim the first quest
+    q.claimed = true;
+    expect(filterQuests(s, f({ status: 'claimed' }), name)).toEqual([q]);
+    expect(filterQuests(s, f({ status: 'progress' }), name)).not.toContain(q);
+    expect(questStatus(s, q)).toBe('claimed');
   });
 });
