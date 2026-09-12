@@ -19,6 +19,7 @@ npm run dev
 | `npm run build` | Production build into `dist/`          |
 | `npm run check` | Type-check `.ts` and `.svelte` files   |
 | `npm test`      | Vitest — engine unit tests             |
+| `npm run fetch-art` | Download Pal art into `public/pals/` (see below) |
 
 ## Layout
 
@@ -31,6 +32,13 @@ src/
 ```
 
 Balance knobs live in `src/engine/formulas.ts` and `src/data/spheres.ts`.
+
+## Art
+
+Pal images are Pocketpair's and are **not** in the repo. `npm run fetch-art` pulls the Paldeck icon and
+render for every Pal in `src/data/pals.ts` from palworld.wiki.gg into `public/pals/` (gitignored).
+Without them the UI shows element-coloured placeholder discs. Private use only — don't publish a build
+that includes them.
 
 ## Status
 

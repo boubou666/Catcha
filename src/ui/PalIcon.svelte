@@ -1,14 +1,21 @@
+<script module lang="ts">
+  // Shared across all instances: files that 404'd, so we don't retry on every re-render.
+  const missing = new Set<string>();
+</script>
+
 <script lang="ts">
-  // Placeholder sprite: a disc coloured by element(s) with the Pal's initials.
-  // Swap this component for real art later without touching anything else.
+  // Shows public/pals/<id>_icon.png (or <id>.png for `render`) when present;
+  // falls back to an element-coloured disc with the Pal's initials otherwise.
+  // Art is fetched by scripts/fetch-pal-art.mjs and is not committed.
   import { palById } from '../data/pals';
   import { ELEMENT_COLORS } from '../data/elements';
 
-  let { palId, size = 48, lucky = false, unknown = false }: {
-    palId: number; size?: number; lucky?: boolean; unknown?: boolean;
+  let { palId, size = 48, lucky = false, unknown = false, render = false }: {
+    palId: number; size?: number; lucky?: boolean; unknown?: boolean; render?: boolean;
   } = $props();
 
   const def = $derived(palById(palId));
+  const src = $derived(`${import.meta.env.BASE_URL}pals/${palId}${render ? '' : '_icon'}.png`);
   const colors = $derived(def.elements.map((e) => ELEMENT_COLORS[e]));
   const background = $derived(
     colors.length > 1
@@ -16,19 +23,29 @@
       : colors[0],
   );
   const initials = $derived(unknown ? '?' : def.name.slice(0, 2).toUpperCase());
+
+  let failed = $state(false);
+  $effect(() => { failed = missing.has(src); });
 </script>
 
 <div
   class="icon"
   class:lucky
   class:unknown
+  class:art={!unknown && !failed}
+  class:render
   style:width="{size}px"
   style:height="{size}px"
   style:font-size="{size * 0.36}px"
-  style:background={unknown ? 'var(--panel-2)' : background}
+  style:background={unknown || !failed ? undefined : background}
   title={unknown ? '???' : def.name}
 >
-  {initials}
+  {#if !failed}
+    <img {src} alt={unknown ? '???' : def.name} draggable="false"
+      onerror={() => { missing.add(src); failed = true; }} />
+  {:else}
+    {initials}
+  {/if}
 </div>
 
 <style>
@@ -40,8 +57,15 @@
     font-weight: 700;
     color: #111;
     flex-shrink: 0;
+    overflow: hidden;
     box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+    background: var(--panel-2);
   }
+  .icon.art { background: var(--panel-2); box-shadow: none; }
+  .icon.render { border-radius: 12px; background: transparent; }
+  img { width: 100%; height: 100%; object-fit: contain; }
+  /* Unknown Paldeck entries show the art as a dark silhouette */
+  .unknown img { filter: brightness(0) opacity(0.35); }
   .unknown { color: var(--muted); }
   .lucky { box-shadow: 0 0 0 3px var(--accent), 0 0 12px var(--accent); }
 </style>

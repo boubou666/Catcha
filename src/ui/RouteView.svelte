@@ -48,7 +48,7 @@
 <div class="panel arena">
   {#if wild && def}
     <div class="row">
-      <PalIcon palId={wild.palId} size={72} lucky={wild.lucky} />
+      <PalIcon palId={wild.palId} size={110} lucky={wild.lucky} render />
       <div class="grow">
         <div class="name">
           {#if wild.kind === 'alpha'}<span class="tag">ALPHA</span>{/if}
