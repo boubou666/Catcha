@@ -206,6 +206,11 @@ Settings: a phone-style search that keeps only the sections whose title or keywo
 Sound, "export" → Save, "timezone" → Daily quest reset), plus quick-jump chips; keywords live in
 `src/engine/settingsfilter.ts`.
 
+Routes panel: a search that spans every reachable region (route name, region, dominant element, or a
+spawning species you have already seen — unseen Pals don't give routes away), status (cleared / in
+progress / locked) and element filters; results group by region and travel on click
+(`src/engine/routefilter.ts`). Without a filter the panel shows the current region as before.
+
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
 breeding rank, status — with the best value per row highlighted.
