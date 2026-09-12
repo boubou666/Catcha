@@ -11,7 +11,9 @@ Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Cat
 It installs as a PWA (Chrome/Edge: install icon in the address bar; Android: "Add to Home screen"; iOS Safari:
 Share → Add to Home Screen) and keeps working offline after the first load. When a new version is deployed, open tabs show a
 "Reload" banner (checked on every visit, every 30 minutes, and whenever the tab regains focus); Settings
-→ About shows the running version.
+→ About shows the running version and a "What's new" button; after an update the changelog entries you
+haven't seen open once. Entries live in `src/data/changelog.ts` — add one at the top when shipping
+something players should know about.
 
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.

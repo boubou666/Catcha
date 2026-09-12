@@ -4,6 +4,8 @@
   import { formatDuration } from './format';
   import type { DailyReset } from '../data/types';
   import { buzz, getPref, hapticsAvailable, play, setPref } from './sfx';
+  import { whatsNew } from '../state/whatsnew.svelte';
+  import { LATEST_VERSION } from '../data/changelog';
 
   let sound = $state(getPref());
   function setSound(next: { enabled?: boolean; volume?: number; haptics?: boolean }) {
@@ -91,7 +93,8 @@
 
 <section>
   <h3>About</h3>
-  <p class="muted small">Catcha version <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
+  <p class="muted small">Catcha version <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}. Changelog v{LATEST_VERSION}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
+  <button class="small" onclick={() => whatsNew.showAll()}>What's new</button>
 </section>
 
 <style>

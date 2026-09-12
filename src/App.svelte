@@ -26,6 +26,8 @@
   import { play, buzz } from './ui/sfx';
   import Toasts from './ui/Toasts.svelte';
   import UpdateBanner from './ui/UpdateBanner.svelte';
+  import WhatsNew from './ui/WhatsNew.svelte';
+  import { whatsNew } from './state/whatsnew.svelte';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings';
   type Group = { id: string; label: string; tabs: { id: Tab; label: string }[] };
@@ -77,6 +79,7 @@
   onMount(() => {
     const stop = game.start();
     const off = game.on((e) => { play(e); buzz(e); });
+    whatsNew.init();
     return () => { stop(); off(); };
   });
 </script>
@@ -84,6 +87,7 @@
 <OfflineSummary />
 <Toasts />
 <UpdateBanner />
+<WhatsNew />
 
 <div class="app">
   <Header />
