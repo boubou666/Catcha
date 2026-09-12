@@ -17,6 +17,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Settings → Appearance: dark HUD, light HUD, or follow the system.',
       'A compact two-line header on phones: the search folds behind a 🔍 button and the numbers become chips.',
       'A one-line arena bar on phones with a tall ⚔ Attack button.',
+      'Tighter tab rows on phones.',
       'The page no longer scrolls as a whole — the columns scroll on their own, so the header and arena stay put.',
     ],
   },

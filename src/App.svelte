@@ -202,6 +202,12 @@
   @media (max-width: 800px) {
     .app { padding: 0.5rem; gap: 0.5rem; }
     .tab-body { min-height: 0; padding: 0.75rem; }
+    /* two tight nav rows: segmented groups, then a scrolling strip of tab chips */
+    .groups { gap: 0.25rem; margin-bottom: 0.3rem; }
+    .groups button { font-size: 0.68rem; letter-spacing: 0.04em; padding: 0.15rem 0.3rem; min-height: 30px; --c: 5px; }
+    .tabs { gap: 0.2rem; padding: 0 0.3rem; margin-bottom: -1px; }
+    .tabs button { font-size: 0.8rem; padding: 0.15rem 0.5rem 0.3rem; min-height: 30px; --c: 5px; }
+    .tab-body { padding-top: 0.6rem; }
     /* one column on phones: the sticky arena stays put while the rest scrolls */
     main.mobile > section { overflow: visible; }
     main.mobile { overflow-y: auto; min-height: 0; display: block; }
