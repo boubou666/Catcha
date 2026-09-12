@@ -122,7 +122,36 @@ const obsidian: RegionDef = {
   },
 };
 
-export const REGIONS: RegionDef[] = [windswept, marsh, dunes, obsidian];
+// ---------------------------------------------------------------------------
+// Region 5 — Astral Mountains (Lv 45–55) · Victor & Shadowbeak
+
+const R5 = 'astral';
+
+const astral: RegionDef = {
+  id: R5, name: 'Astral Mountains',
+  routes: ([
+    ['astral_foot', 'Astral Foothills',            46, 'Ice',     [[57, 25], [59, 20], [1012, 15], [1032, 15], [1024, 10], [54, 15]],  { kind: 'tower', id: 'marcus' }, 380],
+    ['frozen',      'Frozen Forest',               48, 'Grass',   [[77, 20], [78, 20], [87, 20], [92, 15], [91, 10], [79, 15]],       { kind: 'routeCleared', id: 'astral_foot' }, 400],
+    ['ridge',       'Lake Ridge',                  49, 'Water',   [[82, 25], [1071, 20], [1089, 20], [65, 20], [101, 5], [59, 10]],    { kind: 'routeCleared', id: 'frozen' }, 420],
+    ['glacier',     'Glacier Pass',                51, 'Ice',     [[79, 20], [83, 10], [91, 20], [1088, 15], [1090, 5], [57, 30]],     { kind: 'alpha', id: 'wumpo' }, 440],
+    ['summit',      'Astral Summit',               52, 'Neutral', [[108, 5], [109, 5], [83, 20], [1089, 25], [1071, 25], [79, 20]],   { kind: 'routeCleared', id: 'glacier' }, 460],
+    ['sanctuary',   'Wildlife Sanctuary No. 3',    54, 'Dragon',  [[111, 3], [110, 3], [109, 10], [108, 10], [82, 30], [1090, 20], [1110, 3], [92, 21]], { kind: 'alpha', id: 'cryolinx' }, 480],
+    ['genetics',    'PAL Genetic Research Unit',   55, 'Dark',    [[109, 15], [1110, 5], [97, 20], [99, 20], [98, 20], [83, 20]],      { kind: 'alpha', id: 'frostallion' }, 500],
+  ] as RouteArgs[]).map((a) => route(R5, a)),
+  alphas: [
+    { id: 'wumpo',       regionId: R5, palId: 91,  level: 48, hpMult: 30, unlock: { kind: 'routeCleared', id: 'ridge' },     reward: { gold: 70000, effigies: 6 } },
+    { id: 'cryolinx',    regionId: R5, palId: 83,  level: 52, hpMult: 34, unlock: { kind: 'routeCleared', id: 'summit' },    reward: { gold: 100000, effigies: 6 } },
+    { id: 'frostallion', regionId: R5, palId: 110, level: 55, hpMult: 40, unlock: { kind: 'routeCleared', id: 'sanctuary' }, reward: { gold: 150000, effigies: 8 } },
+  ],
+  tower: {
+    id: 'victor', regionId: R5,
+    name: 'PAL Genetic Research Unit Tower', boss: 'Victor & Shadowbeak', palId: 107, level: 55,
+    hp: 280_000, timeLimitSec: 600,
+    unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'frostallion' }, { kind: 'routeCleared', id: 'genetics' }] },
+  },
+};
+
+export const REGIONS: RegionDef[] = [windswept, marsh, dunes, obsidian, astral];
 
 const ROUTES = new Map(REGIONS.flatMap((r) => r.routes).map((r) => [r.id, r]));
 const ALPHAS = new Map(REGIONS.flatMap((r) => r.alphas).map((a) => [a.id, a]));

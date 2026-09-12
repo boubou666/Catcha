@@ -119,3 +119,16 @@ describe('region 4', () => {
     }
   });
 });
+
+describe('region 5', () => {
+  it('opens after the Marcus tower and ends at Victor & Shadowbeak', () => {
+    const save = newState();
+    expect(isUnlocked(save, routeById('astral_foot').unlock)).toBe(false);
+    save.progress.towers.push('marcus');
+    expect(isUnlocked(save, routeById('astral_foot').unlock)).toBe(true);
+    save.progress.alphas.push('wumpo', 'cryolinx', 'frostallion');
+    save.progress.routeKills.genetics = 500;
+    expect(isUnlocked(save, towerById('victor').unlock)).toBe(true);
+    expect(palById(towerById('victor').palId).name).toBe('Shadowbeak');
+  });
+});

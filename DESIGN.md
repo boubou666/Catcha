@@ -53,7 +53,7 @@ Regions, in order, each = a set of routes + Alphas + one tower:
 | 2 | Marsh & Bamboo Groves  | Lily & Lyleen           | 15–25 | ✓ |
 | 3 | Twilight Dunes         | Axel & Orserk           | 25–35 | ✓ |
 | 4 | Mount Obsidian         | Marcus & Faleris        | 35–45 | ✓ |
-| 5 | Astral Mountains       | Victor & Shadowbeak     | 45–55 |
+| 5 | Astral Mountains       | Victor & Shadowbeak     | 45–55 | ✓ |
 | 6 | Sakurajima             | Saya & Selyne           | 55–60 |
 | 7 | Feybreak               | Bjorn & Bastigor        | 60+ |
 

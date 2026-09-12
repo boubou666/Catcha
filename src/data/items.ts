@@ -35,6 +35,8 @@ export const ITEMS: ItemDef[] = [
   M('horn', 'Horn'),
   M('beautiful_flower', 'Beautiful Flower'),
   M('suspicious_juice', 'Suspicious Juice'),
+  M('high_quality_cloth', 'High Quality Cloth'),
+  M('diamond', 'Diamond'),
   // food
   F('red_berries', 'Red Berries'),
   F('cake', 'Cake'),

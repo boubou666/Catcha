@@ -21,6 +21,14 @@ export const SPECIAL_COMBOS: Record<string, number> = {
   '58+75': 1058,   // Pyrin + Katress       → Pyrin Noct
   '9+81': 1081,    // Kelpsea + Rooby       → Kelpsea Ignis
   '84+94': 1084,   // Blazehowl + Felbat    → Blazehowl Noct
+  '10+12': 1012,   // Jolthog + Pengullet   → Jolthog Cryst
+  '10+24': 1024,   // Mau + Pengullet       → Mau Cryst
+  '32+53': 1032,   // Hangyu + Swee         → Hangyu Cryst
+  '57+71': 1071,   // Vanwyrm + Foxcicle    → Vanwyrm Cryst
+  '57+88': 1088,   // Reptyro + Foxcicle    → Reptyro Cryst
+  '59+89': 1089,   // Kingpaca + Reindrix   → Kingpaca Cryst
+  '90+91': 1090,   // Mammorest + Wumpo     → Mammorest Cryst
+  '97+110': 1110,  // Frostallion + Helzephyr → Frostallion Noct
 };
 
 export function comboKey(a: number, b: number): string {

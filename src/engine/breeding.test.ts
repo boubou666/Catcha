@@ -151,3 +151,11 @@ describe('subspecies', () => {
     expect(childOf(1031, 1031)).toBe(1031);
   });
 });
+
+describe('Cryst combos', () => {
+  it('produce the ice subspecies', () => {
+    expect(palById(childOf(12, 10)).name).toBe('Jolthog Cryst');
+    expect(palById(childOf(110, 97)).name).toBe('Frostallion Noct');
+    expect(palById(childOf(88, 57)).name).toBe('Reptyro Cryst');
+  });
+});
