@@ -9,11 +9,11 @@ class UpdateState {
     const check = () => {
       if (reg.waiting && navigator.serviceWorker.controller) { this.waiting = reg.waiting; this.available = true; }
     };
+    // A worker may already be installing when we attach (updatefound fired before we listened), so track that too.
+    const track = (w: ServiceWorker | null) => w?.addEventListener('statechange', () => { if (w.state === 'installed') check(); });
     check();
-    reg.addEventListener('updatefound', () => {
-      const w = reg.installing;
-      w?.addEventListener('statechange', () => { if (w.state === 'installed') check(); });
-    });
+    track(reg.installing);
+    reg.addEventListener('updatefound', () => track(reg.installing));
     // Idle tabs stay open for hours: look for deploys periodically and whenever the tab comes back.
     const poll = () => reg.update().catch(() => {});
     setInterval(poll, 30 * 60 * 1000);
