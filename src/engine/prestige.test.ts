@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
 import { ascend } from './ascend';
-import { arkSlots, buyUpgrade, canAscend, nextUpgradeCost, prestigeMult, relicsFor, routeQuota, startingSpheres, startingTechPoints } from './prestige';
+import { arkSlots, buyUpgrade, canAscend, DEFAULT_UPGRADE_FILTER, filterUpgrades, nextUpgradeCost, prestigeMult, relicsFor, routeQuota, startingSpheres, startingTechPoints, upgradeStatus } from './prestige';
 import { PRESTIGE_UPGRADES, BASE_ARK, prestigeUpgradeById } from '../data/prestige';
 import { routeById } from '../data/regions';
 import { addToBox, makeInstance } from './party';
@@ -140,5 +140,24 @@ describe('migration v15 → v16', () => {
     const s = migrate(v15)!;
     expect(s.version).toBe(SAVE_VERSION);
     expect(s.prestige).toEqual({ relics: 0, ascensions: 0, upgrades: {} });
+  });
+});
+
+describe('upgrade filter', () => {
+  it('classifies and filters upgrades by relics and search', () => {
+    const s = newState();
+    expect(filterUpgrades(s, DEFAULT_UPGRADE_FILTER).map((r) => r.def.id)).toEqual(PRESTIGE_UPGRADES.map((u) => u.id));
+    expect(filterUpgrades(s, { query: '', status: 'affordable' })).toEqual([]);
+    expect(filterUpgrades(s, { query: '', status: 'saving' })).toHaveLength(PRESTIGE_UPGRADES.length);
+    s.prestige.relics = 1;
+    const cheap = filterUpgrades(s, { query: '', status: 'affordable' });
+    expect(cheap.length).toBeGreaterThan(0);
+    expect(cheap.every((r) => r.cost !== null && r.cost <= 1)).toBe(true);
+    expect(upgradeStatus(s, cheap[0].def.id)).toBe('affordable');
+    s.prestige.upgrades.relic_sense = prestigeUpgradeById('relic_sense').maxLevel;
+    expect(filterUpgrades(s, { query: '', status: 'maxed' }).map((r) => r.def.id)).toEqual(['relic_sense']);
+    expect(filterUpgrades(s, { query: 'catch', status: 'any' }).map((r) => r.def.id)).toEqual(['spherecraft']);
+    expect(filterUpgrades(s, { query: 'ark', status: 'any' }).map((r) => r.def.id)).toContain('ark');
+    expect(filterUpgrades(s, { query: 'zzz', status: 'any' })).toEqual([]);
   });
 });

@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'Ascension: search and filter the upgrades; the Ark picker gets the Box search and filters plus a Pick best button.',
       'Merchant: now a real shop — buy base materials as you progress and sell drops and produce for gold, with search, category, sort and affordable / hide-locked filters.',
       'Expeditions: search destinations by name or loot (also filters reports), hide locked ones, search and filter idle Pals for the party, and a Pick best button.',
       'Quest history: past days are kept (90 days) with what you claimed or missed, plus a streak counter, totals and gold from quests.',

@@ -200,6 +200,9 @@ the second (`src/data/shop.ts`, `STOCK`) — and a **Sell** side that takes drop
 the buy price, or `SELL_PRICES` for the rest; spheres, slabs and keys are refused). Search, category, sort,
 "affordable now" and "hide locked" filters (`src/engine/shop.ts`). Selling counts as gold earned.
 
+Ascension: upgrades get a search and an affordable / need-more / maxed filter (`filterUpgrades`); the Ark
+picker uses the Box filter bar over eligible Pals (strongest first, status labels) with a Pick best button.
+
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
 breeding rank, status — with the best value per row highlighted.

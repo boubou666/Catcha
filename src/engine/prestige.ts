@@ -1,5 +1,5 @@
 import type { PalInstance, RouteDef, SaveState } from '../data/types';
-import { BASE_ARK, PRESTIGE_UPGRADES, prestigeUpgradeById, type PrestigeStat } from '../data/prestige';
+import { BASE_ARK, PRESTIGE_UPGRADES, prestigeUpgradeById, type PrestigeStat, type PrestigeUpgradeDef } from '../data/prestige';
 import { REGIONS } from '../data/regions';
 import { isAway } from './party';
 
@@ -65,4 +65,31 @@ export function canAscend(save: SaveState): boolean {
 /** Pals eligible to carry through: anything in the box that isn't away on an expedition. */
 export function arkCandidates(save: SaveState): PalInstance[] {
   return save.box.filter((p) => !isAway(save, p.uid));
+}
+
+// ---- filtering ----------------------------------------------------------------------
+
+export type UpgradeStatus = 'affordable' | 'saving' | 'maxed';
+export interface UpgradeFilter { query: string; status: UpgradeStatus | 'any' }
+export const DEFAULT_UPGRADE_FILTER: UpgradeFilter = { query: '', status: 'any' };
+export const UPGRADE_STATUS_LABEL: Record<UpgradeStatus | 'any', string> = { any: 'Any status', affordable: 'Affordable now', saving: 'Need more relics', maxed: 'Maxed' };
+
+export function upgradeStatus(save: SaveState, id: string): UpgradeStatus {
+  const cost = nextUpgradeCost(save, id);
+  if (cost === null) return 'maxed';
+  return save.prestige.relics >= cost ? 'affordable' : 'saving';
+}
+
+export interface UpgradeRow { def: PrestigeUpgradeDef; level: number; cost: number | null; status: UpgradeStatus }
+
+/** Upgrades in data order, matching every search word against name, description or effect kind. */
+export function filterUpgrades(save: SaveState, f: UpgradeFilter): UpgradeRow[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return PRESTIGE_UPGRADES
+    .map((def) => ({ def, level: upgradeLevel(save, def.id), cost: nextUpgradeCost(save, def.id), status: upgradeStatus(save, def.id) }))
+    .filter((r) => {
+      if (f.status !== 'any' && r.status !== f.status) return false;
+      const hay = [r.def.name, r.def.desc, r.def.effect.kind, 'stat' in r.def.effect ? r.def.effect.stat : ''].join(' ').toLowerCase();
+      return words.every((w) => hay.includes(w));
+    });
 }

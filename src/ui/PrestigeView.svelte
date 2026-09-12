@@ -3,7 +3,10 @@
   import { palById } from '../data/pals';
   import { PRESTIGE_UPGRADES } from '../data/prestige';
   import { REGIONS } from '../data/regions';
-  import { arkCandidates, arkSlots, canAscend, nextUpgradeCost, relicsFor, upgradeLevel } from '../engine/prestige';
+  import { arkCandidates, arkSlots, canAscend, DEFAULT_UPGRADE_FILTER, filterUpgrades, relicsFor, upgradeLevel, UPGRADE_STATUS_LABEL, type UpgradeFilter } from '../engine/prestige';
+  import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
+  import { instanceAttack } from '../engine/formulas';
+  import BoxFilterBar from './BoxFilterBar.svelte';
   import PalIcon from './PalIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
 
@@ -11,7 +14,20 @@
   const relics = $derived(save.prestige.relics);
   const worth = $derived(relicsFor(save));
   const slots = $derived(arkSlots(save));
-  const candidates = $derived(arkCandidates(save).sort((a, b) => b.level - a.level || b.stars - a.stars));
+  const eligible = $derived(new Set(arkCandidates(save).map((p) => p.uid)));
+
+  // upgrades: a small search + status filter; the Ark picker gets the usual Box filter bar
+  let upFilter = $state<UpgradeFilter>({ ...DEFAULT_UPGRADE_FILTER });
+  const upgrades = $derived(filterUpgrades(save, upFilter));
+  const upFiltering = $derived(upFilter.query.trim() !== '' || upFilter.status !== 'any');
+  const PICK_DEFAULTS: BoxFilter = { ...DEFAULT_FILTER, sort: 'attack' };
+  let filter = $state<BoxFilter>({ ...PICK_DEFAULTS });
+  const candidates = $derived(filterBox(save, filter).filter((p) => eligible.has(p.uid)));
+  const filtering = $derived(isFiltering(filter, PICK_DEFAULTS));
+  const clear = () => { filter = { ...PICK_DEFAULTS, sort: filter.sort }; };
+  function pickBest() {
+    keep = [...candidates].sort((a, b) => instanceAttack(b) - instanceAttack(a)).slice(0, slots).map((p) => p.uid);
+  }
   const towersCleared = $derived(save.progress.towers.length);
 
   let keep = $state<string[]>([]);
@@ -48,11 +64,18 @@
 </p>
 
 <section>
-  <h3>Ancient upgrades</h3>
+  <div class="row">
+    <h3 class="grow">Ancient upgrades <span class="muted">{upFiltering ? `${upgrades.length} of ${PRESTIGE_UPGRADES.length}` : PRESTIGE_UPGRADES.length}</span></h3>
+    <input type="search" placeholder="Search upgrades…" bind:value={upFilter.query} aria-label="Search upgrades" />
+    <select bind:value={upFilter.status} aria-label="Upgrade status">
+      {#each Object.entries(UPGRADE_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    </select>
+  </div>
+  {#if upgrades.length === 0}
+    <p class="muted">No upgrade matches. <button class="small" onclick={() => (upFilter = { ...DEFAULT_UPGRADE_FILTER })}>Clear</button></p>
+  {/if}
   <div class="grid">
-    {#each PRESTIGE_UPGRADES as u (u.id)}
-      {@const lv = upgradeLevel(save, u.id)}
-      {@const cost = nextUpgradeCost(save, u.id)}
+    {#each upgrades as { def: u, level: lv, cost } (u.id)}
       <div class="up" class:maxed={cost === null}>
         <div class="row top"><b class="grow">{u.name}</b><span class="muted small">Lv {lv} / {u.maxLevel}</span></div>
         <div class="muted small">{u.desc} <span class="now">({effect(u.id)})</span></div>
@@ -74,14 +97,26 @@
     </p>
     <div class="row">
       <h3 class="grow">Choose up to {slots} to carry <span class="muted">{keep.length} / {slots}</span></h3>
+      <button class="small" disabled={candidates.length === 0} onclick={pickBest} title="Fill the Ark with the strongest Pals in the list below">Pick best</button>
+      {#if keep.length}<button class="small" onclick={() => (keep = [])}>Clear picks</button>{/if}
     </div>
+    <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search Pals to carry">
+      {#snippet heading()}
+        <span class="grow muted small">Eligible {filtering ? `${candidates.length} of ${eligible.size}` : eligible.size}</span>
+      {/snippet}
+    </BoxFilterBar>
+    {#if eligible.size > 0 && candidates.length === 0}
+      <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+    {/if}
     <div class="list scroll">
       {#each candidates as p (p.uid)}
         {@const on = keep.includes(p.uid)}
+        {@const status = statusOf(save, p.uid)}
         <label class="pick row" class:on>
           <input type="checkbox" checked={on} disabled={!on && keep.length >= slots} onchange={() => toggle(p.uid)} />
           <PalIcon palId={p.palId} size={32} lucky={p.lucky} />
-          <span class="grow"><b>{palById(p.palId).name}</b> <span class="muted">Lv {p.level}{p.stars ? ' ' + '★'.repeat(p.stars) : ''}</span> <PassiveChips ids={p.passives} /></span>
+          <span class="grow"><b>{palById(p.palId).name}</b> <span class="muted">Lv {p.level}{p.stars ? ' ' + '★'.repeat(p.stars) : ''}{p.lucky ? ' ✨' : ''} · ATK {instanceAttack(p).toFixed(1)}</span> <PassiveChips ids={p.passives} /></span>
+          {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
         </label>
       {/each}
     </div>
@@ -115,4 +150,6 @@
   .pick.on { border-color: var(--accent); }
   .ascend { width: 100%; padding: 0.8rem; margin-top: 0.75rem; }
   .confirm { margin-top: 0.75rem; padding: 0.75rem; border: 1px solid var(--danger); border-radius: 8px; }
+  input[type='search'] { min-width: 8rem; max-width: 14rem; }
+  select { font-size: 0.85rem; }
 </style>
