@@ -2,6 +2,7 @@
   import { game } from '../state/game.svelte';
   import { DEFAULT_OFFLINE_FILTER, filterOfflineRows, isOfflineFiltering, OFFLINE_CAP_MS, OFFLINE_SHOW_LABEL, OFFLINE_SORT_LABEL, offlineRows, type OfflineFilter } from '../engine/offline';
   import { formatDuration } from './format';
+  import ItemIcon from './ItemIcon.svelte';
 
   const report = $derived(game.offline);
   const all = $derived(report ? offlineRows(report) : []);
@@ -45,7 +46,7 @@
       <table>
         <tbody>
           {#each rows as r (r.kind + r.id)}
-            <tr><td>{r.label}</td><td class="n" class:gain={r.tone === 'gain'} class:loss={r.tone === 'loss'}>{r.text}</td></tr>
+            <tr><td>{#if r.kind === 'item'}<ItemIcon id={r.id} size={18} /> {/if}{r.label}</td><td class="n" class:gain={r.tone === 'gain'} class:loss={r.tone === 'loss'}>{r.text}</td></tr>
           {/each}
         </tbody>
       </table>

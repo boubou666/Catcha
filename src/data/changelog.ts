@@ -13,7 +13,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     version: '0.9.0', date: '2026-09-13', title: 'A Palworld look',
     items: [
       'New interface styled after Palworld’s menus: a sunny Palpagos backdrop, dark glass HUD panels with cyan edge-light and chamfered corners, bold rounded type (Nunito), yellow-orange for the actions that matter.',
-      'Fresh app icons to match.',
+      'Fresh app icons to match; the real Pal art is now included in the hosted build, and every item has its icon (shop, Items, recipes and costs, base output, drops).',
       'Settings → Appearance: dark HUD, light HUD, or follow the system.',
       'A compact two-line header on phones: the search folds behind a 🔍 button and the numbers become chips.',
       'A one-line arena bar on phones with a tall ⚔ Attack button.',

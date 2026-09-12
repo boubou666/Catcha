@@ -7,6 +7,7 @@
   import { canAfford } from '../engine/inventory';
   import { describeRequirement } from '../engine/progress';
   import CostLine from './CostLine.svelte';
+  import ItemIcon from './ItemIcon.svelte';
   import { recipeTech } from '../data/tech';
 
   const save = $derived(game.save);
@@ -78,6 +79,7 @@
     {@const usable = canCraft(save, r.id)}
     {@const owned = status === 'owned'}
     <div class="recipe row" class:locked={!unlocked}>
+      {#if r.output.kind === 'item'}<ItemIcon id={r.output.itemId} size={34} />{:else}<span class="weapon">🗡</span>{/if}
       <div class="grow">
         <b>{r.name}</b> <span class="muted small">{r.work} work · {eta(r.work)} each</span>
         {#if owned}<span class="muted small">· owned</span>{/if}
@@ -136,6 +138,7 @@
 
 <style>
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .weapon { font-size: 1.4rem; width: 34px; text-align: center; }
   .recipe, .job { padding: 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .locked { opacity: 0.55; }
   .small { font-size: 0.8rem; }

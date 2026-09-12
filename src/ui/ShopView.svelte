@@ -6,6 +6,7 @@
   import { describeRequirement } from '../engine/progress';
   import { DEFAULT_SHOP_FILTER, filterSellable, filterStock, isShopFiltering, SHOP_SORT_LABEL, type ShopFilter } from '../engine/shop';
   import { CATEGORY_LABEL } from '../engine/itemsfilter';
+  import ItemIcon from './ItemIcon.svelte';
 
   const save = $derived(game.save);
   const gold = $derived(save.player.gold);
@@ -61,6 +62,7 @@
   <div class="list">
     {#each stock as it (it.itemId)}
       <div class="row item" class:locked={!it.unlocked}>
+        <ItemIcon id={it.itemId} size={34} />
         <div class="grow">
           <b>{it.name}</b> <span class="muted small">{CATEGORY_LABEL[it.category]}{it.owned ? ` · you have ${fmt(it.owned)}` : ''}</span>
           {#if it.itemId.startsWith('sphere_')}<span class="muted small">· ×{SPHERES[it.itemId.slice(7) as typeof SPHERE_TIERS[number]].mult} catch rate</span>{/if}
@@ -82,6 +84,7 @@
   <div class="list">
     {#each sellable as it (it.itemId)}
       <div class="row item">
+        <ItemIcon id={it.itemId} size={34} />
         <div class="grow">
           <b>{it.name}</b> <span class="muted small">{CATEGORY_LABEL[it.category]} · you have {fmt(it.owned)}</span>
         </div>

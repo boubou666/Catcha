@@ -12,7 +12,8 @@
     "fetch-art": "node scripts/fetch-pal-art.mjs",
     "fetch-data": "node scripts/fetch-pal-data.mjs",
     "balance": "tsx scripts/balance.mjs",
-    "icons": "node scripts/make-icons.mjs"
+    "icons": "node scripts/make-icons.mjs",
+    "fetch-item-art": "tsx scripts/fetch-item-art.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.3.0",

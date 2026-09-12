@@ -1,6 +1,7 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
   import { CATEGORY_LABEL, DEFAULT_ITEMS_FILTER, filterItems, isItemsFiltering, ITEMS_SORT_LABEL, type ItemsFilter } from '../engine/itemsfilter';
+  import ItemIcon from './ItemIcon.svelte';
 
   let filter = $state<ItemsFilter>({ ...DEFAULT_ITEMS_FILTER });
   let open = $state(false);
@@ -44,6 +45,7 @@
     <tbody>
       {#each items as it (it.def.id)}
         <tr class:none={it.count === 0}>
+          <td class="iconcell"><ItemIcon id={it.def.id} size={30} /></td>
           <td>
             <div>{it.def.name} <span class="cat muted">{CATEGORY_LABEL[it.def.category]}</span></div>
             {#if it.sources.length}<div class="muted tiny">From: {list(it.sources)}</div>{/if}
@@ -60,6 +62,7 @@
   table { width: 100%; border-collapse: collapse; }
   td { padding: 0.35rem 0.25rem; border-bottom: 1.5px solid var(--border-soft); vertical-align: top; }
   tr.none { opacity: 0.55; }
+  .iconcell { width: 2.4rem; padding-right: 0; }
   .n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
   .cat { font-size: 0.75rem; margin-left: 0.3rem; }
   .tiny { font-size: 0.75rem; }

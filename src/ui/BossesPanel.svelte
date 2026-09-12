@@ -8,6 +8,7 @@
   import { raidWins, summonBlocker, type SummonBlock } from '../engine/raid';
   import { countOf } from '../engine/inventory';
   import { itemName } from '../data/items';
+  import ItemIcon from './ItemIcon.svelte';
   import { ELEMENTS } from '../data/types';
   import { BOSS_KIND_LABEL, BOSS_STATUS_LABEL, DEFAULT_BOSS_FILTER, filterBosses, isBossFiltering, type BossFilter, type BossRow } from '../engine/bossfilter';
 
@@ -99,7 +100,7 @@
         {@const slabs = countOf(game.save, r.slabItemId)}
         <button class="raid-btn" class:primary={!block && wins === 0} disabled={!game.canSummon(r.id)} onclick={() => game.summonRaid(r.id)}
           title={block === 'locked' ? describeRequirement(r.unlock) : block ? RAID_BLOCK[block] : `${(r.hp / 1000).toLocaleString()}k HP in ${r.timeLimitSec / 60} minutes. Win: ${r.reward.gold.toLocaleString()} gold, loot, and a ${r.name} egg that inherits passives from your party (${Math.round(r.luckyChance * 100)}% Lucky).`}>
-          🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>
+          🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} <ItemIcon id={r.slabItemId} size={14} /> {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>
         </button>
       {/each}
     </div>

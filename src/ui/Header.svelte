@@ -6,6 +6,7 @@
   import { achievementPoints } from '../engine/achievements';
   import NotificationCenter from './NotificationCenter.svelte';
   import GlobalSearch from './GlobalSearch.svelte';
+  import ItemIcon from './ItemIcon.svelte';
   import type { TabEntry } from '../engine/globalsearch';
 
   let { tabs, go }: { tabs: TabEntry[]; go: (tab: string) => void } = $props();
@@ -80,7 +81,7 @@
     <div class="label">Spheres</div>
     <div class="muted small">
       {#if spheres.length === 0}none — visit the Merchant{/if}
-      {#each spheres as s}<span class="chip">{SPHERES[s.tier].name} ×{s.n}</span>{/each}
+      {#each spheres as s}<span class="chip"><ItemIcon id={SPHERES[s.tier].itemId} size={16} /> {SPHERES[s.tier].name} ×{s.n}</span>{/each}
     </div>
   </div>
 

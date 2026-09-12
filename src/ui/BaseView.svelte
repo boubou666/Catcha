@@ -7,6 +7,7 @@
   import PalCard from './PalCard.svelte';
   import CostLine from './CostLine.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
+  import ItemIcon from './ItemIcon.svelte';
   import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
   import { structureTech } from '../data/tech';
 
@@ -47,11 +48,11 @@
 <h2>Base <span class="muted">{workers.length} / {save.base.slots} workers</span></h2>
 
 <div class="status row">
-  <span>🍇 {itemName(FOOD_ITEM)}: <b>{berries}</b>
+  <span><ItemIcon id={FOOD_ITEM} size={18} /> {itemName(FOOD_ITEM)}: <b>{berries}</b>
     {#if workers.length > 0}<span class="muted">(−{fmt(rates.foodPerMin)}/min)</span>{/if}</span>
   <span>Output: <b>×{rates.mult.toFixed(2)}</b></span>
   {#if workers.length > 0}
-    <span>💊 {itemName(MEDICINE_ITEM)}: <b>{medical}</b> <span class="muted">(+{fmt(rates.medicalPerMin)}/min · SAN −{fmt(rates.sanDrainPerMin)}/min each)</span></span>
+    <span><ItemIcon id={MEDICINE_ITEM} size={18} /> {itemName(MEDICINE_ITEM)}: <b>{medical}</b> <span class="muted">(+{fmt(rates.medicalPerMin)}/min · SAN −{fmt(rates.sanDrainPerMin)}/min each)</span></span>
   {/if}
   {#if sick > 0}<span class="warn">{sick} worker{sick === 1 ? ' is' : 's are'} sick and not working — rest them or stock Medical Supplies.</span>
   {:else if stressed > 0}<span class="warn">{stressed} worker{stressed === 1 ? '' : 's'} below 50 SAN.</span>{/if}
@@ -103,9 +104,9 @@
   {#if Object.keys(rates.items).length > 0 || rates.smeltPerMin > 0 || rates.handiworkPerSec > 0}
     <div class="rates row">
       {#each Object.entries(rates.items) as [id, perMin]}
-        <span class="chip">{itemName(id)} +{fmt(perMin)}/min</span>
+        <span class="chip"><ItemIcon id={id} size={16} /> {itemName(id)} +{fmt(perMin)}/min</span>
       {/each}
-      {#if rates.smeltPerMin > 0}<span class="chip">Ingot +{fmt(rates.smeltPerMin)}/min (uses Ore)</span>{/if}
+      {#if rates.smeltPerMin > 0}<span class="chip"><ItemIcon id="ingot" size={16} /> Ingot +{fmt(rates.smeltPerMin)}/min (uses Ore)</span>{/if}
       {#if rates.handiworkPerSec > 0}<span class="chip">Crafting {fmt(rates.handiworkPerSec)} work/s</span>{/if}
     </div>
   {/if}

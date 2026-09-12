@@ -63,6 +63,7 @@ npm run dev
 | `npm test`      | Vitest — engine unit tests             |
 | `npm run icons` | Regenerate the PWA icons (`public/icons/`) |
 | `npm run fetch-art` | Download Pal art into `public/pals/` (see below) |
+| `npm run fetch-item-art` | Download item icons into `public/items/` |
 | `npm run balance` | Print the headless balance model (per-region times, plus hours per run across ascensions; `-- --runs N`) |
 | `npm run fetch-data` | Regenerate `src/data/pals.ts`, `combos.ts` and drop items from the wiki (`--dry-run` to preview) |
 
@@ -92,7 +93,9 @@ and the wiki page name, then rerun.
 `public/pals/` holds the Paldeck icon and render for every Pal in `src/data/pals.ts` (about 19 MB), pulled
 from palworld.wiki.gg by `npm run fetch-art` and committed so the hosted build shows them. The art is
 Pocketpair's, used here as in the fan wiki — for a non-commercial fan project. A missing image falls back to
-an element-coloured placeholder disc.
+an element-coloured placeholder disc. Item icons (`public/items/<id>.png`, ~3 MB) come the same way via
+`npm run fetch-item-art` ("<Item name> icon.png" on the wiki, aliases in the script for the few that differ)
+and show in the shop, Items, craft recipes and costs, base output, drops and the welcome-back summary.
 
 ## Look
 

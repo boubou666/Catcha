@@ -10,6 +10,7 @@
   import { dungeonById } from '../data/dungeons';
   import { raidById } from '../data/raids';
   import PalIcon from './PalIcon.svelte';
+  import ItemIcon from './ItemIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
 
   let { palId, onclose, onselect }: { palId: number; onclose: () => void; onselect: (id: number) => void } = $props();
@@ -62,11 +63,11 @@
         <div>
           <h3>Work</h3>
           <div class="small">{#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}{#if work.length === 0}<span class="muted">none</span>{/if}
-            {#if def.farmDrop}<div class="muted">Ranch: {itemName(def.farmDrop.itemId)}</div>{/if}</div>
+            {#if def.farmDrop}<div class="muted">Ranch: <ItemIcon id={def.farmDrop.itemId} size={16} label /></div>{/if}</div>
         </div>
         <div>
           <h3>Drops</h3>
-          <div class="small">{#if caught}{def.drops.map((d) => `${itemName(d.itemId)}${d.chance < 1 ? ` (${pct(d.chance)})` : ''}`).join(', ')}{:else}<span class="muted">catch one to learn</span>{/if}</div>
+          <div class="small drops">{#if caught}{#each def.drops as d (d.itemId)}<span class="drop"><ItemIcon id={d.itemId} size={16} label />{#if d.chance < 1}<span class="muted"> ({pct(d.chance)})</span>{/if}</span>{/each}{:else}<span class="muted">catch one to learn</span>{/if}</div>
         </div>
       </section>
     {/if}
@@ -133,6 +134,8 @@
   ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.25rem; }
   li.locked { opacity: 0.6; }
   .job { margin-right: 0.35rem; white-space: nowrap; }
+  .drops { display: flex; flex-wrap: wrap; gap: 0.25rem 0.6rem; }
+  .drop { white-space: nowrap; }
   .tiny { font-size: 0.75rem; padding: 0.05rem 0.4rem; margin-left: 0.3rem; }
   .link { background: none; border: none; padding: 0; color: var(--accent-2); cursor: pointer; font: inherit; text-decoration: underline; }
   .controls { margin-top: 1rem; }
