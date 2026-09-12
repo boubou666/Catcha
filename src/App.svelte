@@ -10,6 +10,7 @@
   import PaldeckView from './ui/PaldeckView.svelte';
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
+  import OfflineSummary from './ui/OfflineSummary.svelte';
 
   type Tab = 'party' | 'box' | 'base' | 'craft' | 'paldeck' | 'items' | 'shop';
   const TABS: { id: Tab; label: string }[] = [
@@ -25,6 +26,8 @@
 
   onMount(() => game.start());
 </script>
+
+<OfflineSummary />
 
 <div class="app">
   <Header />

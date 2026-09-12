@@ -40,6 +40,8 @@ every 1000 ms tick:
 ```
 
 Offline progress: only closed-form systems run (base production, timers). Combat does not simulate offline. Cap at 24 h.
+Implemented in `engine/offline.ts`: the gap is replayed through `tickBase` in 60 s chunks so running out of
+food or ore part-way is priced in; the same path handles a suspended tab mid-session.
 
 ## 3. Progression
 

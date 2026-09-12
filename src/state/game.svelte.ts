@@ -10,16 +10,18 @@ import { addToParty, release, removeFromParty } from '../engine/party';
 import { clickDamage, wildHp } from '../engine/formulas';
 import { assignWorker, build, cancelCraft, enqueue, tickBase, unassignWorker } from '../engine/base';
 import { recipeById, structureById } from '../data/base';
+import { applyOffline, type OfflineReport } from '../engine/offline';
 
 const AUTOSAVE_MS = 30_000;
 const TICK_MS = 100;
-const MAX_TICK_MS = 5_000; // clamp a long gap (tab throttled / machine asleep); offline progress comes later
+const MAX_TICK_MS = 5_000; // anything longer is a suspend/sleep gap and goes through applyOffline
 const LOG_LINES = 12;
 
 export class Game {
   save = $state<SaveState>(newState());
   wild = $state<Wild | null>(null);
   log = $state<string[]>([]);
+  offline = $state<OfflineReport | null>(null);   // "while you were away" summary, until dismissed
   private sinceSave = 0;
 
   constructor() {
@@ -27,6 +29,7 @@ export class Game {
     if (loaded) {
       this.save = loaded;
       this.push('Save loaded.');
+      this.catchUp(Date.now() - loaded.lastSavedAt);
     } else {
       this.push('Welcome to the Palpagos Islands. Attack a Pal to begin.');
     }
@@ -52,16 +55,32 @@ export class Game {
     let last = performance.now();
     const id = setInterval(() => {
       const now = performance.now();
-      this.tick(Math.min(now - last, MAX_TICK_MS));
+      const dt = now - last;
       last = now;
+      if (dt > MAX_TICK_MS) this.catchUp(dt);   // machine slept / tab frozen: base only, no combat
+      else this.tick(dt);
     }, TICK_MS);
     const onHide = () => { if (document.hidden) this.persist(); };
+    const onLeave = () => this.persist();
     document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', onLeave);
     return () => {
       clearInterval(id);
       document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onLeave);
     };
   }
+
+  /** Simulate a gap the live loop didn't cover. Surfaces a report when there's something to show. */
+  private catchUp(elapsedMs: number) {
+    const report = applyOffline(this.save, elapsedMs);
+    if (report) {
+      this.offline = report;
+      this.persist();
+    }
+  }
+
+  dismissOffline() { this.offline = null; }
 
   tick(dtMs: number) {
     const w = this.wild;

@@ -51,4 +51,7 @@ berries, Kindling smelts, Handiwork crafts spheres and weapons, Farming yields P
 Transporting/Electricity multiply, Cooling cuts food use. Structures gate and multiply jobs;
 workers eat Red Berries and slow down when hungry. Knobs: `src/data/base.ts` (RATES).
 
-Next: offline progress, breeding, condensing, tech tree — see DESIGN.md §10.
+Offline progress: on load (and after a laptop-sleep gap) the base is simulated in 60 s chunks for the
+time away, capped at 24 h, and a summary shows the deltas. Combat never runs offline.
+
+Next: breeding, condensing, tech tree — see DESIGN.md §10.
