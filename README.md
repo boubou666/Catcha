@@ -11,7 +11,10 @@ Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Cat
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.
 
-Sound effects are synthesized with the Web Audio API (no audio files): attacks, defeats, catches, level-ups,
+Toast notifications for catches, level-ups, boss and tower wins, hatches, achievements, quests, expedition
+returns, Lucky spawns, new daily quests and ascension; click one to dismiss.
+
+Sound effects are synthesized with the Web Audio API (no audio files): clicks and click-kills, catches, level-ups,
 boss and tower wins, hatches, achievements, quests, Lucky spawns, raid summons, ascension. Toggle and volume
 under Settings, stored per device.
 

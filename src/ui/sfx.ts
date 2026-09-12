@@ -104,7 +104,7 @@ const MIN_GAP_MS: Partial<Record<Sfx, number>> = { click: 30, defeat: 60, craftD
 
 /** Play a sound if enabled. Safe to call from anywhere; failures are swallowed. */
 export function play(name: Sfx): void {
-  if (!pref.enabled) return;
+  if (!pref.enabled || document.hidden) return;
   const now = performance.now();
   if (now - (lastPlayed[name] ?? 0) < (MIN_GAP_MS[name] ?? 0)) return;
   lastPlayed[name] = now;

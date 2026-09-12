@@ -36,6 +36,8 @@ const TICK_MS = 100;
 const MAX_TICK_MS = 5_000; // anything longer is a suspend/sleep gap and goes through applyOffline
 const LOG_LINES = 12;
 
+export type ToastKind = 'info' | 'success' | 'gold' | 'warn';
+
 export type GameEvent =
   | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
   | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone';
@@ -44,6 +46,16 @@ export class Game {
   save = $state<SaveState>(newState());
   wild = $state<Wild | null>(null);
   log = $state<string[]>([]);
+
+  /** Transient notifications shown by the Toasts component. */
+  toasts = $state<{ id: number; text: string; kind: ToastKind }[]>([]);
+  private toastSeq = 0;
+  notify(text: string, kind: ToastKind = 'info', ms = 4000) {
+    const id = ++this.toastSeq;
+    this.toasts = [...this.toasts, { id, text, kind }].slice(-4);
+    setTimeout(() => this.dismissToast(id), ms);
+  }
+  dismissToast(id: number) { this.toasts = this.toasts.filter((t) => t.id !== id); }
 
   /** Game events for the UI layer (sounds, toasts). Handlers must not throw. */
   private listeners = new Set<(e: GameEvent) => void>();
@@ -129,18 +141,19 @@ export class Game {
     if (this.sinceCheck >= 1000) {
       this.sinceCheck = 0;
       this.unlockAchievements();
-      if (rollDaily(this.save)) this.push('A new day — fresh daily quests are up.');
+      if (rollDaily(this.save)) { this.push('A new day — fresh daily quests are up.'); this.notify('📅 New daily quests are up', 'info'); }
     }
     const queued = this.save.base.queue.length;
     const world = tickWorld(this.save, dtMs / 1000);
     if (this.save.base.queue.length < queued) this.emit('craftDone');
-    for (const palId of world.hatched) { this.push(`An egg hatched: ${palById(palId).name}!`); this.emit('hatched'); }
+    for (const palId of world.hatched) { this.push(`An egg hatched: ${palById(palId).name}!`); this.emit('hatched'); this.notify(`🥚 ${palById(palId).name} hatched!`, 'success'); }
+    for (const r of world.returned) this.notify(`${r.success ? '✅' : '❌'} ${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} (+${r.gold.toLocaleString()} gold)`, r.success ? 'gold' : 'warn');
     for (const r of world.returned) this.push(`${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} — +${r.gold.toLocaleString()} gold${Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}.`);
     this.sinceSave += dtMs;
     if (this.sinceSave >= AUTOSAVE_MS) this.persist();
   }
 
-  click() { this.save.stats.clicks += 1; this.emit('click'); this.hit(this.clickDmg); }
+  click() { this.save.stats.clicks += 1; this.emit('click'); this.hit(this.clickDmg, true); }
 
   // ---- prestige ----------------------------------------------------------
 
@@ -158,11 +171,12 @@ export class Game {
     this.persist();
     this.push(`Ascension ${next.prestige.ascensions} — +${relics} Ancient Relics. A new run begins.`);
     this.emit('ascend');
+    this.notify(`🏺 Ascension ${next.prestige.ascensions} — +${relics} relics`, 'gold', 6000);
   }
 
   claimQuest(id: string) {
     const q = claimQuest(this.save, id);
-    if (q) this.emit('questClaimed');
+    if (q) { this.emit('questClaimed'); this.notify(`Quest complete: +${q.reward.gold.toLocaleString()} gold`, 'gold'); }
     if (q) this.push(`Quest complete: ${describeQuest(q, (r) => routeById(r).name)} — +${q.reward.gold.toLocaleString()} gold, ${Object.entries(q.reward.items).map(([i, n]) => `${n} ${itemName(i)}`).join(', ')}.`);
   }
 
@@ -171,29 +185,29 @@ export class Game {
   }
 
   private unlockAchievements() {
-    for (const a of checkAchievements(this.save)) { this.push(`🏆 Achievement: ${a.name} — ${a.desc} (+${a.points} pts)`); this.emit('achievement'); }
+    for (const a of checkAchievements(this.save)) { this.push(`🏆 Achievement: ${a.name} — ${a.desc} (+${a.points} pts)`); this.emit('achievement'); this.notify(`🏆 ${a.name} (+${a.points} pts)`, 'gold', 5000); }
   }
 
-  private hit(dmg: number) {
+  private hit(dmg: number, byClick = false) {
     const w = this.wild;
     if (!w || dmg <= 0) return;
     w.hp -= dmg;
-    if (w.hp <= 0) this.defeat(w);
+    if (w.hp <= 0) this.defeat(w, byClick);
   }
 
-  private defeat(w: Wild) {
+  private defeat(w: Wild, byClick = false) {
     const def = palById(w.palId);
     const save = this.save;
     const levelBefore = save.player.level;
     const reward = applyDefeat(save, w);
-    this.emit('defeat');
-    if (save.player.level > levelBefore) this.emit('levelUp');
+    if (byClick) this.emit('defeat');   // idle kills stay silent — otherwise it's a thud every few seconds forever
+    if (save.player.level > levelBefore) { this.emit('levelUp'); this.notify(`Level ${save.player.level}!`, 'success'); }
 
     if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
       if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
       const res = tryCatch(save, w);
       const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
-      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`); this.emit('caught'); }
+      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`); this.emit('caught'); this.notify(`Caught ${label}`, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
       else if (res.outcome === 'failed') { this.push(`${label} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
       else if (w.lucky) this.push(`A Lucky ${def.name} got away — no sphere thrown.`);
       if (this.run && w.kind !== 'wild') {
@@ -202,6 +216,7 @@ export class Game {
         if (w.kind === 'dungeonBoss') {
           const chest = completeRun(save, dungeonById(this.run.id));
           this.emit('realmClear');
+          this.notify(`🗝 ${dungeonById(this.run.id).name} cleared!`, 'gold', 5000);
           this.push(`${dungeonById(this.run.id).name} cleared! Chest: ${describeChest(chest, itemName)}.`);
           this.run = null;
           this.spawn();
@@ -220,6 +235,7 @@ export class Game {
         save.player.effigies += alpha.reward.effigies ?? 0;
         this.push(`Alpha ${def.name} defeated! +${alpha.reward.gold} gold, +${alpha.reward.effigies ?? 0} effigies.`);
         this.emit('bossWin');
+        this.notify(`Alpha ${def.name} defeated! +${alpha.reward.gold.toLocaleString()} gold`, 'gold', 5000);
       } else {
         this.push(`Alpha ${def.name} defeated again. +${reward.gold} gold.`);
       }
@@ -228,18 +244,20 @@ export class Game {
       if (!save.progress.towers.includes(w.refId)) save.progress.towers.push(w.refId);
       this.push(`${tower.boss} defeated — ${tower.name} cleared!`);
       this.emit('towerWin');
+      this.notify(`🏰 ${tower.name} cleared!`, 'gold', 6000);
     } else if (w.kind === 'raid' && w.refId) {
       const raid = raidById(w.refId);
       const chest = completeRaid(save, raid);
       this.push(`${raid.name} defeated! ${describeRaidChest(chest, raid.name, itemName)}.`);
       this.emit('towerWin');
+      this.notify(`🔮 ${raid.name} defeated — egg in the incubator`, 'gold', 6000);
     }
     this.spawn();
   }
 
   spawn() {
     this.wild = spawnWild(this.route);
-    if (this.wild.lucky) this.emit('luckySpawn');
+    if (this.wild.lucky) { this.emit('luckySpawn'); this.notify(`✨ A Lucky ${palById(this.wild.palId).name} appeared!`, 'warn', 5000); }
   }
 
   // ---- navigation --------------------------------------------------------
