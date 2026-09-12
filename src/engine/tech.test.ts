@@ -7,6 +7,7 @@ import { catchChance } from './catch';
 import { isResearched, recipeUnlocked, research, researchBlocker, structureUnlocked, techMult } from './tech';
 import { STARTING_TECH_POINTS, TECHS, techById } from '../data/tech';
 import { STRUCTURES, RECIPES } from '../data/base';
+import { palById } from '../data/pals';
 
 describe('tech data', () => {
   it('references real structures, recipes and prerequisites', () => {
@@ -66,7 +67,8 @@ describe('multipliers', () => {
 
     save.tech = ['labor_1'];
     const inst = makeInstance(4, 1); addToBox(save, inst); assignWorker(save, inst.uid);
-    expect(computeRates(save).mult).toBeCloseTo(1.03 * 1.15);
+    const transport = 1 + 0.03 * (palById(4).work.Transporting ?? 0);
+    expect(computeRates(save).mult).toBeCloseTo(transport * 1.15);
 
     expect(catchChance('common', 'pal', 0, false, 1.15)).toBeCloseTo(0.69);
   });

@@ -115,7 +115,7 @@ type WorkType = 'Kindling'|'Watering'|'Planting'|'Electricity'|'Handiwork'|'Gath
 type Rarity   = 'common'|'uncommon'|'rare'|'epic'|'legendary';
 
 interface PalDef {
-  id: number;                 // Paldeck #
+  id: number;                 // internal key; `no` holds the wiki Paldeck number
   name: string;
   variantOf?: number;         // e.g. Jolthog Cryst → 12
   elements: Element[];        // 1–2

@@ -35,8 +35,9 @@ describe('effects', () => {
     const save = newState();
     save.tech = TECHS.filter((t) => t.effect.kind !== 'mult').map((t) => t.id);
     addToBox(save, artisan); assignWorker(save, artisan.uid);
-    expect(workLevels(save).Lumbering).toBeCloseTo(1.5);
-    expect(computeRates(save).foodPerMin).toBeCloseTo(0.5 * 1.15);
+    expect(workLevels(save).Lumbering).toBeCloseTo(palById(4).work.Lumbering! * 1.5);
+    const cooling = 1 - Math.min(0.5, 0.1 * (palById(4).work.Cooling ?? 0));
+    expect(computeRates(save).foodPerMin).toBeCloseTo(0.5 * 1.15 * cooling);
   });
 });
 

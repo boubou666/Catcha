@@ -1,5 +1,7 @@
 import type { PalDef, PalInstance, Rarity, SaveState } from '../data/types';
 import { PALS, palById } from '../data/pals';
+import { SPECIAL_COMBOS } from '../data/combos';
+export { SPECIAL_COMBOS };
 import { countOf } from './inventory';
 import { addToBox, instanceByUid, isAway, makeInstance } from './party';
 import { inheritPassives, type Rng } from './passives';
@@ -11,36 +13,6 @@ export const INCUBATION_SEC: Record<Rarity, number> = {
   common: 120, uncommon: 300, rare: 600, epic: 1200, legendary: 2400,
 };
 
-/**
- * Fixed-outcome pairs, keyed "lowerId+higherId". Palworld's specials mostly produce
- * subspecies (Jolthog Cryst, Mau Cryst…) that aren't in the roster yet — add them here as they land.
- */
-export const SPECIAL_COMBOS: Record<string, number> = {
-  '9+31': 1031,    // Gobfin + Rooby        → Gobfin Ignis
-  '39+66': 1039,   // Incineram + Maraith   → Incineram Noct
-  '44+70': 1044,   // Leezpunk + Flambelle  → Leezpunk Ignis
-  '58+75': 1058,   // Pyrin + Katress       → Pyrin Noct
-  '9+81': 1081,    // Kelpsea + Rooby       → Kelpsea Ignis
-  '84+94': 1084,   // Blazehowl + Felbat    → Blazehowl Noct
-  '10+12': 1012,   // Jolthog + Pengullet   → Jolthog Cryst
-  '10+24': 1024,   // Mau + Pengullet       → Mau Cryst
-  '32+53': 1032,   // Hangyu + Swee         → Hangyu Cryst
-  '57+71': 1071,   // Vanwyrm + Foxcicle    → Vanwyrm Cryst
-  '57+88': 1088,   // Reptyro + Foxcicle    → Reptyro Cryst
-  '59+89': 1089,   // Kingpaca + Reindrix   → Kingpaca Cryst
-  '90+91': 1090,   // Mammorest + Wumpo     → Mammorest Cryst
-  '97+110': 1110,  // Frostallion + Helzephyr → Frostallion Noct
-  '33+103': 1033,  // Mossanda + Grizzbolt  → Mossanda Lux
-  '32+36': 1036,   // Eikthyrdeer + Hangyu  → Eikthyrdeer Terra
-  '60+64': 1064,   // Dinossom + Rayhound   → Dinossom Lux
-  '65+80': 1080,   // Elphidran + Surfent   → Elphidran Aqua
-  '7+85': 1085,    // Relaxaurus + Sparkit  → Relaxaurus Lux
-  '6+86': 1086,    // Broncherry + Fuack    → Broncherry Aqua
-  '101+102': 1102, // Suzaku + Jormuntide   → Suzaku Aqua
-  '99+104': 1104,  // Lyleen + Menasting    → Lyleen Noct
-  '13+47': 1047,   // Robinquill + Gumoss   → Robinquill Terra
-  '65+67': 1065,   // Surfent + Digtoise    → Surfent Terra
-};
 
 export function comboKey(a: number, b: number): string {
   return a < b ? `${a}+${b}` : `${b}+${a}`;

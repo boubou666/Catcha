@@ -26,12 +26,17 @@ describe('childOf', () => {
     expect(childOf(11, 11)).toBe(11);
   });
   it('picks the species closest to the average breedPower, lower id on ties', () => {
-    // Lamball 1470 + Penking 620 → 1045 → Tocotoco 1050 (d=5) beats Fuddler 1010 (d=35)
-    expect(childOf(1, 11)).toBe(27);
-    // Lamball 1470 + Cattiva 1440 → 1455: equidistant candidates, lowest id wins
+    // Lamball + Penking: the base species nearest the average rank (computed, since ranks come from the wiki)
+    const target = (palById(1).breedPower + palById(11).breedPower) / 2;
+    const expected = PALS.filter((p) => !p.variantOf).reduce((best, p) =>
+      Math.abs(p.breedPower - target) < Math.abs(best.breedPower - target)
+      || (Math.abs(p.breedPower - target) === Math.abs(best.breedPower - target) && p.id < best.id) ? p : best);
+    expect(childOf(1, 11)).toBe(expected.id);
+    // equidistant candidates either side of the parents' average: lowest id wins
+    const avg = (palById(1).breedPower + palById(2).breedPower) / 2;
     const pals = [
-      { ...palById(1), id: 30, breedPower: 1460 },
-      { ...palById(1), id: 20, breedPower: 1450 },
+      { ...palById(1), id: 30, breedPower: avg + 5 },
+      { ...palById(1), id: 20, breedPower: avg - 5 },
     ];
     expect(childOf(1, 2, pals, {})).toBe(20);
   });

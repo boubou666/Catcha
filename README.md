@@ -20,6 +20,7 @@ npm run dev
 | `npm run check` | Type-check `.ts` and `.svelte` files   |
 | `npm test`      | Vitest — engine unit tests             |
 | `npm run fetch-art` | Download Pal art into `public/pals/` (see below) |
+| `npm run fetch-data` | Regenerate `src/data/pals.ts`, `combos.ts` and drop items from the wiki (`--dry-run` to preview) |
 
 ## Layout
 
@@ -32,6 +33,15 @@ src/
 ```
 
 Balance knobs live in `src/engine/formulas.ts` and `src/data/spheres.ts`.
+
+## Data
+
+`src/data/pals.ts` and `src/data/combos.ts` are generated from palworld.wiki.gg infoboxes by
+`npm run fetch-data`: elements, stats, work suitability, breeding rank, drops, partner skills and the
+special breeding combos are the wiki's. Internal `id`s, `variantOf` and `farmDrop` are preserved across
+runs; `no` is the wiki's current Paldeck number (Pocketpair renumbered the deck, so it no longer equals
+`id`). Rarity is derived from egg tier and breeding rank. To add a Pal, append a stub with a unique id
+and the wiki page name, then rerun.
 
 ## Art
 

@@ -26,7 +26,8 @@ export interface Drop {
 }
 
 export interface PalDef {
-  id: number;                // Paldeck number
+  id: number;                // internal key (stable); not the Paldeck number
+  no: string;                // wiki Paldeck number as displayed: "001", "055B"
   name: string;
   variantOf?: number;
   elements: Element[];       // 1–2
@@ -34,7 +35,7 @@ export interface PalDef {
   baseHp: number;
   baseAttack: number;
   baseDefense: number;
-  work: Partial<Record<WorkType, 1 | 2 | 3 | 4>>;
+  work: Partial<Record<WorkType, number>>;   // 1–7 in current Palworld
   farmDrop?: { itemId: string; perMinute: number };
   drops: Drop[];
   breedPower: number;        // combi rank; lower = "stronger" child

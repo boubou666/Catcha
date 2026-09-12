@@ -6,7 +6,7 @@ import {
   tickBase, unassignWorker, workLevels,
 } from './base';
 import { RATES, RECIPES, STRUCTURES } from '../data/base';
-import { PALS } from '../data/pals';
+import { PALS, palById } from '../data/pals';
 import { itemById } from '../data/items';
 import { TECHS } from '../data/tech';
 
@@ -60,28 +60,31 @@ describe('workers', () => {
     expect(assignWorker(save, extra.uid)).toBe(true);
   });
   it('sums work levels with star bonus', () => {
-    const save = staffed(2, 11); // Penking: 2 in five jobs
+    const save = staffed(2, 11); // two Penkings
+    const mining = palById(11).work.Mining!;
     save.box[0].stars = 2;
     const w = workLevels(save);
-    expect(w.Mining).toBeCloseTo(2 * (1 + 2 * RATES.starBonus) + 2);
+    expect(w.Mining).toBeCloseTo(mining * (1 + 2 * RATES.starBonus) + mining);
     expect(w.Kindling).toBe(0);
   });
 });
 
 describe('production', () => {
   it('produces wood from Lumbering and multiplies with the Logging Site', () => {
-    const save = staffed(1, 4); // Lifmunk: Lumbering 1, Transporting 1 (+3%)
+    const save = staffed(1, 4); // Lifmunk: Lumbering 1
     const before = computeRates(save).items.wood;
-    expect(before).toBeCloseTo(RATES.wood * 1.03);
+    const transport = 1 + RATES.transportBonus * (palById(4).work.Transporting ?? 0);
+    expect(before).toBeCloseTo(RATES.wood * transport);
     save.inventory.wood = 30; save.inventory.stone = 10;
     expect(build(save, 'logging')).toBe(true);
     expect(computeRates(save).items.wood).toBeCloseTo(before * 2);
   });
   it('moves whole units into the inventory over time', () => {
     const save = staffed(1, 4);
-    tickBase(save, 60); // one minute at ~4.12 wood/min
-    expect(save.inventory.wood).toBe(4);
-    expect(save.base.acc.wood).toBeCloseTo(0.12);
+    const perMin = computeRates(save).items.wood;
+    tickBase(save, 60);
+    expect(save.inventory.wood).toBe(Math.floor(perMin));
+    expect(save.base.acc.wood).toBeCloseTo(perMin - Math.floor(perMin));
   });
   it('berries need all three crew jobs and the plantation', () => {
     const save = staffed(1, 4); // Lifmunk has Planting + Gathering but no Watering

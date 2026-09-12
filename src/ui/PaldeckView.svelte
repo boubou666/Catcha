@@ -1,10 +1,10 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { PALS, paldeckNumber } from '../data/pals';
+  import { PALS, paldeckNumber, paldeckOrder } from '../data/pals';
   import PalIcon from './PalIcon.svelte';
 
   const entries = $derived(
-    [...PALS].sort((a, b) => (a.variantOf ?? a.id) - (b.variantOf ?? b.id) || a.id - b.id).map((def) => {
+    [...PALS].sort((a, b) => paldeckOrder(a) - paldeckOrder(b)).map((def) => {
       const e = game.save.paldeck[def.id];
       return { def, seen: !!e?.seen, caught: e?.caught ?? 0 };
     }),
