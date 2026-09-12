@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'Welcome-back summary: sorted by biggest change, with search and Gained / Consumed / Events views when there is a lot to read.',
       'Arena: "Who lives here?" shows the route\'s spawn odds and Paldeck status with search and filters, and a 👀 watch that pops a toast when a species spawns.',
       'Tutorial: an All steps list (also "How to play" in Settings → About) with done / current / upcoming status, search and Go buttons.',
       'Stats: search any statistic, pick a section, hide zero rows.',
