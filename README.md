@@ -8,6 +8,9 @@ Design notes: [DESIGN.md](DESIGN.md).
 
 Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Catcha/**
 
+It installs as a PWA (Chrome/Edge: install icon in the address bar; Android: "Add to Home screen"; iOS Safari:
+Share → Add to Home Screen) and keeps working offline after the first load.
+
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.
 
@@ -37,6 +40,7 @@ npm run dev
 | `npm run build` | Production build into `dist/`          |
 | `npm run check` | Type-check `.ts` and `.svelte` files   |
 | `npm test`      | Vitest — engine unit tests             |
+| `npm run icons` | Regenerate the PWA icons (`public/icons/`) |
 | `npm run fetch-art` | Download Pal art into `public/pals/` (see below) |
 | `npm run balance` | Print the headless balance model (per-region times, plus hours per run across ascensions; `-- --runs N`) |
 | `npm run fetch-data` | Regenerate `src/data/pals.ts`, `combos.ts` and drop items from the wiki (`--dry-run` to preview) |

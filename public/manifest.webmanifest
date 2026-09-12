@@ -1,0 +1,16 @@
+{
+  "name": "Catcha",
+  "short_name": "Catcha",
+  "description": "A Palworld-themed idle clicker: catch, build, breed, ascend.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#14161c",
+  "theme_color": "#14161c",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
