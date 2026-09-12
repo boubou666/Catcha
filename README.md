@@ -40,8 +40,10 @@ boss and tower wins, hatches, achievements, quests, Lucky spawns, raid summons, 
 under Settings, stored per device. On touch devices with `navigator.vibrate` (Android browsers; not iOS
 Safari) the same events also give short haptic buzzes — toggle in Settings.
 
-Works on phones: below 800 px the arena becomes a sticky bar under the header and the routes, bosses and
-log move into a World tab group; touch targets are enlarged.
+Works on phones: below 800 px the header collapses to a two-line strip (title · region · level with a thin
+exp bar, 🔍 / 🔔 / Save, then a scrolling row of chips for gold, effigies, tech points, trophies, relics and
+spheres; the search unfolds behind 🔍 or the / shortcut), the arena becomes a sticky bar under it and the
+routes, bosses and log move into a World tab group; touch targets are enlarged.
 
 ## Run
 
