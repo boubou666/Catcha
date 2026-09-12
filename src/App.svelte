@@ -31,6 +31,9 @@
   import StatsView from './ui/StatsView.svelte';
   import SpawnList from './ui/SpawnList.svelte';
   import { whatsNew } from './state/whatsnew.svelte';
+  import { ui } from './state/ui.svelte';
+  import ShortcutsHelp from './ui/ShortcutsHelp.svelte';
+  import { isFieldTarget, resolveShortcut } from './engine/shortcuts';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings' | 'stats';
   type Group = { id: string; label: string; tabs: { id: Tab; label: string }[] };
@@ -83,6 +86,28 @@
     select(lastInGroup[g.id] ?? g.tabs[0].id);
   }
 
+  function onKey(e: KeyboardEvent) {
+    const el = e.target as HTMLElement | null;
+    const action = resolveShortcut({ key: e.key, code: e.code, ctrl: e.ctrlKey, meta: e.metaKey, alt: e.altKey, shift: e.shiftKey, inField: isFieldTarget(el?.tagName, !!el?.isContentEditable) });
+    if (!action) return;
+    // Space on a focused button is that button's click, not an attack
+    if (action.kind === 'attack' && e.code === 'Space' && el?.tagName === 'BUTTON') return;
+    // a modal owns the keyboard while open (its own Escape handling still runs)
+    if (game.offline || whatsNew.open || ui.shortcutsOpen) { if (action.kind === 'help') ui.shortcutsOpen = false; return; }
+    e.preventDefault();
+    const gi = groups.findIndex((g) => g.id === group.id);
+    switch (action.kind) {
+      case 'tab': { const t = group.tabs[action.index]; if (t) select(t.id); break; }
+      case 'tabStep': { const i = group.tabs.findIndex((t) => t.id === tab); select(group.tabs[(i + action.delta + group.tabs.length) % group.tabs.length].id); break; }
+      case 'group': { const g = groups[action.index]; if (g) selectGroup(g); break; }
+      case 'groupStep': selectGroup(groups[(gi + action.delta + groups.length) % groups.length]); break;
+      case 'attack': if (game.wild) game.click(); break;
+      case 'search': ui.focusSearch += 1; break;
+      case 'help': ui.shortcutsOpen = !ui.shortcutsOpen; break;
+      case 'save': game.persist(); game.notify('💾 Saved', 'info', 1500); break;
+    }
+  }
+
   onMount(() => {
     const stop = game.start();
     const off = game.on((e) => { play(e); buzz(e); });
@@ -91,8 +116,11 @@
   });
 </script>
 
+<svelte:window onkeydown={onKey} />
+
 <OfflineSummary />
 <Toasts />
+<ShortcutsHelp bind:open={ui.shortcutsOpen} />
 <UpdateBanner />
 <WhatsNew />
 

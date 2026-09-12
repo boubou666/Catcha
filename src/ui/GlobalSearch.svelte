@@ -28,6 +28,8 @@
     else if (e.key === 'Enter') { pick(results[Math.min(active, results.length - 1)].action); e.preventDefault(); }
   }
   $effect(() => { void results; active = 0; });
+  // the "/" shortcut asks for focus through the ui store
+  $effect(() => { if (ui.focusSearch > 0) { input?.focus(); open = true; } });
 </script>
 
 <svelte:window onkeydown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); input?.focus(); open = true; } }} />

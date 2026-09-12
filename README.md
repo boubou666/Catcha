@@ -119,6 +119,11 @@ time away, capped at 24 h, and a summary shows the deltas. Combat never runs off
 more than six lines it gets a search, an Everything / Gained / Consumed / Events view and a sort (biggest
 change, with events last, or name) — `offlineRows` / `filterOfflineRows` in `src/engine/offline.ts`.
 
+Keyboard shortcuts: `1`–`9` open the Nth tab of the current group, `←`/`→` step tabs, `↑`/`↓` step groups, `Space`
+or `A` attacks, `/` or Ctrl+K focuses the global search, `S` saves, `?` shows the list (also Settings → About).
+Digits go by physical key so AZERTY/QWERTZ work unshifted; nothing fires while typing in a field or with
+Ctrl/Alt/Meta held (`src/engine/shortcuts.ts`).
+
 Global search: the header search box (Ctrl+K) finds tabs, your Pals, Paldeck species (unseen ones by number
 only), routes, bosses, owned items, recipes, techs, Ascension upgrades, achievements and settings sections —
 at most five per kind, thirty overall, with a kind filter — and jumps there: routes travel, a species opens
