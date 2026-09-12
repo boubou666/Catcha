@@ -4,6 +4,7 @@ import { elementMult } from '../data/elements';
 import { partyInstances, grantExp } from './party';
 import { addItem, earnGold } from './inventory';
 import { achievementGoldMult } from './achievements';
+import { prestigeMult } from './prestige';
 import { techMult } from './tech';
 import { expReward, goldReward, instanceAttack, LUCKY_CHANCE, LUCKY_HP_MULT, wildHp } from './formulas';
 
@@ -50,7 +51,7 @@ export function partyDps(save: SaveState, wild: Wild): number {
   for (const inst of partyInstances(save)) {
     dps += instanceAttack(inst) * elementMult(palById(inst.palId).elements, target);
   }
-  return dps * techMult(save, 'attack');
+  return dps * techMult(save, 'attack') * prestigeMult(save, 'attack');
 }
 
 export interface DefeatSummary {
@@ -65,8 +66,8 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
   const bossMult = { wild: 1, dungeon: 2, alpha: 10, dungeonBoss: 12, tower: 25, raid: 40 }[wild.kind];
   const luckyMult = wild.lucky ? 5 : 1;
 
-  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold') * achievementGoldMult(save));
-  const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp'));
+  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold') * achievementGoldMult(save) * prestigeMult(save, 'gold'));
+  const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp') * prestigeMult(save, 'exp'));
   earnGold(save, gold);
   save.stats.defeated += 1;
   for (const e of def.elements) save.stats.defeatedByElement[e] = (save.stats.defeatedByElement[e] ?? 0) + 1;

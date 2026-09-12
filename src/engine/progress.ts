@@ -2,13 +2,14 @@ import type { Requirement, RouteDef, SaveState } from '../data/types';
 import { alphaById, routeById, towerById } from '../data/regions';
 import { palById } from '../data/pals';
 import { raidById } from '../data/raids';
+import { routeQuota } from './prestige';
 
 export function routeKills(save: SaveState, routeId: string): number {
   return save.progress.routeKills[routeId] ?? 0;
 }
 
 export function routeCleared(save: SaveState, route: RouteDef): boolean {
-  return routeKills(save, route.id) >= route.killsToClear;
+  return routeKills(save, route.id) >= routeQuota(save, route);
 }
 
 export function isUnlocked(save: SaveState, req: Requirement): boolean {

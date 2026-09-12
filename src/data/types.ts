@@ -195,7 +195,8 @@ export interface SaveState {
     defeatedByElement: Partial<Record<Element, number>>;
   };
   achievements: string[];                // unlocked ids
-  daily: DailyState | null;              // today's quests; regenerated when the UTC day changes
+  daily: DailyState | null;              // today's quests; regenerated when the day changes
+  prestige: { relics: number; ascensions: number; upgrades: Record<string, number> };
   lastSavedAt: number;
 }
 

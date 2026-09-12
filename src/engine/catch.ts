@@ -4,6 +4,7 @@ import { palById } from '../data/pals';
 import { BASE_CATCH_RATE, EFFIGY_CAPTURE_BONUS, LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
 import { addToBox, makeInstance } from './party';
 import { techMult } from './tech';
+import { prestigeMult } from './prestige';
 import { rollWildPassives } from './passives';
 import type { Rng, Wild } from './combat';
 
@@ -43,7 +44,7 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
   const itemId = SPHERES[tier].itemId;
   save.inventory[itemId] -= 1;
 
-  const chance = catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch'));
+  const chance = catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch') * prestigeMult(save, 'catch'));
   if (rand() < chance) {
     addToBox(save, makeInstance(wild.palId, wild.level, wild.lucky, rollWildPassives(palById(wild.palId), wild.lucky, rand)));
     save.stats.caught += 1;

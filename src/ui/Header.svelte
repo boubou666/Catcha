@@ -29,7 +29,7 @@
 
   <div class="stat">
     <div class="label">💰 {Math.floor(player.gold).toLocaleString()}</div>
-    <div class="muted small">Effigies: {player.effigies} · Tech pts: {player.techPoints} · 🏆 {achievementPoints(game.save)}</div>
+    <div class="muted small">Effigies: {player.effigies} · Tech pts: {player.techPoints} · 🏆 {achievementPoints(game.save)}{#if game.save.prestige.relics > 0 || game.save.prestige.ascensions > 0}&nbsp;· 🏺 {game.save.prestige.relics}{/if}</div>
   </div>
 
   <div class="stat grow">

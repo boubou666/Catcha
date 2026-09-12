@@ -4,7 +4,7 @@ import { newBase } from './base';
 import { newStats } from './achievements';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 15;
+export const SAVE_VERSION = 16;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -22,6 +22,7 @@ export function newState(): SaveState {
     stats: newStats(),
     achievements: [],
     daily: null,
+    prestige: { relics: 0, ascensions: 0, upgrades: {} },
     lastSavedAt: Date.now(),
   };
 }
@@ -112,6 +113,10 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 14 && s.settings) {
     s.settings.dailyReset ??= 'utc';
     s.version = 15;
+  }
+  if (s.version === 15) {
+    s.prestige ??= { relics: 0, ascensions: 0, upgrades: {} };
+    s.version = 16;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

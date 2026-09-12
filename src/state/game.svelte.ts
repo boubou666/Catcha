@@ -21,6 +21,9 @@ import { completeRaid, describeRaidChest, summon, summonBlocker } from '../engin
 import { raidById } from '../data/raids';
 import { checkAchievements } from '../engine/achievements';
 import { claimBonus, claimQuest, rollDaily, describeQuest, BONUS_EFFIGIES } from '../engine/daily';
+import { buyUpgrade, relicsFor } from '../engine/prestige';
+import { ascend } from '../engine/ascend';
+import { prestigeUpgradeById } from '../data/prestige';
 import { earnGold } from '../engine/inventory';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
@@ -127,6 +130,23 @@ export class Game {
   }
 
   click() { this.save.stats.clicks += 1; this.hit(this.clickDmg); }
+
+  // ---- prestige ----------------------------------------------------------
+
+  buyUpgrade(id: string) {
+    if (buyUpgrade(this.save, id)) this.push(`Ancient upgrade: ${prestigeUpgradeById(id).name} Lv ${this.save.prestige.upgrades[id]}.`);
+  }
+
+  ascend(keepUids: string[]) {
+    const relics = relicsFor(this.save);
+    const next = ascend(this.save, keepUids);
+    if (!next) return;
+    this.save = next;
+    this.run = null;
+    this.spawn();
+    this.persist();
+    this.push(`Ascension ${next.prestige.ascensions} — +${relics} Ancient Relics. A new run begins.`);
+  }
 
   claimQuest(id: string) {
     const q = claimQuest(this.save, id);

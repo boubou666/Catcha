@@ -129,6 +129,12 @@ Achievements: 63 across combat, collection, base, breeding, exploration and econ
 every point is a permanent +1% gold from defeated Pals. Lifetime stats (defeats, catches, crafts, gold…)
 are tracked from save v13 onward. Defined in `src/data/achievements.ts`.
 
+Ascension (prestige): after clearing a tower, start the map over for Ancient Relics — towers weigh 1–7 by
+region, plus one per 10 species owned and per 10 levels. Relics buy permanent upgrades (party attack,
+base output, catch rate, exp, gold, bigger Ark, head-start tech points, shorter route quotas, starting
+spheres). You carry 1 Pal (+1 per Ark level) with levels, stars and passives; Paldeck records,
+achievements, stats and daily quests survive. Defined in `src/data/prestige.ts`.
+
 Every system in DESIGN.md is built and the numbers have been through a model-based balance pass
 (`npm run balance`): on-level kills sit at 4–6 s from region 1 to 7, Alphas at 2–4 min, towers at
 ~60–65% of their 10-minute limit for an on-level party, raids at 75–96%. Real play will still find things.

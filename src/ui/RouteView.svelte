@@ -3,6 +3,7 @@
   import { palById } from '../data/pals';
   import { alphaById, towerById } from '../data/regions';
   import { describeRequirement, isUnlocked, routeCleared, routeKills } from '../engine/progress';
+  import { routeQuota } from '../engine/prestige';
   import PalIcon from './PalIcon.svelte';
   import { dungeonsOf, dungeonById } from '../data/dungeons';
   import { bossName, dungeonClears, dungeonUnlocked } from '../engine/dungeon';
@@ -53,7 +54,7 @@
         class:cleared
         disabled={!unlocked || game.inBossFight}
         onclick={() => game.travel(r.id)}
-        title={unlocked ? `${routeKills(game.save, r.id)} / ${r.killsToClear} defeated` : describeRequirement(r.unlock)}
+        title={unlocked ? `${routeKills(game.save, r.id)} / ${routeQuota(game.save, r)} defeated` : describeRequirement(r.unlock)}
       >
         <span>{r.name}</span>
         <span class="muted">Lv {r.level}{cleared ? ' ✓' : ''}</span>
@@ -91,7 +92,7 @@
     <div class="row muted small">
       <span>Party DPS: <b>{game.dps.toFixed(1)}</b></span>
       {#if wild.kind === 'wild'}
-        <span>· Route progress: <b>{Math.min(kills, game.route.killsToClear)} / {game.route.killsToClear}</b></span>
+        <span>· Route progress: <b>{Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}</b></span>
       {:else}
         <button class="small" onclick={() => game.flee()}>{run ? 'Leave realm' : wild.kind === 'raid' ? 'Give up (slab lost)' : 'Retreat'}</button>
       {/if}

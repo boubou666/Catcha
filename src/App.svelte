@@ -13,12 +13,13 @@
   import AchievementsView from './ui/AchievementsView.svelte';
   import DailyView from './ui/DailyView.svelte';
   import SettingsView from './ui/SettingsView.svelte';
+  import PrestigeView from './ui/PrestigeView.svelte';
   import PaldeckView from './ui/PaldeckView.svelte';
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
 
-  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'expedition' | 'tech' | 'paldeck' | 'items' | 'shop' | 'achievements' | 'daily' | 'settings';
+  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'expedition' | 'tech' | 'paldeck' | 'items' | 'shop' | 'achievements' | 'daily' | 'settings' | 'prestige';
   const TABS: { id: Tab; label: string }[] = [
     { id: 'party', label: 'Party' },
     { id: 'box', label: 'Box' },
@@ -32,6 +33,7 @@
     { id: 'shop', label: 'Merchant' },
     { id: 'daily', label: 'Daily' },
     { id: 'achievements', label: 'Achievements' },
+    { id: 'prestige', label: 'Ascension' },
     { id: 'settings', label: 'Settings' },
   ];
   let tab = $state<Tab>('party');
@@ -66,6 +68,7 @@
         {:else if tab === 'shop'}<ShopView />
         {:else if tab === 'daily'}<DailyView />
         {:else if tab === 'settings'}<SettingsView />
+        {:else if tab === 'prestige'}<PrestigeView />
         {:else}<AchievementsView />{/if}
       </div>
     </section>

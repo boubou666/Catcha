@@ -6,6 +6,7 @@ import { detachFromBreeding, instanceByUid, isAway } from './party';
 import { isUnlocked } from './progress';
 import { recipeUnlocked, structureUnlocked, techMult } from './tech';
 import { passiveMult } from './passives';
+import { prestigeMult } from './prestige';
 
 export function newBase(): BaseState {
   return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [], expeditions: [], reports: [] };
@@ -105,7 +106,7 @@ export function isHungry(save: SaveState): boolean {
 export function globalMult(save: SaveState, levels = workLevels(save)): number {
   const transport = Math.min(RATES.transportCap, levels.Transporting * RATES.transportBonus);
   const electric = Math.min(RATES.electricCap, levels.Electricity * RATES.electricBonus);
-  return (1 + transport) * (1 + electric) * (isHungry(save) ? RATES.hungryMult : 1) * techMult(save, 'base');
+  return (1 + transport) * (1 + electric) * (isHungry(save) ? RATES.hungryMult : 1) * techMult(save, 'base') * prestigeMult(save, 'base');
 }
 
 export function foodPerMinute(save: SaveState, levels = workLevels(save)): number {
