@@ -3,7 +3,8 @@ import { palById } from '../data/pals';
 import { passiveById } from '../data/passives';
 import { instanceAttack } from './formulas';
 import { isAway } from './party';
-import { isBreeding } from './breeding';
+import { breedable, childOf, isBreeding } from './breeding';
+import { instanceByUid } from './party';
 
 export type BoxStatus = 'any' | 'idle' | 'party' | 'base' | 'breeding' | 'expedition';
 export type BoxSort = 'stars' | 'level' | 'attack' | 'work' | 'name' | 'species' | 'newest';
@@ -92,4 +93,23 @@ function comparator(sort: BoxSort, save: SaveState, job: WorkType | 'any'): (a: 
       return (a, b) => (idx.get(b.uid) ?? 0) - (idx.get(a.uid) ?? 0);
     }
   }
+}
+
+// ---- parent picker ------------------------------------------------------------------
+
+/**
+ * Idle Pals that match a Box filter (status is forced to idle), minus the parent already picked.
+ * Once one parent is chosen, the search words may also match the *offspring* that Pal would give.
+ */
+export function partnerCandidates(save: SaveState, filter: BoxFilter, pickedUid: string | null): PalInstance[] {
+  const idle = new Set(breedable(save).map((p) => p.uid));
+  const eligible = (p: PalInstance) => idle.has(p.uid) && p.uid !== pickedUid;
+  const base = filterBox(save, { ...filter, status: 'idle' }).filter(eligible);
+  const picked = pickedUid ? instanceByUid(save, pickedUid) : undefined;
+  const words = filter.query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!picked || words.length === 0) return base;
+  const seen = new Set(base.map((p) => p.uid));
+  const byChild = filterBox(save, { ...filter, query: '', status: 'idle' })
+    .filter((p) => eligible(p) && !seen.has(p.uid) && words.every((w) => palById(childOf(picked.palId, p.palId)).name.toLowerCase().includes(w)));
+  return [...base, ...byChild];
 }

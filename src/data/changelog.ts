@@ -19,6 +19,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Paldeck search and filters: status, region, element, work, rarity, subspecies, and sort — without revealing unseen Pals.',
       'The Party tab has an "Add from the Box" picker with the same search and filters, so you can build a party without switching tabs.',
       'Base: the Workers list and the Assign picker get the same search and filters, plus a Work suitability sort that follows the job you filter on.',
+      'Breeding: parents are picked from a searchable, filterable list; with one parent chosen, every candidate shows the offspring it would give and the search matches that too.',
     ],
   },
   {

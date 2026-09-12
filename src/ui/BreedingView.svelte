@@ -12,18 +12,28 @@
   import PalCard from './PalCard.svelte';
   import PassiveChips from './PassiveChips.svelte';
   import { MUTATION_CHANCE } from '../data/passives';
+  import BoxFilterBar from './BoxFilterBar.svelte';
+  import { DEFAULT_FILTER, isFiltering, partnerCandidates, type BoxFilter } from '../engine/boxfilter';
 
   const save = $derived(game.save);
   const hasFarm = $derived(structureLevel(save, BREEDING_FARM) > 0);
   const parents = $derived(breedingParents(save));
   const pair = $derived(save.base.breeding);
   const cakes = $derived(countOf(save, CAKE));
-  const idle = $derived(
-    breedable(save).sort((x, y) => x.palId - y.palId || y.level - x.level),
-  );
+  const idle = $derived(breedable(save));
 
   let aUid = $state('');
   let bUid = $state('');
+  // Picker: idle Pals by species; once a parent is picked the search also matches the offspring's name.
+  const PICK_DEFAULTS: BoxFilter = { ...DEFAULT_FILTER, status: 'idle', sort: 'species' };
+  let filter = $state<BoxFilter>({ ...PICK_DEFAULTS });
+  const picked = $derived(aUid || bUid || null);
+  const candidates = $derived(partnerCandidates(save, filter, picked).filter((p) => p.uid !== aUid && p.uid !== bUid));
+  const filtering = $derived(isFiltering(filter, PICK_DEFAULTS));
+  const clear = () => { filter = { ...PICK_DEFAULTS, sort: filter.sort }; };
+  const pick = (uid: string) => { if (!aUid) aUid = uid; else if (!bUid) bUid = uid; else bUid = uid; };
+  const childWith = (uid: string) => { const a = save.box.find((p) => p.uid === picked); const b = save.box.find((p) => p.uid === uid); return a && b ? childOf(a.palId, b.palId) : null; };
+  const inst = (uid: string) => save.box.find((p) => p.uid === uid);
   const preview = $derived.by(() => {
     const a = save.box.find((p) => p.uid === aUid);
     const b = save.box.find((p) => p.uid === bUid);
@@ -81,15 +91,18 @@
 {:else}
   <p class="muted small">Pick two idle Pals — not in the party, not working. Same species breeds true; otherwise the child is the species closest to the parents' average breeding power.</p>
   <div class="row picks">
-    <select bind:value={aUid}>
-      <option value="">Parent A…</option>
-      {#each idle as p (p.uid)}<option value={p.uid}>{label(p.uid)}</option>{/each}
-    </select>
-    <span class="heart">♥</span>
-    <select bind:value={bUid}>
-      <option value="">Parent B…</option>
-      {#each idle as p (p.uid)}<option value={p.uid}>{label(p.uid)}</option>{/each}
-    </select>
+    {#each [['A', aUid], ['B', bUid]] as [which, uid], i}
+      <div class="slot" class:filled={!!uid}>
+        {#if uid && inst(uid)}
+          <PalIcon palId={inst(uid)!.palId} size={32} lucky={inst(uid)!.lucky} />
+          <span class="grow">{label(uid)}</span>
+          <button class="small" onclick={() => { if (i === 0) aUid = ''; else bUid = ''; }} title="Remove">✕</button>
+        {:else}
+          <span class="muted">Parent {which} — pick from the list below</span>
+        {/if}
+      </div>
+      {#if i === 0}<span class="heart">♥</span>{/if}
+    {/each}
   </div>
   <div class="row child">
     {#if preview !== null}
@@ -103,6 +116,29 @@
   </div>
   {#if block}<div class="warn small">{BLOCK_TEXT[block]}</div>{/if}
   <p class="muted small">{cakes} {itemName(CAKE)} in stock · one per egg · {formatDuration(BREED_SEC * 1000)} per egg</p>
+
+  <div class="picker">
+    <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search parents" hideStatus>
+      {#snippet heading()}
+        <h3 class="grow">Idle Pals <span class="muted">{filtering ? `${candidates.length} of ${idle.length}` : candidates.length}</span></h3>
+      {/snippet}
+    </BoxFilterBar>
+    {#if picked}<p class="muted small">Searching also matches the offspring each partner would give — try the species you want.</p>{/if}
+    {#if idle.length === 0}
+      <p class="muted">No idle Pals — everyone is in the party, working or away.</p>
+    {:else if candidates.length === 0}
+      <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+    {/if}
+    <div class="list scroll">
+      {#each candidates as p (p.uid)}
+        {@const child = picked ? childWith(p.uid) : null}
+        <PalCard inst={p}>
+          {#if child !== null}<span class="muted small child-tag">→ <PalIcon palId={child} size={20} /> {palById(child).name}</span>{/if}
+          <button class="small" onclick={() => pick(p.uid)}>{!aUid ? 'Parent A' : !bUid ? 'Parent B' : 'Swap B'}</button>
+        </PalCard>
+      {/each}
+    </div>
+  </div>
 {/if}
 
 <h3 class="eggs-title">Incubator <span class="muted">{save.base.eggs.length}</span></h3>
@@ -127,7 +163,14 @@
   .parents { align-items: center; }
   .parents :global(.card) { flex: 1; }
   .heart { color: var(--danger); font-size: 1.3rem; }
-  .picks select { flex: 1; min-width: 0; }
+  .picks { align-items: center; }
+  .slot { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; border: 1px dashed var(--border); border-radius: 8px; min-height: 2.8rem; }
+  .slot.filled { border-style: solid; border-color: var(--accent); }
+  .picker { margin-top: 1rem; }
+  .list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .scroll { max-height: 45vh; overflow-y: auto; }
+  .child-tag { display: inline-flex; align-items: center; gap: 0.25rem; }
+  h3 { margin: 0; }
   .child { min-height: 2rem; }
   .small { font-size: 0.8rem; }
   .warn { color: var(--accent); }

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { newState } from './save';
 import { addToBox, makeInstance } from './party';
-import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, workScore, type BoxFilter } from './boxfilter';
+import { DEFAULT_FILTER, filterBox, isFiltering, partnerCandidates, statusOf, workScore, type BoxFilter } from './boxfilter';
+import { childOf } from './breeding';
+import { palById } from '../data/pals';
 
 // Lamball (1, Neutral, Handiwork/Transporting/Farming), Chikipi (3, Neutral), Foxparks (5, Fire),
 // Penking (11, Water/Ice, Mining 3 …)
@@ -105,5 +107,25 @@ describe('work sort', () => {
     expect(workScore(makeInstance(11, 1))).toBe(12);
     expect(workScore(makeInstance(11, 1), 'Mining')).toBe(3);
     expect(workScore(makeInstance(11, 1), 'Kindling')).toBe(0);
+  });
+});
+
+describe('breeding partner candidates', () => {
+  it('lists idle Pals only, minus the picked parent, and matches offspring names once a parent is picked', () => {
+    const { s, lamA, lamB, chik, fox, pen } = setup();     // fox in party, pen at base, chik away → idle: lamA, lamB
+    const f0 = { ...DEFAULT_FILTER, status: 'any' as const, sort: 'species' as const };
+    expect(partnerCandidates(s, f0, null).map((p) => p.uid)).toEqual([lamB.uid, lamA.uid]);
+    expect(partnerCandidates(s, f0, lamA.uid).map((p) => p.uid)).toEqual([lamB.uid]);
+
+    // free everyone; pick Lamball A, then search for the child a partner would give (Lamball + Penking → Verdash)
+    s.party = []; s.base.workers = []; s.base.expeditions = [];
+    expect(palById(childOf(lamA.palId, pen.palId)).name).toBe('Verdash');
+    expect(partnerCandidates(s, { ...f0, query: 'verdash' }, lamA.uid).map((p) => p.uid)).toEqual([pen.uid]);
+    // a plain name search still works alongside the offspring match
+    expect(partnerCandidates(s, { ...f0, query: 'foxparks' }, lamA.uid).map((p) => p.uid)).toEqual([fox.uid]);
+    // without a picked parent the query only matches the Pal itself
+    expect(partnerCandidates(s, { ...f0, query: 'verdash' }, null)).toEqual([]);
+    expect(partnerCandidates(s, f0, null)).toHaveLength(5);
+    void chik;
   });
 });

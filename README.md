@@ -165,6 +165,10 @@ an "Add from the Box" picker under the slots — idle Pals sorted by attack by d
 workers and breeding pairs can be pulled; expedition members can't). The Base tab uses it twice: over the
 Workers list (status pinned to the base) and as the "Assign from the Box" picker; both default to the
 "Work suitability" sort, which ranks by the job chosen in the work filter, or overall suitability if none.
+Breeding picks parents from the same kind of list instead of dropdowns: two parent slots, a searchable list
+of idle Pals with a "Parent A / Parent B" button, and — once one parent is picked — the offspring each
+partner would give shown on its card and matched by the search too (`partnerCandidates`), so you can type
+the species you want.
 
 Paldeck search and filters work the same way (`src/engine/paldeckfilter.ts`): search by name, number or
 element; filter by status (caught / seen / never seen), region (met on its routes, Alphas or tower), element,
