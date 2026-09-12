@@ -129,6 +129,10 @@ Achievements: 63 across combat, collection, base, breeding, exploration and econ
 every point is a permanent +1% gold from defeated Pals. Lifetime stats (defeats, catches, crafts, gold…)
 are tracked from save v13 onward. Defined in `src/data/achievements.ts`.
 
+Paldeck detail: click any entry for stats, work, drops, every place it spawns (with odds and lock
+requirements, and a Go button), and how to breed it — special combos plus rank-formula pairs from species
+you already own.
+
 Ascension (prestige): after clearing a tower, start the map over for Ancient Relics — towers weigh 1–7 by
 region, plus one per 10 species owned and per 10 levels. Relics buy permanent upgrades (party attack,
 base output, catch rate, exp, gold, bigger Ark, head-start tech points, shorter route quotas, starting

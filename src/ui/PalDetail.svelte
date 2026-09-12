@@ -1,0 +1,115 @@
+<script lang="ts">
+  import { game } from '../state/game.svelte';
+  import { palById, paldeckNumber } from '../data/pals';
+  import { itemName } from '../data/items';
+  import { JOB_ICON } from '../data/base';
+  import type { WorkType } from '../data/types';
+  import { breedingInfoFor, habitatOf, isSeen, ownedCopies } from '../engine/paldex';
+  import { routeById } from '../data/regions';
+  import { isUnlocked, describeRequirement } from '../engine/progress';
+  import { dungeonById } from '../data/dungeons';
+  import { raidById } from '../data/raids';
+  import PalIcon from './PalIcon.svelte';
+  import PassiveChips from './PassiveChips.svelte';
+
+  let { palId, onclose, onselect }: { palId: number; onclose: () => void; onselect: (id: number) => void } = $props();
+
+  const save = $derived(game.save);
+  const def = $derived(palById(palId));
+  const seen = $derived(isSeen(save, def));
+  const caught = $derived((save.paldeck[palId]?.caught ?? 0) > 0);
+  const habitat = $derived(habitatOf(palId));
+  const breeding = $derived(breedingInfoFor(save, palId));
+  const owned = $derived(ownedCopies(save, palId));
+  const work = $derived(Object.entries(def.work) as [WorkType, number][]);
+  const pct = (n: number) => `${Math.round(n * 100)}%`;
+  const name = (id: number) => (isSeen(save, palById(id)) ? palById(id).name : '???');
+</script>
+
+<svelte:window onkeydown={(e) => { if (e.key === 'Escape') onclose(); }} />
+
+<div class="backdrop">
+  <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="pal-title">
+    <div class="row head">
+      <PalIcon {palId} size={96} unknown={!seen} render />
+      <div class="grow">
+        <div class="muted small">{paldeckNumber(def)}{def.variantOf ? ` · subspecies of ${name(def.variantOf)}` : ''}</div>
+        <h2 id="pal-title">{seen ? def.name : '???'}</h2>
+        <div class="muted">{seen ? `${def.elements.join(' / ')} · ${def.rarity}${def.partnerSkill ? ` · ${def.partnerSkill}` : ''}` : 'Unknown element'}</div>
+        {#if owned.count > 0}
+          <div class="small">Owned ×{owned.count}{owned.best ? ` · best Lv ${owned.best.level}${owned.best.stars ? ' ' + '★'.repeat(owned.best.stars) : ''}` : ''}</div>
+        {:else if seen}<div class="muted small">Seen, not yet caught</div>
+        {:else}<div class="muted small">Not yet encountered</div>{/if}
+      </div>
+      <button class="small" onclick={onclose}>✕</button>
+    </div>
+
+    {#if seen}
+      <section class="cols">
+        <div>
+          <h3>Stats</h3>
+          <div class="small">HP {def.baseHp} · ATK {def.baseAttack} · DEF {def.baseDefense}<br />Breeding rank {def.breedPower}</div>
+        </div>
+        <div>
+          <h3>Work</h3>
+          <div class="small">{#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}{#if work.length === 0}<span class="muted">none</span>{/if}
+            {#if def.farmDrop}<div class="muted">Ranch: {itemName(def.farmDrop.itemId)}</div>{/if}</div>
+        </div>
+        <div>
+          <h3>Drops</h3>
+          <div class="small">{#if caught}{def.drops.map((d) => `${itemName(d.itemId)}${d.chance < 1 ? ` (${pct(d.chance)})` : ''}`).join(', ')}{:else}<span class="muted">catch one to learn</span>{/if}</div>
+        </div>
+      </section>
+    {/if}
+
+    <section>
+      <h3>Habitat</h3>
+      {#if habitat.routes.length + habitat.alphas.length + habitat.towers.length + habitat.realms.length + habitat.raids.length === 0}
+        <div class="muted small">Not found in the wild.</div>
+      {/if}
+      <ul class="small">
+        {#each habitat.routes as r}
+          {@const open = isUnlocked(save, routeById(r.routeId).unlock)}
+          <li class:locked={!open}>{r.routeName} <span class="muted">({r.regionName}, Lv {r.level}) · {pct(r.chance)} of spawns{open ? '' : ` · 🔒 ${describeRequirement(routeById(r.routeId).unlock)}`}</span>
+            {#if open && !game.inBossFight && game.route.id !== r.routeId}<button class="tiny" onclick={() => { game.travel(r.routeId); onclose(); }}>Go</button>{/if}</li>
+        {/each}
+        {#each habitat.alphas as a}<li>Alpha in {a.regionName} <span class="muted">(Lv {a.level})</span></li>{/each}
+        {#each habitat.towers as t}<li>{t.boss} — {t.name} <span class="muted">(tower boss, not catchable)</span></li>{/each}
+        {#each habitat.realms as d}<li>{d.name} <span class="muted">({d.role === 'guardian' ? 'guardian' : `${pct(d.chance)} of waves`}{isUnlocked(save, dungeonById(d.dungeonId).unlock) ? '' : ` · 🔒 ${describeRequirement(dungeonById(d.dungeonId).unlock)}`})</span></li>{/each}
+        {#each habitat.raids as r}<li>{r.name} raid <span class="muted">(egg on victory{isUnlocked(save, raidById(r.raidId).unlock) ? '' : ` · 🔒 ${describeRequirement(raidById(r.raidId).unlock)}`})</span></li>{/each}
+      </ul>
+    </section>
+
+    <section>
+      <h3>Breeding</h3>
+      <ul class="small">
+        <li>{seen ? def.name : 'It'} × {seen ? def.name : 'itself'} → {seen ? def.name : 'itself'} <span class="muted">(same species breeds true)</span></li>
+        {#each breeding.producedBy as p}
+          <li><button class="link" onclick={() => onselect(p.a)}>{name(p.a)}</button> × <button class="link" onclick={() => onselect(p.b)}>{name(p.b)}</button> → {seen ? def.name : '???'}
+            <span class="muted">{p.special ? '(special combo)' : '(by breeding rank, from species you own)'}</span></li>
+        {/each}
+        {#each breeding.parentOf as p}
+          <li>{seen ? def.name : '???'} × <button class="link" onclick={() => onselect(p.partner)}>{name(p.partner)}</button> → <button class="link" onclick={() => onselect(p.child)}>{name(p.child)}</button> <span class="muted">(special combo)</span></li>
+        {/each}
+        {#if breeding.producedBy.length === 0 && !def.variantOf}
+          <li class="muted">No owned pair lands on this rank yet — catch more species and check back.</li>
+        {/if}
+      </ul>
+    </section>
+  </div>
+</div>
+
+<style>
+  .backdrop { position: fixed; inset: 0; z-index: 10; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal { width: min(640px, 100%); max-height: 90vh; overflow-y: auto; }
+  .head { align-items: flex-start; }
+  .small { font-size: 0.85rem; }
+  section { margin-top: 1rem; }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  @media (max-width: 560px) { .cols { grid-template-columns: 1fr; } }
+  ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.25rem; }
+  li.locked { opacity: 0.6; }
+  .job { margin-right: 0.35rem; white-space: nowrap; }
+  .tiny { font-size: 0.75rem; padding: 0.05rem 0.4rem; margin-left: 0.3rem; }
+  .link { background: none; border: none; padding: 0; color: var(--accent-2); cursor: pointer; font: inherit; text-decoration: underline; }
+</style>
