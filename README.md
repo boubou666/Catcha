@@ -115,7 +115,8 @@ gain exp either way and are locked until they return. Resolves offline. Data in 
 Raids: build the Summoning Altar (tech Lv 35), assemble a slab from Slab Fragments (Sealed Realms
 from region 3, long expeditions), and summon Bellanoir (500k HP), Xenolord (1.5M) or Bellanoir Libero
 (3M) for a ten-minute DPS check. The slab is spent on summon. Winning pays Diamonds, Ingots, a
-Legendary Sphere chance and the boss's egg. Data in `src/data/raids.ts`.
+Legendary Sphere chance and the boss's egg, which inherits passives from the party that won
+(same rule as breeding, with your five fighters as the parent pool). Data in `src/data/raids.ts`.
 
 Every system in DESIGN.md is built and the numbers have been through a model-based balance pass
 (`npm run balance`): on-level kills sit at 4–6 s from region 1 to 7, Alphas at 2–4 min, towers at

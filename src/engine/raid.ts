@@ -2,9 +2,14 @@ import type { SaveState } from '../data/types';
 import { ALTAR, raidById, type RaidDef } from '../data/raids';
 import { INCUBATION_SEC } from './breeding';
 import { palById } from '../data/pals';
+import { passiveById } from '../data/passives';
 import { addItem, countOf } from './inventory';
 import { isUnlocked } from './progress';
 import type { Rng, Wild } from './combat';
+import { inheritFromParents } from './passives';
+import { partyInstances } from './party';
+
+const passiveName = (id: string) => passiveById(id).name;
 
 export function raidWins(save: SaveState, id: string): number {
   return save.progress.raids[id] ?? 0;
@@ -28,11 +33,11 @@ export function summon(save: SaveState, id: string, now = Date.now()): Wild | nu
   return { palId: def.palId, level: def.level, hp: def.hp, maxHp: def.hp, lucky: false, kind: 'raid', refId: id, deadlineAt: now + def.timeLimitSec * 1000 };
 }
 
-export interface RaidChest { gold: number; items: Record<string, number>; egg: boolean }
+export interface RaidChest { gold: number; items: Record<string, number>; egg: boolean; passives: string[] }
 
-/** Grant the win: chest, the boss's egg into the incubator, win count. */
+/** Grant the win: chest, the boss's egg (inheriting passives from the winning party), win count. */
 export function completeRaid(save: SaveState, def: RaidDef, rand: Rng = Math.random): RaidChest {
-  const chest: RaidChest = { gold: def.reward.gold, items: {}, egg: def.reward.egg };
+  const chest: RaidChest = { gold: def.reward.gold, items: {}, egg: def.reward.egg, passives: [] };
   save.player.gold += chest.gold;
   for (const drop of def.reward.items) {
     if (rand() < drop.chance) {
@@ -43,8 +48,8 @@ export function completeRaid(save: SaveState, def: RaidDef, rand: Rng = Math.ran
   }
   if (def.reward.egg) {
     const boss = palById(def.palId);
-    const passives = boss.rarity === 'legendary' ? ['legend'] : [];
-    save.base.eggs.push({ palId: def.palId, remaining: INCUBATION_SEC[boss.rarity], passives });
+    chest.passives = inheritFromParents(partyInstances(save), boss, rand);
+    save.base.eggs.push({ palId: def.palId, remaining: INCUBATION_SEC[boss.rarity], passives: chest.passives });
   }
   save.progress.raids[def.id] = raidWins(save, def.id) + 1;
   return chest;
@@ -53,6 +58,6 @@ export function completeRaid(save: SaveState, def: RaidDef, rand: Rng = Math.ran
 export function describeRaidChest(chest: RaidChest, bossName: string, itemName: (id: string) => string): string {
   const parts = [`${chest.gold.toLocaleString()} gold`];
   for (const [id, n] of Object.entries(chest.items)) parts.push(`${n} ${itemName(id)}`);
-  if (chest.egg) parts.push(`a ${bossName} egg`);
+  if (chest.egg) parts.push(`a ${bossName} egg${chest.passives.length ? ` (${chest.passives.map(passiveName).join(', ')})` : ''}`);
   return parts.join(', ');
 }
