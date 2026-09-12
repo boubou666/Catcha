@@ -4,6 +4,13 @@ A Palworld-themed idle/clicker in the spirit of PokéClicker. Browser-only, save
 
 Design notes: [DESIGN.md](DESIGN.md).
 
+## Play
+
+Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Catcha/**
+
+Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
+**Import** on the other to move a save.
+
 ## Run
 
 ```bash
@@ -48,8 +55,8 @@ and the wiki page name, then rerun.
 
 Pal images are Pocketpair's and are **not** in the repo. `npm run fetch-art` pulls the Paldeck icon and
 render for every Pal in `src/data/pals.ts` from palworld.wiki.gg into `public/pals/` (gitignored).
-Without them the UI shows element-coloured placeholder discs. Private use only — don't publish a build
-that includes them.
+Without them the UI shows element-coloured placeholder discs — which is what the GitHub Pages build
+shows, since the images are never committed or deployed.
 
 ## Status
 
