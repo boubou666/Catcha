@@ -18,7 +18,9 @@ something players should know about.
 New saves get a ten-step tutorial card above the tabs (attack → catch → party → clear a route → research → worker →
 build → craft → Alpha). Each step checks the save state and advances on its own, with a "Take me there" button
 for steps that live on another tab; it can be skipped at any time and replayed from Settings → About. Steps live
-in `src/engine/tutorial.ts`; saves from before it existed are marked done.
+in `src/engine/tutorial.ts`; saves from before it existed are marked done. "All steps" on the card (and "How to
+play" under Settings → About) lists every step with done / current / upcoming status, a search and a status
+filter, and Go buttons to the relevant tab (`filterTutorial`).
 
 Progress → Stats shows lifetime statistics (they survive Ascension): time played, gold earned and spent, defeats by
 kind and by element, spheres thrown and catch rate per tier, Paldeck and Box counts, strongest Pal, base output

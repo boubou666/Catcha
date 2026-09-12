@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'Tutorial: an All steps list (also "How to play" in Settings → About) with done / current / upcoming status, search and Go buttons.',
       'Stats: search any statistic, pick a section, hide zero rows.',
       'Log: keeps 200 entries with time and category (combat, catching, base, breeding, quests, expeditions & realms, merchant, system); search, category filter and Show all.',
       'Bosses: search Alphas, towers, Sealed Realms and raids across reachable regions, with kind / beaten / available / locked / element filters.',

@@ -7,6 +7,7 @@
   import { whatsNew } from '../state/whatsnew.svelte';
   import { LATEST_VERSION } from '../data/changelog';
   import { filterSettings, SETTINGS_SECTIONS, type SettingsSection } from '../engine/settingsfilter';
+  import TutorialSteps from './TutorialSteps.svelte';
 
   let sound = $state(getPref());
   function setSound(next: { enabled?: boolean; volume?: number; haptics?: boolean }) {
@@ -51,6 +52,7 @@
   const show = (id: SettingsSection) => shown.has(id);
   const filtering = $derived(query.trim() !== '' || only !== null);
   const clear = () => { query = ''; only = null; };
+  let showSteps = $state(false);
 </script>
 
 <div class="row">
@@ -127,7 +129,11 @@
   <div class="row">
     <button class="small" onclick={() => whatsNew.showAll()}>What's new</button>
     <button class="small" onclick={() => game.restartTutorial()} disabled={!game.save.tutorial.done}>{game.save.tutorial.done ? 'Replay tutorial' : 'Tutorial in progress'}</button>
+    <button class="small" onclick={() => (showSteps = !showSteps)} aria-expanded={showSteps}>{showSteps ? 'Hide steps' : 'How to play'}</button>
   </div>
+  {#if showSteps}
+    <div class="steps"><TutorialSteps /></div>
+  {/if}
 </section>
 {/if}
 
@@ -144,4 +150,5 @@
   .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
   .chip { font-size: 0.8rem; padding: 0.15rem 0.6rem; border-radius: 999px; }
   .chip.on { border-color: var(--accent); color: var(--accent); }
+  .steps { margin-top: 0.5rem; }
 </style>

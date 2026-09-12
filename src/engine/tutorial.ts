@@ -54,3 +54,28 @@ export function currentStep(save: SaveState): TutorialStep | null {
 export function finishTutorial(save: SaveState): void {
   save.tutorial = { step: TUTORIAL.length - 1, done: true };
 }
+
+// ---- listing & filtering ----------------------------------------------------------------
+
+export type StepStatus = 'done' | 'current' | 'upcoming';
+export interface TutorialFilter { query: string; status: StepStatus | 'any' }
+export const DEFAULT_TUTORIAL_FILTER: TutorialFilter = { query: '', status: 'any' };
+export const STEP_STATUS_LABEL: Record<StepStatus | 'any', string> = { any: 'Any status', done: 'Done', current: 'Current', upcoming: 'Upcoming' };
+
+export interface StepRow { index: number; step: TutorialStep; status: StepStatus }
+
+/** Every step with its status relative to the save's progress (all done once the tutorial is finished). */
+export function tutorialSteps(save: SaveState): StepRow[] {
+  const { step, done } = save.tutorial;
+  return TUTORIAL.map((s, index) => ({ index, step: s, status: done || index < step ? 'done' : index === step ? 'current' : 'upcoming' }));
+}
+
+/** Every search word must match the step title, text or the tab it points at. */
+export function filterTutorial(save: SaveState, f: TutorialFilter): StepRow[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return tutorialSteps(save).filter((r) => {
+    if (f.status !== 'any' && r.status !== f.status) return false;
+    const hay = [r.step.title, r.step.text, r.step.tab ?? ''].join(' ').toLowerCase();
+    return words.every((w) => hay.includes(w));
+  });
+}

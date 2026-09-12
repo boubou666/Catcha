@@ -11,7 +11,7 @@ export const SETTINGS_SECTIONS: SettingsSectionDef[] = [
   { id: 'sound', title: 'Sound', keywords: ['sound', 'audio', 'sfx', 'effects', 'volume', 'mute', 'music', 'vibration', 'haptic', 'buzz', 'vibrate'] },
   { id: 'catching', title: 'Catching', keywords: ['catch', 'catching', 'sphere', 'policy', 'throw', 'merchant', 'auto'] },
   { id: 'save', title: 'Save', keywords: ['save', 'export', 'import', 'backup', 'transfer', 'copy', 'clipboard', 'reset game', 'delete', 'wipe', 'restart', 'autosave', 'storage', 'browser'] },
-  { id: 'about', title: 'About', keywords: ['about', 'version', 'build', 'changelog', "what's new", 'whats new', 'update', 'tutorial', 'help', 'replay'] },
+  { id: 'about', title: 'About', keywords: ['about', 'version', 'build', 'changelog', "what's new", 'whats new', 'update', 'tutorial', 'help', 'replay', 'how to play', 'steps', 'guide'] },
 ];
 
 /** Sections whose title or keywords match every word of the query (empty query = all). */

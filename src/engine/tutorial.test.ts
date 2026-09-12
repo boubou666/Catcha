@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
-import { advanceTutorial, currentStep, finishTutorial, TUTORIAL } from './tutorial';
+import { advanceTutorial, currentStep, filterTutorial, finishTutorial, tutorialSteps, TUTORIAL } from './tutorial';
 import { ascend } from './ascend';
 import { addToBox, makeInstance } from './party';
 import { assignWorker, build, enqueue } from './base';
@@ -110,5 +110,22 @@ describe('tutorial persistence', () => {
     s.progress.towers.push('rayne');
     const next = ascend(s, [])!;
     expect(next.tutorial).toEqual({ step: TUTORIAL.length - 1, done: true });
+  });
+});
+
+describe('tutorial step list', () => {
+  it('reports done / current / upcoming and filters by status and text', () => {
+    const s = newState();
+    s.stats.defeated = 1; s.stats.caught = 1;
+    advanceTutorial(s);                                        // past 'attack' and 'catch'
+    const rows = tutorialSteps(s);
+    expect(rows.map((r) => r.status).slice(0, 4)).toEqual(['done', 'done', 'current', 'upcoming']);
+    expect(filterTutorial(s, { query: '', status: 'done' }).map((r) => r.step.id)).toEqual(['attack', 'catch']);
+    expect(filterTutorial(s, { query: '', status: 'current' }).map((r) => r.step.id)).toEqual(['party']);
+    expect(filterTutorial(s, { query: 'workbench', status: 'any' }).map((r) => r.step.id)).toEqual(['tech', 'build']);
+    expect(filterTutorial(s, { query: 'base', status: 'upcoming' }).every((r) => r.status === 'upcoming')).toBe(true);
+    expect(filterTutorial(s, { query: 'zzz', status: 'any' })).toEqual([]);
+    finishTutorial(s);
+    expect(tutorialSteps(s).every((r) => r.status === 'done')).toBe(true);
   });
 });
