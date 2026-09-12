@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'What\'s new: search the whole changelog or pin a version.',
       'Notification centre: a 🔔 in the header keeps every toast of the session with an unread badge, search, kind and unread filters — and lets you choose which kinds still pop up.',
       'Welcome-back summary: sorted by biggest change, with search and Gained / Consumed / Events views when there is a lot to read.',
       'Arena: "Who lives here?" shows the route\'s spawn odds and Paldeck status with search and filters, and a 👀 watch that pops a toast when a species spawns.',
@@ -101,3 +102,29 @@ export const CHANGELOG: ChangelogEntry[] = [
 ];
 
 export const LATEST_VERSION = CHANGELOG[0].version;
+
+// ---- filtering ----------------------------------------------------------------------
+
+export interface ChangelogFilter { query: string; version: string | 'any' }
+export const DEFAULT_CHANGELOG_FILTER: ChangelogFilter = { query: '', version: 'any' };
+
+export function isChangelogFiltering(f: ChangelogFilter): boolean {
+  return f.query.trim() !== '' || f.version !== 'any';
+}
+
+/**
+ * Entries reduced to the items that match every search word (against the item, or the entry's version
+ * and title — a title match keeps the whole entry); entries with nothing left are dropped.
+ */
+export function filterChangelog(entries: ChangelogEntry[], f: ChangelogFilter): ChangelogEntry[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  const out: ChangelogEntry[] = [];
+  for (const e of entries) {
+    if (f.version !== 'any' && e.version !== f.version) continue;
+    if (words.length === 0) { out.push(e); continue; }
+    const head = `v${e.version} ${e.title}`.toLowerCase();
+    const items = words.every((w) => head.includes(w)) ? e.items : e.items.filter((it) => words.every((w) => it.toLowerCase().includes(w)));
+    if (items.length) out.push({ ...e, items });
+  }
+  return out;
+}

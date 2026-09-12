@@ -13,7 +13,8 @@ Share → Add to Home Screen) and keeps working offline after the first load. Wh
 "Reload" banner (checked on every visit, every 30 minutes, and whenever the tab regains focus); Settings
 → About shows the running version and a "What's new" button; after an update the changelog entries you
 haven't seen open once. Entries live in `src/data/changelog.ts` — add one at the top when shipping
-something players should know about.
+something players should know about. The panel has a search (over items, or a version/title, which keeps the
+whole entry) and a version select; searching widens the "new since last time" view to the whole history.
 
 New saves get a ten-step tutorial card above the tabs (attack → catch → party → clear a route → research → worker →
 build → craft → Alpha). Each step checks the save state and advances on its own, with a "Take me there" button
