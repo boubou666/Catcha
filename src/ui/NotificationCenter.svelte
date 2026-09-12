@@ -17,9 +17,10 @@
 
 <svelte:window onkeydown={(e) => { if (e.key === 'Escape' && open) toggle(); }} />
 
-<button class="small bell" onclick={toggle} aria-expanded={open} title="Notifications">
-  🔔{#if game.unreadNotices > 0}<span class="badge">{game.unreadNotices > 99 ? '99+' : game.unreadNotices}</span>{/if}
-</button>
+<span class="bellwrap">
+  <button class="small bell" onclick={toggle} aria-expanded={open} title="Notifications">🔔</button>
+  {#if game.unreadNotices > 0}<span class="badge" aria-label="{game.unreadNotices} unread">{game.unreadNotices > 99 ? '99+' : game.unreadNotices}</span>{/if}
+</span>
 
 {#if open}
   <div class="backdrop" onclick={toggle} role="presentation"></div>
@@ -63,8 +64,8 @@
 {/if}
 
 <style>
-  .bell { position: relative; }
-  .badge { position: absolute; top: -0.4rem; right: -0.4rem; background: var(--danger); color: #fff; border-radius: 999px; font-size: 0.65rem; padding: 0.05rem 0.35rem; font-weight: 700; }
+  .bellwrap { position: relative; display: inline-flex; }
+  .badge { position: absolute; top: -0.45rem; right: -0.45rem; pointer-events: none; z-index: 1; background: var(--danger); color: #fff; border-radius: 999px; font-size: 0.65rem; padding: 0.05rem 0.35rem; font-weight: 700; }
   .backdrop { position: fixed; inset: 0; z-index: 14; }
   .center { position: fixed; top: 4.5rem; right: 1rem; z-index: 15; background: rgba(var(--navy), 0.98); backdrop-filter: blur(10px); width: min(420px, calc(100vw - 2rem)); max-height: 75vh; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: var(--shadow-float); }
   .head h3 { margin: 0; }
