@@ -6,6 +6,7 @@
   import { buzz, getPref, hapticsAvailable, play, setPref } from './sfx';
   import { whatsNew } from '../state/whatsnew.svelte';
   import { LATEST_VERSION } from '../data/changelog';
+  import { filterSettings, SETTINGS_SECTIONS, type SettingsSection } from '../engine/settingsfilter';
 
   let sound = $state(getPref());
   function setSound(next: { enabled?: boolean; volume?: number; haptics?: boolean }) {
@@ -42,10 +43,31 @@
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const version = __APP_VERSION__;
   const builtAt = __BUILT_AT__;
+
+  // search narrows the sections; a chip pins one (chips act as a second query)
+  let query = $state('');
+  let only = $state<SettingsSection | null>(null);
+  const shown = $derived(new Set(filterSettings(query).filter((sec) => !only || sec.id === only).map((sec) => sec.id)));
+  const show = (id: SettingsSection) => shown.has(id);
+  const filtering = $derived(query.trim() !== '' || only !== null);
+  const clear = () => { query = ''; only = null; };
 </script>
 
-<h2>Settings</h2>
+<div class="row">
+  <h2 class="grow">Settings <span class="muted">{filtering ? `${shown.size} of ${SETTINGS_SECTIONS.length}` : ''}</span></h2>
+  <input type="search" placeholder="Search settings…" bind:value={query} aria-label="Search settings" />
+</div>
+<nav class="chips">
+  <button class="chip" class:on={only === null} onclick={() => (only = null)}>All</button>
+  {#each SETTINGS_SECTIONS as sec (sec.id)}
+    <button class="chip" class:on={only === sec.id} onclick={() => (only = only === sec.id ? null : sec.id)}>{sec.title}</button>
+  {/each}
+</nav>
+{#if shown.size === 0}
+  <p class="muted">No setting matches. <button class="small" onclick={clear}>Clear</button></p>
+{/if}
 
+{#if show('daily')}
 <section>
   <h3>Daily quest reset</h3>
   <div class="options">
@@ -59,7 +81,9 @@
     </label>
   </div>
 </section>
+{/if}
 
+{#if show('sound')}
 <section>
   <h3>Sound</h3>
   <div class="row sound">
@@ -73,12 +97,16 @@
   </div>
   <p class="muted small">Synthesized in the browser — no audio files. Stored on this device.</p>
 </section>
+{/if}
 
+{#if show('catching')}
 <section>
   <h3>Catching</h3>
   <p class="muted small">Sphere policies live under <b>Merchant → Catch settings</b>.</p>
 </section>
+{/if}
 
+{#if show('save')}
 <section>
   <h3>Save</h3>
   <p class="muted small">Autosaves every 30 s and when you leave. Saves are per browser — use Export / Import to move between the local copy and the hosted one.</p>
@@ -90,7 +118,9 @@
     <button class="small danger" onclick={doReset}>Reset game</button>
   </div>
 </section>
+{/if}
 
+{#if show('about')}
 <section>
   <h3>About</h3>
   <p class="muted small">Catcha version <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}. Changelog v{LATEST_VERSION}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
@@ -99,6 +129,7 @@
     <button class="small" onclick={() => game.restartTutorial()} disabled={!game.save.tutorial.done}>{game.save.tutorial.done ? 'Replay tutorial' : 'Tutorial in progress'}</button>
   </div>
 </section>
+{/if}
 
 <style>
   section { margin-top: 1.25rem; }
@@ -109,4 +140,8 @@
   .opt input { margin-top: 0.2rem; }
   .sound { gap: 1.5rem; }
   .sound input[type=range] { flex: 1; min-height: 0; }
+  input[type='search'] { min-width: 10rem; flex: 1; max-width: 16rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+  .chip { font-size: 0.8rem; padding: 0.15rem 0.6rem; border-radius: 999px; }
+  .chip.on { border-color: var(--accent); color: var(--accent); }
 </style>

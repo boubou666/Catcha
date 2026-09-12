@@ -202,6 +202,9 @@ the buy price, or `SELL_PRICES` for the rest; spheres, slabs and keys are refuse
 
 Ascension: upgrades get a search and an affordable / need-more / maxed filter (`filterUpgrades`); the Ark
 picker uses the Box filter bar over eligible Pals (strongest first, status labels) with a Pick best button.
+Settings: a phone-style search that keeps only the sections whose title or keywords match ("vibration" →
+Sound, "export" → Save, "timezone" → Daily quest reset), plus quick-jump chips; keywords live in
+`src/engine/settingsfilter.ts`.
 
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
