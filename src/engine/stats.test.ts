@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
-import { catchByTier, defeatsByElement, defeatsByKind, fmtDuration, highestLevelPal, statsReport, strongestPal } from './stats';
+import { catchByTier, defeatsByElement, defeatsByKind, DEFAULT_STATS_FILTER, filterStats, fmtDuration, highestLevelPal, isStatsFiltering, statsReport, strongestPal, type StatsFilter, type StatSection } from './stats';
 import { applyDefeat } from './combat';
 import { tryCatch } from './catch';
 import { spend } from './inventory';
@@ -100,5 +100,43 @@ describe('stats report', () => {
     expect(combat.find((r) => r.label === 'Pals defeated')?.hint).toBe('1 per hour played');
     expect(catching.find((r) => r.label === '  Pal Sphere')).toEqual({ label: '  Pal Sphere', value: '1 / 1', hint: '100%' });
     expect(catching.find((r) => r.label === 'Spheres thrown')?.hint).toBe('100% landed');
+  });
+});
+
+describe('stats filter', () => {
+  const sections = (): StatSection[] => [
+    { title: 'Combat', rows: [
+      { label: 'Pals defeated', value: '275', hint: '1,019 per hour played' },
+      { label: '  Wild Pals', value: '270' },
+      { label: '  Alphas', value: '5' },
+      { label: 'Lucky Pals defeated', value: '0' },
+    ] },
+    { title: 'World', rows: [
+      { label: 'Towers cleared', value: '0 / 7' },
+      { label: 'Raid wins', value: '2', hint: '1 / 3 raid bosses beaten' },
+    ] },
+  ];
+  const f = (over: Partial<StatsFilter>): StatsFilter => ({ ...DEFAULT_STATS_FILTER, ...over });
+  const labels = (over: Partial<StatsFilter>) => filterStats(sections(), f(over)).map((s) => `${s.title}: ${s.rows.map((r) => r.label.trim()).join(', ')}`);
+
+  it('passes everything through by default', () => {
+    expect(filterStats(sections(), DEFAULT_STATS_FILTER)).toEqual(sections());
+    expect(isStatsFiltering(DEFAULT_STATS_FILTER)).toBe(false);
+    expect(isStatsFiltering(f({ nonZero: true }))).toBe(true);
+  });
+
+  it('searches title, label, value and hint; sub-rows follow their parent', () => {
+    expect(labels({ query: 'defeated' })).toEqual(['Combat: Pals defeated, Wild Pals, Alphas, Lucky Pals defeated']);
+    expect(labels({ query: 'alphas' })).toEqual(['Combat: Alphas']);
+    expect(labels({ query: 'raid bosses' })).toEqual(['World: Raid wins']);
+    expect(labels({ query: 'world' })).toEqual(['World: Towers cleared, Raid wins']);
+    expect(labels({ query: '275' })).toEqual(['Combat: Pals defeated, Wild Pals, Alphas']);
+    expect(labels({ query: 'zzz' })).toEqual([]);
+  });
+
+  it('narrows to one section and hides zero rows', () => {
+    expect(labels({ section: 'World' })).toEqual(['World: Towers cleared, Raid wins']);
+    expect(labels({ nonZero: true })).toEqual(['Combat: Pals defeated, Wild Pals, Alphas', 'World: Raid wins']);
+    expect(labels({ section: 'Combat', nonZero: true, query: 'lucky' })).toEqual([]);
   });
 });

@@ -22,7 +22,9 @@ in `src/engine/tutorial.ts`; saves from before it existed are marked done.
 
 Progress → Stats shows lifetime statistics (they survive Ascension): time played, gold earned and spent, defeats by
 kind and by element, spheres thrown and catch rate per tier, Paldeck and Box counts, strongest Pal, base output
-counters and world completion. Counters live in `save.stats`; the report is built by `src/engine/stats.ts`.
+counters and world completion. Counters live in `save.stats`; the report is built by `src/engine/stats.ts`,
+and the tab has a search (title, label, value or hint), a section select and a "hide zeros" toggle
+(`filterStats`).
 
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.

@@ -122,3 +122,39 @@ export function statsReport(save: SaveState, live: { dps: number; clickDmg: numb
     ] },
   ];
 }
+
+// ---- filtering ----------------------------------------------------------------------
+
+export interface StatsFilter { query: string; section: string | 'any'; nonZero: boolean }
+export const DEFAULT_STATS_FILTER: StatsFilter = { query: '', section: 'any', nonZero: false };
+
+export function isStatsFiltering(f: StatsFilter): boolean {
+  return f.query.trim() !== '' || f.section !== 'any' || f.nonZero;
+}
+
+const isZero = (r: StatRow) => /^(0|—|0 \/ \d+|0 caught · 0 seen)$/.test(r.value.trim());
+
+/**
+ * Sections reduced to the rows that match: every search word against the section title, row label,
+ * value or hint; optional single section; optional "hide zero / empty rows". A sub-row (indented
+ * breakdown) is kept whenever its parent matches, so "Pals defeated" keeps its per-kind lines.
+ */
+export function filterStats(sections: StatSection[], f: StatsFilter): StatSection[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  const out: StatSection[] = [];
+  for (const sec of sections) {
+    if (f.section !== 'any' && sec.title !== f.section) continue;
+    const rows: StatRow[] = [];
+    let parentKept = false;
+    for (const r of sec.rows) {
+      const sub = r.label.startsWith(' ');
+      const hay = [sec.title, r.label, r.value, r.hint ?? ''].join(' ').toLowerCase();
+      const textOk = words.every((w) => hay.includes(w));
+      const keep: boolean = (textOk || (sub && parentKept)) && !(f.nonZero && isZero(r));
+      if (!sub) parentKept = keep;
+      if (keep) rows.push(r);
+    }
+    if (rows.length) out.push({ title: sec.title, rows });
+  }
+  return out;
+}

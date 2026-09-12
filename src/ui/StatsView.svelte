@@ -1,6 +1,6 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { defeatsByElement, fmtInt, statsReport } from '../engine/stats';
+  import { defeatsByElement, DEFAULT_STATS_FILTER, filterStats, fmtInt, isStatsFiltering, statsReport, type StatsFilter } from '../engine/stats';
   import { ELEMENT_COLORS } from '../data/elements';
   import type { Element } from '../data/types';
 
@@ -10,15 +10,40 @@
     const id = setInterval(() => { tick += 1; }, 1000);
     return () => clearInterval(id);
   });
-  const sections = $derived.by(() => { void tick; return statsReport(game.save, { dps: game.dps, clickDmg: game.clickDmg }); });
+  const all = $derived.by(() => { void tick; return statsReport(game.save, { dps: game.dps, clickDmg: game.clickDmg }); });
+  let filter = $state<StatsFilter>({ ...DEFAULT_STATS_FILTER });
+  const sections = $derived(filterStats(all, filter));
+  const filtering = $derived(isStatsFiltering(filter));
+  const rowCount = (xs: typeof all) => xs.reduce((n, sec) => n + sec.rows.length, 0);
+  const clear = () => { filter = { ...DEFAULT_STATS_FILTER }; };
+  // the element chart is its own section; it follows the section select and hides when a search doesn't touch it
   const elements = $derived.by(() => { void tick; return defeatsByElement(game.save); });
+  const showChart = $derived.by(() => {
+    if (filter.section !== 'any' && filter.section !== 'Defeats by element') return false;
+    if (filter.nonZero && elements.length === 0) return false;
+    const hay = ['defeats by element', ...elements.map((e) => e.element)].join(' ').toLowerCase();
+    return filter.query.toLowerCase().split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
+  });
   const maxElement = $derived(elements[0]?.n ?? 1);
 </script>
 
 <div class="row">
-  <h2 class="grow">Statistics</h2>
+  <h2 class="grow">Statistics <span class="muted">{filtering ? `${rowCount(sections)} of ${rowCount(all)}` : ''}</span></h2>
   <span class="muted small">Lifetime, carried through Ascension</span>
 </div>
+<div class="row">
+  <input type="search" placeholder="Search stats…" bind:value={filter.query} aria-label="Search statistics" />
+  <select bind:value={filter.section} aria-label="Section">
+    <option value="any">All sections</option>
+    {#each all as sec (sec.title)}<option value={sec.title}>{sec.title}</option>{/each}
+    <option value="Defeats by element">Defeats by element</option>
+  </select>
+  <label class="chk"><input type="checkbox" bind:checked={filter.nonZero} /> Hide zeros</label>
+  {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+</div>
+{#if sections.length === 0 && !showChart}
+  <p class="muted">No statistic matches. <button class="small" onclick={clear}>Clear</button></p>
+{/if}
 
 <div class="grid">
   {#each sections as sec (sec.title)}
@@ -35,6 +60,7 @@
     </section>
   {/each}
 
+  {#if showChart}
   <section class="card">
     <h3>Defeats by element</h3>
     {#if elements.length === 0}
@@ -51,6 +77,7 @@
       </ul>
     {/if}
   </section>
+  {/if}
 </div>
 
 <style>
@@ -70,4 +97,8 @@
   .fill { display: block; height: 100%; border-radius: 4px; }
   .n { text-align: right; font-variant-numeric: tabular-nums; }
   .small { font-size: 0.8rem; }
+  input[type='search'] { min-width: 10rem; flex: 1; max-width: 16rem; }
+  select { font-size: 0.85rem; }
+  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
+  .chk input { min-height: 0; width: auto; }
 </style>
