@@ -8,12 +8,10 @@
   import { isAway } from '../engine/party';
   import PalCard from './PalCard.svelte';
   import { compare } from '../state/compare.svelte';
-  import { DEFAULT_FILTER, filterBox, isFiltering, SORT_LABEL, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
-  import { ELEMENTS } from '../data/types';
-  import { JOBS } from '../data/base';
+  import { DEFAULT_FILTER, filterBox, isFiltering, type BoxFilter } from '../engine/boxfilter';
+  import BoxFilterBar from './BoxFilterBar.svelte';
 
   let filter = $state<BoxFilter>({ ...DEFAULT_FILTER });
-  let showFilters = $state(false);
   const sorted = $derived(filterBox(game.save, filter));
   const filtering = $derived(isFiltering(filter));
   const clear = () => { filter = { ...DEFAULT_FILTER, sort: filter.sort }; };
@@ -27,34 +25,11 @@
   };
 </script>
 
-<div class="row">
-  <h2 class="grow">Box <span class="muted">{filtering ? `${sorted.length} of ${game.save.box.length}` : game.save.box.length}</span></h2>
-  <input type="search" placeholder="Search name, #, element, passive…" bind:value={filter.query} aria-label="Search the Box" />
-  <button class="small" class:active={showFilters || filtering} onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters}>Filters{filtering ? ' •' : ''}</button>
-</div>
-
-{#if showFilters}
-  <div class="filters">
-    <select bind:value={filter.element} aria-label="Element">
-      <option value="any">Any element</option>
-      {#each ELEMENTS as e}<option value={e}>{e}</option>{/each}
-    </select>
-    <select bind:value={filter.work} aria-label="Work suitability">
-      <option value="any">Any work</option>
-      {#each JOBS as j}<option value={j.type}>{j.icon} {j.type}</option>{/each}
-    </select>
-    <select bind:value={filter.status} aria-label="Status">
-      {#each Object.entries(STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
-    </select>
-    <select bind:value={filter.sort} aria-label="Sort">
-      {#each Object.entries(SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
-    </select>
-    <label class="chk"><input type="checkbox" bind:checked={filter.lucky} /> ✨ Lucky</label>
-    <label class="chk"><input type="checkbox" bind:checked={filter.starred} /> ★ Starred</label>
-    <label class="chk"><input type="checkbox" bind:checked={filter.dupes} /> Duplicates</label>
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
-  </div>
-{/if}
+<BoxFilterBar bind:filter>
+  {#snippet heading()}
+    <h2 class="grow">Box <span class="muted">{filtering ? `${sorted.length} of ${game.save.box.length}` : game.save.box.length}</span></h2>
+  {/snippet}
+</BoxFilterBar>
 
 {#if game.save.box.length === 0}
   <p class="muted">Nothing here yet. Defeat wild Pals with a Pal Sphere in stock to catch them.</p>
@@ -94,12 +69,6 @@
 <style>
   .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 60vh; overflow-y: auto; }
   .small { font-size: 0.8rem; }
-  input[type='search'] { min-width: 12rem; }
-  button.active { border-color: var(--accent); color: var(--accent); }
-  .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.5rem 0; padding: 0.5rem; background: var(--panel-2); border-radius: var(--radius); }
-  .filters select { font-size: 0.85rem; }
-  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; padding: 0 0.3rem; cursor: pointer; }
-  .chk input { min-height: 0; width: auto; }
   .star.ready { border-color: var(--accent); color: var(--accent); }
   .cmp-on { border-color: var(--accent-2); color: var(--accent-2); }
 </style>

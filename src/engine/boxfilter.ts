@@ -36,9 +36,10 @@ export function statusOf(save: SaveState, uid: string): Exclude<BoxStatus, 'any'
   return 'idle';
 }
 
-/** True when the filter differs from the defaults in anything but the sort order. */
-export function isFiltering(f: BoxFilter): boolean {
-  return f.query.trim() !== '' || f.element !== 'any' || f.work !== 'any' || f.status !== 'any' || f.lucky || f.starred || f.dupes;
+/** True when the filter differs from its defaults in anything but the sort order. */
+export function isFiltering(f: BoxFilter, defaults: BoxFilter = DEFAULT_FILTER): boolean {
+  return f.query.trim() !== defaults.query.trim() || f.element !== defaults.element || f.work !== defaults.work
+    || f.status !== defaults.status || f.lucky !== defaults.lucky || f.starred !== defaults.starred || f.dupes !== defaults.dupes;
 }
 
 /** Name / Paldeck number / passive-name match, case-insensitive; every word of the query must match somewhere. */

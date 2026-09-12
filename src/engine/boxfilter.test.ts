@@ -84,3 +84,13 @@ describe('box filter', () => {
     expect(byAttack.at(-1)).toBe('1@5');
   });
 });
+
+describe('isFiltering against custom defaults', () => {
+  it('treats a change away from the given defaults as filtering, sort excluded', () => {
+    const picker: BoxFilter = { ...DEFAULT_FILTER, status: 'idle', sort: 'attack' };
+    expect(isFiltering(picker, picker)).toBe(false);
+    expect(isFiltering({ ...picker, sort: 'name' }, picker)).toBe(false);
+    expect(isFiltering({ ...picker, status: 'any' }, picker)).toBe(true);
+    expect(isFiltering({ ...picker, query: 'x' }, picker)).toBe(true);
+  });
+});

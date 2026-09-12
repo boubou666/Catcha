@@ -17,6 +17,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Skip it any time; replay it from Settings → About.',
       'Box search now matches Paldeck numbers, elements and passives; a Filters bar adds element, work, status, Lucky, starred and duplicate filters plus sort options.',
       'Paldeck search and filters: status, region, element, work, rarity, subspecies, and sort — without revealing unseen Pals.',
+      'The Party tab has an "Add from the Box" picker with the same search and filters, so you can build a party without switching tabs.',
     ],
   },
   {
