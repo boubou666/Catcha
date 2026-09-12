@@ -29,6 +29,14 @@ export const SPECIAL_COMBOS: Record<string, number> = {
   '59+89': 1089,   // Kingpaca + Reindrix   → Kingpaca Cryst
   '90+91': 1090,   // Mammorest + Wumpo     → Mammorest Cryst
   '97+110': 1110,  // Frostallion + Helzephyr → Frostallion Noct
+  '33+103': 1033,  // Mossanda + Grizzbolt  → Mossanda Lux
+  '32+36': 1036,   // Eikthyrdeer + Hangyu  → Eikthyrdeer Terra
+  '60+64': 1064,   // Dinossom + Rayhound   → Dinossom Lux
+  '65+80': 1080,   // Elphidran + Surfent   → Elphidran Aqua
+  '7+85': 1085,    // Relaxaurus + Sparkit  → Relaxaurus Lux
+  '6+86': 1086,    // Broncherry + Fuack    → Broncherry Aqua
+  '101+102': 1102, // Suzaku + Jormuntide   → Suzaku Aqua
+  '99+104': 1104,  // Lyleen + Menasting    → Lyleen Noct
 };
 
 export function comboKey(a: number, b: number): string {

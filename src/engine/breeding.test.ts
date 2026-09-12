@@ -159,3 +159,11 @@ describe('Cryst combos', () => {
     expect(palById(childOf(88, 57)).name).toBe('Reptyro Cryst');
   });
 });
+
+describe('Lux / Aqua combos', () => {
+  it('produce the Sakurajima-era subspecies', () => {
+    expect(palById(childOf(103, 33)).name).toBe('Mossanda Lux');
+    expect(palById(childOf(7, 85)).name).toBe('Relaxaurus Lux');
+    expect(palById(childOf(104, 99)).name).toBe('Lyleen Noct');
+  });
+});

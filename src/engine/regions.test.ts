@@ -132,3 +132,16 @@ describe('region 5', () => {
     expect(palById(towerById('victor').palId).name).toBe('Shadowbeak');
   });
 });
+
+describe('region 6', () => {
+  it('opens after the Victor tower and ends at Saya & Selyne', () => {
+    const save = newState();
+    expect(isUnlocked(save, routeById('rice').unlock)).toBe(false);
+    save.progress.towers.push('victor');
+    expect(isUnlocked(save, routeById('rice').unlock)).toBe(true);
+    save.progress.alphas.push('knocklem', 'dogen', 'xenolord');
+    save.progress.routeKills.moonflower = 650;
+    expect(isUnlocked(save, towerById('saya').unlock)).toBe(true);
+    expect(palById(towerById('saya').palId).name).toBe('Selyne');
+  });
+});

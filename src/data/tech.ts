@@ -75,6 +75,10 @@ export const TECHS: TechDef[] = [
   R('sphere_legendary', 'Legendary Sphere', 40, 6, 'The ultimate sphere: ×6.5 catch rate. Needs a Diamond.', ['r_sphere_ultra']),
   M('labor_4', 'Efficient Labor IV', 40, 6, 'base', 1.3, '+30% base output.', ['labor_3']),
   M('training_5', 'Pal Training V', 40, 6, 'attack', 1.3, '+30% party attack.', ['training_4']),
+  // level 50
+  M('capture_3', 'Capture Technique III', 50, 7, 'catch', 1.25, '+25% catch rate.', ['capture_2']),
+  M('labor_5', 'Efficient Labor V', 50, 7, 'base', 1.35, '+35% base output.', ['labor_4']),
+  M('training_6', 'Pal Training VI', 50, 7, 'attack', 1.35, '+35% party attack.', ['training_5']),
 ];
 
 const BY_ID = new Map(TECHS.map((t) => [t.id, t]));

@@ -151,7 +151,36 @@ const astral: RegionDef = {
   },
 };
 
-export const REGIONS: RegionDef[] = [windswept, marsh, dunes, obsidian, astral];
+// ---------------------------------------------------------------------------
+// Region 6 — Sakurajima (Lv 55–62) · Saya & Selyne
+
+const R6 = 'sakurajima';
+
+const sakurajima: RegionDef = {
+  id: R6, name: 'Sakurajima',
+  routes: ([
+    ['rice',       'Sakurajima Rice Fields',    56, 'Grass',    [[113, 25], [112, 25], [114, 20], [1086, 15], [115, 15]],           { kind: 'tower', id: 'victor' }, 520],
+    ['cedar',      'Cedar Forest',              57, 'Electric', [[1033, 20], [1064, 20], [1091, 15], [114, 20], [1036, 25]],         { kind: 'routeCleared', id: 'rice' }, 540],
+    ['shrine',     'Moonflower Shrine Path',    58, 'Dark',     [[116, 30], [117, 25], [1104, 5], [121, 30], [122, 5], [1036, 5]],   { kind: 'routeCleared', id: 'cedar' }, 560],
+    ['hotspring',  'Hot Spring Cliffs',         59, 'Water',    [[1080, 20], [1102, 10], [112, 25], [1085, 20], [1086, 25]],         { kind: 'alpha', id: 'knocklem' }, 580],
+    ['dojo',       "Yakumo's Dojo",             60, 'Electric', [[119, 25], [120, 20], [118, 20], [1085, 20], [115, 15]],            { kind: 'routeCleared', id: 'hotspring' }, 600],
+    ['crash',      'Meteorite Crash Site',      61, 'Dark',     [[123, 30], [124, 10], [117, 25], [116, 25], [125, 2], [122, 8]],    { kind: 'alpha', id: 'dogen' }, 620],
+    ['moonflower', 'Moonflower Tower Approach', 62, 'Neutral',  [[124, 15], [123, 20], [120, 20], [119, 20], [1104, 15], [122, 10]], { kind: 'alpha', id: 'xenolord' }, 650],
+  ] as RouteArgs[]).map((a) => route(R6, a)),
+  alphas: [
+    { id: 'knocklem', regionId: R6, palId: 118, level: 57, hpMult: 34, unlock: { kind: 'routeCleared', id: 'shrine' }, reward: { gold: 200000, effigies: 8 } },
+    { id: 'dogen',    regionId: R6, palId: 120, level: 60, hpMult: 38, unlock: { kind: 'routeCleared', id: 'dojo' },   reward: { gold: 300000, effigies: 8 } },
+    { id: 'xenolord', regionId: R6, palId: 125, level: 62, hpMult: 45, unlock: { kind: 'routeCleared', id: 'crash' },  reward: { gold: 500000, effigies: 10 } },
+  ],
+  tower: {
+    id: 'saya', regionId: R6,
+    name: 'Moonflower Tower', boss: 'Saya & Selyne', palId: 126, level: 62,
+    hp: 400_000, timeLimitSec: 600,
+    unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'xenolord' }, { kind: 'routeCleared', id: 'moonflower' }] },
+  },
+};
+
+export const REGIONS: RegionDef[] = [windswept, marsh, dunes, obsidian, astral, sakurajima];
 
 const ROUTES = new Map(REGIONS.flatMap((r) => r.routes).map((r) => [r.id, r]));
 const ALPHAS = new Map(REGIONS.flatMap((r) => r.alphas).map((a) => [a.id, a]));
