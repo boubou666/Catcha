@@ -81,7 +81,7 @@
 </section>
 
 <style>
-  .loadouts { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+  .loadouts { margin-top: 1rem; padding-top: 0.75rem; border-top: 1.5px solid var(--border-soft); }
   .head h3 { margin: 0; }
   .small { font-size: 0.8rem; }
   .tiny { font-size: 0.7rem; }
@@ -90,10 +90,10 @@
   .tools { margin-top: 0.4rem; }
   .tools select { font-size: 0.85rem; }
   .list { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
-  .lo { border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; }
+  .lo { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; }
   .lo.current { border-color: var(--accent); }
   .members { gap: 0.5rem 0.75rem; }
   .member { display: inline-flex; align-items: center; gap: 0.3rem; }
   .member.off { opacity: 0.55; }
-  .ghost { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+  .ghost { width: 22px; height: 22px; border-radius: 50%; background: var(--border-soft); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; }
 </style>

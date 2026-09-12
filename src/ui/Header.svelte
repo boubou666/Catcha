@@ -56,7 +56,8 @@
 <style>
   header { gap: 1.5rem; }
   @media (max-width: 800px) { header { gap: 0.6rem 1rem; } .stat { min-width: 0; flex: 1 1 40%; } }
-  h1 { font-size: 1.4rem; color: var(--accent); }
+  h1 { font-size: 1.6rem; color: #fff; text-shadow: 0 0 14px rgba(53, 208, 255, 0.9), 0 2px 0 rgba(0, 0, 0, 0.35); letter-spacing: 0.04em; text-transform: uppercase; }
+  .stat .label { font-weight: 800; }
   .stat { min-width: 150px; }
   .label { font-weight: 600; }
   .small { font-size: 0.8rem; }

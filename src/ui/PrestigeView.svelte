@@ -139,17 +139,17 @@
   .small { font-size: 0.8rem; }
   section { margin-top: 1.25rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.5rem; }
-  .up { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.3rem; }
+  .up { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.5rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.3rem; }
   .up.maxed { border-color: var(--ok); }
   .maxed-label { color: var(--ok); }
   .now { color: var(--text); }
   .up button { margin-top: auto; align-self: flex-start; }
   .list { display: flex; flex-direction: column; gap: 0.4rem; }
   .scroll { max-height: 35vh; overflow-y: auto; }
-  .pick { padding: 0.35rem 0.5rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+  .pick { padding: 0.35rem 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); cursor: pointer; }
   .pick.on { border-color: var(--accent); }
   .ascend { width: 100%; padding: 0.8rem; margin-top: 0.75rem; }
-  .confirm { margin-top: 0.75rem; padding: 0.75rem; border: 1px solid var(--danger); border-radius: 8px; }
+  .confirm { margin-top: 0.75rem; padding: 0.75rem; border: 1px solid var(--danger); border-radius: var(--radius-sm); }
   input[type='search'] { min-width: 8rem; max-width: 14rem; }
   select { font-size: 0.85rem; }
 </style>

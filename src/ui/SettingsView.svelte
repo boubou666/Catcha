@@ -153,7 +153,7 @@
   section { margin-top: 1.25rem; }
   .small { font-size: 0.8rem; }
   .options { display: flex; flex-direction: column; gap: 0.4rem; }
-  .opt { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+  .opt { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.6rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); cursor: pointer; }
   .opt.on { border-color: var(--accent); }
   .opt input { margin-top: 0.2rem; }
   .sound { gap: 1.5rem; }

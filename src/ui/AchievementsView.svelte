@@ -73,7 +73,7 @@
   .small { font-size: 0.8rem; }
   section { margin-top: 1rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.5rem; }
-  .ach { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.25rem; }
+  .ach { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.5rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.25rem; }
   .ach.done { border-color: var(--ok); }
   .ach.done .pts { color: var(--ok); }
   .pts { font-size: 0.8rem; color: var(--muted); }

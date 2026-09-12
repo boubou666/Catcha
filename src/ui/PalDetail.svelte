@@ -123,7 +123,7 @@
 </div>
 
 <style>
-  .backdrop { position: fixed; inset: 0; z-index: 10; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .backdrop { position: fixed; inset: 0; z-index: 10; background: var(--overlay); display: flex; align-items: center; justify-content: center; padding: 1rem; }
   .modal { width: min(640px, 100%); max-height: 90vh; overflow-y: auto; }
   .head { align-items: flex-start; }
   .small { font-size: 0.85rem; }

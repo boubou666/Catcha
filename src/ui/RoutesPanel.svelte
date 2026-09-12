@@ -88,12 +88,14 @@
 
 <style>
   .regions { margin-bottom: 0.6rem; }
-  .regions button.active { border-color: var(--accent); color: var(--accent); }
+  .regions button.active { background: rgba(53, 208, 255, 0.25); color: #fff; border-color: var(--accent-2); }
   .head { margin-bottom: 0.4rem; }
   .head h3 { margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .routes { display: flex; flex-direction: column; gap: 0.25rem; }
   .routes button { display: flex; justify-content: space-between; text-align: left; }
-  .routes button.active { border-color: var(--accent); color: var(--accent); }
+  .routes button { border-radius: var(--radius-sm); box-shadow: none; font-weight: 700; }
+  .routes button.active { background: var(--accent); color: var(--on-accent); box-shadow: var(--shadow-sm); }
+  .routes button.active .muted { color: var(--on-accent); opacity: 0.75; }
   .routes button.cleared:not(.active) { color: var(--ok); }
   .small { font-size: 0.85rem; }
   input[type='search'] { min-width: 7rem; flex: 1; max-width: 12rem; }

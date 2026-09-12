@@ -101,7 +101,7 @@
   .small { font-size: 0.8rem; }
   .scroll { overflow-x: auto; margin-top: 0.75rem; }
   table { border-collapse: collapse; width: 100%; min-width: 420px; }
-  th, td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
+  th, td { padding: 0.35rem 0.5rem; border-bottom: 1.5px solid var(--border-soft); text-align: center; vertical-align: middle; }
   th { vertical-align: top; }
   td.label { text-align: left; color: var(--muted); white-space: nowrap; }
   td.best { color: var(--ok); font-weight: 600; }
@@ -111,7 +111,7 @@
   .rowbar select { font-size: 0.85rem; }
   .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
   .chk input { min-height: 0; width: auto; }
-  .picker { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+  .picker { margin-top: 1rem; padding-top: 0.75rem; border-top: 1.5px solid var(--border-soft); }
   .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 45vh; overflow-y: auto; }
   h3 { margin: 0; }
 </style>

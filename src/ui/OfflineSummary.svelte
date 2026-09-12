@@ -58,7 +58,7 @@
 <style>
   .backdrop {
     position: fixed; inset: 0; z-index: 10;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--overlay);
     display: flex; align-items: center; justify-content: center;
     padding: 1rem;
   }
@@ -69,7 +69,7 @@
   .controls select { font-size: 0.85rem; }
   .small { font-size: 0.8rem; }
   table { width: 100%; border-collapse: collapse; margin: 0.75rem 0 1rem; }
-  td { padding: 0.3rem 0.25rem; border-bottom: 1px solid var(--border); }
+  td { padding: 0.3rem 0.25rem; border-bottom: 1.5px solid var(--border-soft); }
   .n { text-align: right; font-variant-numeric: tabular-nums; }
   .gain { color: var(--ok); }
   .loss { color: var(--muted); }

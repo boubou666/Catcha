@@ -66,7 +66,7 @@
   .bell { position: relative; }
   .badge { position: absolute; top: -0.4rem; right: -0.4rem; background: var(--danger); color: #fff; border-radius: 999px; font-size: 0.65rem; padding: 0.05rem 0.35rem; font-weight: 700; }
   .backdrop { position: fixed; inset: 0; z-index: 14; }
-  .center { position: fixed; top: 4.5rem; right: 1rem; z-index: 15; width: min(420px, calc(100vw - 2rem)); max-height: 75vh; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+  .center { position: fixed; top: 4.5rem; right: 1rem; z-index: 15; width: min(420px, calc(100vw - 2rem)); max-height: 75vh; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: var(--shadow-float); }
   .head h3 { margin: 0; }
   .small { font-size: 0.8rem; }
   .tiny { font-size: 0.75rem; margin-top: 0.25rem; }
@@ -75,12 +75,12 @@
   .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
   .chk input { min-height: 0; width: auto; }
   .list { overflow-y: auto; display: flex; flex-direction: column; gap: 0.3rem; min-height: 4rem; }
-  .notice { display: flex; gap: 0.5rem; padding: 0.35rem 0.5rem; border: 1px solid var(--border); border-left: 4px solid var(--accent-2); border-radius: 8px; font-size: 0.9rem; }
+  .notice { display: flex; gap: 0.5rem; padding: 0.35rem 0.5rem; border: 1.5px solid var(--border-soft); border-left: 4px solid var(--accent-2); border-radius: var(--radius-sm); font-size: 0.9rem; }
   .notice.success { border-left-color: var(--ok); }
   .notice.gold { border-left-color: var(--accent); }
   .notice.warn { border-left-color: var(--danger); }
   .notice.unread { background: var(--panel-2); }
   .t { font-variant-numeric: tabular-nums; font-size: 0.75rem; white-space: nowrap; }
-  .prefs { border-top: 1px solid var(--border); padding-top: 0.5rem; }
+  .prefs { border-top: 1.5px solid var(--border-soft); padding-top: 0.5rem; }
   @media (max-width: 800px) { .center { top: auto; bottom: 0.5rem; right: 0.5rem; left: 0.5rem; width: auto; } }
 </style>

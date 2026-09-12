@@ -40,7 +40,7 @@
   input[type='search'] { min-width: 8rem; flex: 1; max-width: 14rem; }
   select { font-size: 0.85rem; }
   .steps { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
-  li { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
+  li { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.4rem 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   li.done { opacity: 0.7; }
   li.done .mark { color: var(--ok); }
   li.current { border-color: var(--accent); }

@@ -73,16 +73,16 @@
 <style>
   .name { font-size: 1.15rem; font-weight: 600; }
   .tag { font-size: 0.7rem; padding: 0.1rem 0.35rem; border-radius: 4px; background: var(--danger); color: #fff; margin-right: 0.3rem; vertical-align: middle; }
-  .tag.lucky { background: var(--accent); color: #111; }
+  .tag.lucky { background: var(--accent); color: var(--on-accent); }
   .tag.realm { background: var(--accent-2); }
   .tag.raid { background: #7b2cbf; }
   .bar.hp { margin: 0.35rem 0; }
   .bar.hp > span { background: var(--danger); }
-  .attack { width: 100%; padding: 0.9rem; font-size: 1.1rem; margin: 0.75rem 0 0.5rem; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .attack { width: 100%; padding: 0.9rem; font-size: 1.2rem; font-weight: 900; border-radius: var(--radius); box-shadow: var(--shadow); margin: 0.75rem 0 0.5rem; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .small { font-size: 0.85rem; }
   .compact { padding: 0.6rem 0.75rem; }
   .compact .name { font-size: 1rem; }
   .compact .attack { padding: 0.7rem; margin: 0.5rem 0 0.35rem; }
-  .here { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+  .here { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1.5px solid var(--border-soft); }
   button.active { border-color: var(--accent); color: var(--accent); }
 </style>

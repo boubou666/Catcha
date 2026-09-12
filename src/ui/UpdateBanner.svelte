@@ -21,6 +21,6 @@
     position: fixed; left: 50%; top: 0.6rem; transform: translateX(-50%); z-index: 30;
     max-width: min(480px, 94vw); width: max-content;
     background: var(--panel); border: 1px solid var(--accent); border-radius: 999px;
-    padding: 0.4rem 0.6rem 0.4rem 1rem; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45); gap: 0.5rem;
+    padding: 0.4rem 0.6rem 0.4rem 1rem; box-shadow: var(--shadow-float); gap: 0.5rem;
   }
 </style>

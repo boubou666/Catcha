@@ -66,8 +66,8 @@
 
 <style>
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .slot { border: 1px dashed var(--border); border-radius: 8px; padding: 0.9rem; text-align: center; }
-  .picker { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+  .slot { border: 2px dashed var(--border-soft); border-radius: var(--radius-sm); padding: 0.9rem; text-align: center; }
+  .picker { margin-top: 1rem; padding-top: 0.75rem; border-top: 1.5px solid var(--border-soft); }
   .picker .list { max-height: 45vh; overflow-y: auto; }
   .small { font-size: 0.8rem; }
   h3 { margin: 0; }

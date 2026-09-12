@@ -46,7 +46,7 @@
 </div>
 
 <style>
-  .card { padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); }
+  .card { padding: 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--panel-2); }
   .small { font-size: 0.8rem; }
   .stars { color: var(--accent); }
   .bar { height: 4px; margin-top: 0.25rem; }

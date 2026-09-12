@@ -47,7 +47,7 @@
 {/if}
 
 <style>
-  .backdrop { position: fixed; inset: 0; z-index: 10; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .backdrop { position: fixed; inset: 0; z-index: 10; background: var(--overlay); display: flex; align-items: center; justify-content: center; padding: 1rem; }
   .modal { width: min(560px, 100%); max-height: 90vh; display: flex; flex-direction: column; gap: 0.75rem; }
   .entries { overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 0.25rem; }
   h3 { text-transform: none; letter-spacing: 0; color: var(--text); font-size: 1rem; }

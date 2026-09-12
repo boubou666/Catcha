@@ -91,6 +91,13 @@ render for every Pal in `src/data/pals.ts` from palworld.wiki.gg into `public/pa
 Without them the UI shows element-coloured placeholder discs — which is what the GitHub Pages build
 shows, since the images are never committed or deployed.
 
+## Look
+
+The interface is styled after Palworld's own menus: a sunny Palpagos backdrop, dark navy glass panels with a
+cyan edge-light and chamfered corners, bold rounded type (Nunito from Google Fonts, system fallback offline),
+yellow-orange for the actions that matter. Everything is driven by the tokens at the top of 
+(colours, chamfer size, glow); components only use those tokens. Icons come from .
+
 ## Status
 
 All seven regions from the design: Windswept Hills (Lv 1–15, Zoe & Grizzbolt), Marsh & Bamboo Groves

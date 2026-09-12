@@ -59,7 +59,7 @@
   .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
   .chk input { min-height: 0; width: auto; }
   .spawns { display: flex; flex-direction: column; gap: 0.25rem; max-height: 40vh; overflow-y: auto; }
-  .spawn { padding: 0.25rem 0.4rem; border: 1px solid var(--border); border-radius: 8px; }
+  .spawn { padding: 0.25rem 0.4rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .spawn.here { border-color: var(--accent); }
   .spawn.missing { opacity: 0.7; }
   .chance { min-width: 2.5rem; text-align: right; font-variant-numeric: tabular-nums; }

@@ -79,7 +79,7 @@
 
 <style>
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem; }
-  .entry { text-align: center; padding: 0.5rem 0.25rem; border-radius: 8px; border: 1px solid var(--border); opacity: 0.45; background: transparent; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+  .entry { text-align: center; padding: 0.5rem 0.25rem; border-radius: var(--radius-sm); border: 1.5px solid var(--border-soft); opacity: 0.45; background: transparent; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
   .entry:hover { opacity: 1; border-color: var(--accent); }
   .entry.seen { opacity: 0.75; }
   .entry.caught { opacity: 1; border-color: var(--ok); }

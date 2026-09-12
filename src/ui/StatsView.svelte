@@ -82,7 +82,7 @@
 
 <style>
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
-  .card { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6rem 0.75rem; }
+  .card { background: var(--panel-2); border: 1.5px solid var(--border-soft); border-radius: var(--radius); padding: 0.6rem 0.75rem; }
   h3 { margin: 0 0 0.4rem; }
   dl { margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
   .stat { display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline; }
@@ -93,7 +93,7 @@
   .hint { display: block; font-weight: 400; font-size: 0.75rem; }
   .bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
   .bars li { display: grid; grid-template-columns: 5rem 1fr 3.5rem; gap: 0.5rem; align-items: center; font-size: 0.85rem; }
-  .track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .track { height: 8px; background: var(--border-soft); border-radius: 4px; overflow: hidden; }
   .fill { display: block; height: 100%; border-radius: 4px; }
   .n { text-align: right; font-variant-numeric: tabular-nums; }
   .small { font-size: 0.8rem; }

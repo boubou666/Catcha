@@ -168,9 +168,9 @@
   .chance { font-weight: 600; }
   .chance.good { color: var(--ok); }
   .chance.bad { color: var(--danger); }
-  .pick { padding: 0.35rem 0.5rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+  .pick { padding: 0.35rem 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); cursor: pointer; }
   .pick.on { border-color: var(--accent); }
-  .trip, .report { padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
+  .trip, .report { padding: 0.4rem 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .trip-bar { width: 120px; }
   .trip-bar > span { background: var(--accent-2); }
   .eta { min-width: 3.5rem; text-align: right; }

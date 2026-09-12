@@ -136,7 +136,7 @@
 
 <style>
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .recipe, .job { padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
+  .recipe, .job { padding: 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .locked { opacity: 0.55; }
   .small { font-size: 0.8rem; }
   .warn { color: var(--accent); }

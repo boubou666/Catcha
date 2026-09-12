@@ -116,7 +116,7 @@
   .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 60vh; overflow-y: auto; }
   .small { font-size: 0.8rem; }
   .star.ready { border-color: var(--accent); color: var(--accent); }
-  .bulkbar { margin: 0.5rem 0; padding: 0.4rem 0.5rem; border: 1px dashed var(--border); border-radius: 8px; }
+  .bulkbar { margin: 0.5rem 0; padding: 0.4rem 0.5rem; border: 2px dashed var(--border-soft); border-radius: var(--radius-sm); }
   .bulkbar.on { border-style: solid; border-color: var(--accent); background: var(--panel-2); }
   .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
   .chk input, .sel { min-height: 0; width: auto; }

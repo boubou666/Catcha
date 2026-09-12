@@ -175,12 +175,12 @@
 {/if}
 
 <style>
-  .panel-2 { background: var(--panel-2); border-radius: 8px; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .panel-2 { background: var(--panel-2); border-radius: var(--radius-sm); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
   .parents { align-items: center; }
   .parents :global(.card) { flex: 1; }
   .heart { color: var(--danger); font-size: 1.3rem; }
   .picks { align-items: center; }
-  .slot { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; border: 1px dashed var(--border); border-radius: 8px; min-height: 2.8rem; }
+  .slot { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; border: 2px dashed var(--border-soft); border-radius: var(--radius-sm); min-height: 2.8rem; }
   .slot.filled { border-style: solid; border-color: var(--accent); }
   .picker { margin-top: 1rem; }
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -197,7 +197,7 @@
   .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
   .chk input { min-height: 0; width: auto; }
   .eggs { display: flex; flex-direction: column; gap: 0.4rem; }
-  .egg { padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
+  .egg { padding: 0.4rem 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .egg-bar { width: 120px; }
   .egg-bar > span { background: var(--accent-2); }
   .eta { min-width: 3.5rem; text-align: right; }

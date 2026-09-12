@@ -15,8 +15,8 @@
   }
   .toast {
     pointer-events: auto; max-width: min(360px, 90vw); text-align: left;
-    background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--accent-2);
-    border-radius: 8px; padding: 0.5rem 0.75rem; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    background: var(--panel); border: 1.5px solid var(--border-soft); border-left: 4px solid var(--accent-2);
+    border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; box-shadow: var(--shadow-float);
     animation: toast-in 180ms ease-out;
   }
   .toast.success { border-left-color: var(--ok); }

@@ -66,17 +66,17 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    color: #111;
+    color: var(--text);
     flex-shrink: 0;
     overflow: hidden;
-    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 -3px 0 rgba(31, 42, 68, 0.18);
     background: var(--panel-2);
   }
   .icon.art { background: var(--panel-2); box-shadow: none; }
   .icon.render { border-radius: 12px; background: transparent; }
   img { width: 100%; height: 100%; object-fit: contain; }
   /* Unknown Paldeck entries show the art as a dark silhouette */
-  .unknown img { filter: brightness(0) opacity(0.35); }
+  .unknown img { filter: brightness(0) invert(1) opacity(0.3); }
   .unknown { color: var(--muted); }
   .lucky { box-shadow: 0 0 0 3px var(--accent), 0 0 12px var(--accent); }
 </style>

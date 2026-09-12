@@ -167,18 +167,18 @@
 
 <style>
   section { margin-top: 1.25rem; }
-  .status { padding: 0.5rem 0.75rem; background: var(--panel-2); border-radius: 8px; }
+  .status { padding: 0.5rem 0.75rem; background: var(--panel-2); border-radius: var(--radius-sm); }
   .warn { color: var(--accent); }
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
   .scroll { max-height: 40vh; overflow-y: auto; }
   table { width: 100%; border-collapse: collapse; }
-  td { padding: 0.25rem 0.3rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  td { padding: 0.25rem 0.3rem; border-bottom: 1.5px solid var(--border-soft); vertical-align: top; }
   td.icon { width: 1.6rem; }
   tr.idle { opacity: 0.5; }
   .small { font-size: 0.8rem; }
   .rates { margin-top: 0.5rem; }
   .chip { background: var(--panel-2); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.85rem; }
-  .structure { padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
+  .structure { padding: 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .structure.locked { opacity: 0.6; }
   input[type='search'] { min-width: 8rem; max-width: 12rem; }
   select { font-size: 0.85rem; }

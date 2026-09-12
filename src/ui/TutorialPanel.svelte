@@ -38,12 +38,12 @@
   .head { gap: 0.6rem; }
   .label { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75rem; }
   .dots { display: inline-flex; gap: 3px; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-soft); }
   .dot.done { background: var(--accent); opacity: 0.55; }
   .dot.now { background: var(--accent); }
   .ghost { color: var(--muted); border-color: transparent; background: transparent; }
   .title { font-weight: 600; }
   p { margin: 0; font-size: 0.9rem; line-height: 1.4; }
   button.primary { align-self: flex-start; }
-  .all { margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--border); }
+  .all { margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1.5px solid var(--border-soft); }
 </style>

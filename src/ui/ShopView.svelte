@@ -112,10 +112,10 @@
 <style>
   .gold { font-weight: 600; color: var(--accent); }
   .sides { display: flex; gap: 0.25rem; }
-  .sides button.active { background: var(--accent); color: #1a1a1a; border-color: transparent; }
-  .sides button.active .muted { color: #1a1a1a; opacity: 0.7; }
+  .sides button.active { background: var(--accent-2); color: #fff; }
+  .sides button.active .muted { color: #fff; opacity: 0.8; }
   .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 50vh; overflow-y: auto; }
-  .item { padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
+  .item { padding: 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .item.locked { opacity: 0.6; }
   .price { white-space: nowrap; font-variant-numeric: tabular-nums; }
   .settings { margin-top: 1.5rem; }

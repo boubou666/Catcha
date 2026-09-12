@@ -10,6 +10,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.9.0', date: '2026-09-13', title: 'A Palworld look',
+    items: [
+      'New interface styled after Palworld's menus: a sunny Palpagos backdrop, dark glass HUD panels with cyan edge-light and chamfered corners, bold rounded type (Nunito), yellow-orange for the actions that matter.',
+      'Fresh app icons to match.',
+    ],
+  },
+  {
     version: '0.8.0', date: '2026-09-12', title: 'Tutorial and statistics',
     items: [
       'A Stats tab under Progress: time played, gold, defeats by kind and element, catch rates per sphere, Paldeck, base and world completion.',

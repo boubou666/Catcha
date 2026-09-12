@@ -17,7 +17,7 @@
   .chips { display: inline-flex; flex-wrap: wrap; gap: 0.2rem; vertical-align: middle; }
   .chip {
     font-size: 0.7rem; line-height: 1.3; padding: 0 0.4rem; border-radius: 999px;
-    border: 1px solid var(--border); color: var(--muted); background: var(--panel);
+    border: 1.5px solid var(--border-soft); color: var(--muted); background: var(--panel);
     white-space: nowrap;
   }
   .normal .chip { font-size: 0.8rem; padding: 0.1rem 0.5rem; }

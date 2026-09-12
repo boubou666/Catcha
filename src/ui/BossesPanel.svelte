@@ -131,5 +131,6 @@
   .region-title { margin: 0.5rem 0 0.2rem; text-transform: uppercase; letter-spacing: 0.04em; }
   .found { display: flex; flex-direction: column; gap: 0.25rem; }
   .found-btn { display: flex; justify-content: space-between; text-align: left; }
+  .found-btn { border-radius: var(--radius-sm); box-shadow: none; }
   .found-btn.beaten:not(.primary) { color: var(--ok); }
 </style>

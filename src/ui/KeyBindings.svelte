@@ -48,7 +48,7 @@
   .warn { color: var(--accent); }
   h4 { margin: 0.75rem 0 0.3rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; }
   .bindings { display: flex; flex-direction: column; gap: 0.25rem; }
-  .binding { padding: 0.25rem 0.4rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+  .binding { padding: 0.25rem 0.4rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); font-size: 0.9rem; }
   .binding.clash { border-color: var(--danger); }
   .binding.off { opacity: 0.65; }
   .key { min-width: 7rem; font-family: ui-monospace, monospace; }

@@ -188,17 +188,21 @@
   .app { max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
   main { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr); gap: 1rem; }
   main.mobile { grid-template-columns: 1fr; }
+  main > section { min-width: 0; }
+  .groups button { min-width: 0; padding-left: 0.4rem; padding-right: 0.4rem; }
   .spawns-mobile { margin-top: 0.75rem; }
-  .sticky-arena { position: sticky; top: 0; z-index: 5; background: var(--bg); padding-bottom: 0.25rem; }
+  .sticky-arena { position: sticky; top: 0; z-index: 5; padding-bottom: 0.35rem; }
   @media (max-width: 800px) {
     .app { padding: 0.5rem; gap: 0.5rem; }
     .tab-body { min-height: 0; padding: 0.75rem; }
   }
-  .groups { display: flex; gap: 0.25rem; margin-bottom: 0.4rem; }
-  .groups button { flex: 1; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8rem; }
-  .groups button.active { background: var(--accent); color: #1a1a1a; border-color: transparent; }
-  .tabs { display: flex; gap: 0.25rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
-  .tabs button { border-radius: 6px 6px 0 0; }
-  .tabs button.active { background: var(--panel); border-color: var(--accent); color: var(--accent); }
+  .groups { display: flex; gap: 0.35rem; margin-bottom: 0.5rem; }
+  .groups button { flex: 1; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; }
+  .groups button.active { background: linear-gradient(180deg, #7fe3ff, var(--accent-2)); color: var(--on-accent); border-color: #d9f6ff; }
+  .tabs { display: flex; gap: 0.3rem; margin-bottom: -2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 0 0.5rem; position: relative; z-index: 1; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { flex: 0 0 auto; border-radius: var(--radius-sm) var(--radius-sm) 0 0; border-bottom: none; box-shadow: none; background: var(--panel-2); padding: 0.3rem 0.65rem 0.45rem; font-size: 0.9rem; }
+  .tabs button.active { background: rgba(53, 208, 255, 0.18); color: #fff; border-color: var(--accent-2); font-weight: 900; }
+  .tab-body { border-top-left-radius: 0; }
   .tab-body { min-height: 400px; }
 </style>

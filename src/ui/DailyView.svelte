@@ -125,24 +125,24 @@
 <style>
   .small { font-size: 0.8rem; }
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .quest { border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.35rem; }
+  .quest { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.6rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.35rem; }
   .quest.ready { border-color: var(--accent); }
   .quest.done { opacity: 0.6; border-color: var(--ok); }
   .bar { height: 5px; }
   .quest.done .bar > span { background: var(--ok); }
   .claimed { color: var(--ok); font-size: 0.85rem; }
-  .bonus { margin-top: 1rem; padding: 0.6rem; border: 1px dashed var(--border); border-radius: 8px; }
+  .bonus { margin-top: 1rem; padding: 0.6rem; border: 2px dashed var(--border-soft); border-radius: var(--radius-sm); }
   .bonus.ready { border-style: solid; border-color: var(--accent); }
   input[type='search'] { min-width: 10rem; flex: 1; max-width: 16rem; }
   button.active { border-color: var(--accent); color: var(--accent); }
   .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.5rem 0; padding: 0.5rem; background: var(--panel-2); border-radius: var(--radius); }
   .filters select { font-size: 0.85rem; }
   .list { margin-top: 0.5rem; }
-  .history { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+  .history { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1.5px solid var(--border-soft); }
   .history h3 { margin: 0; }
   .summary { gap: 1rem; margin: 0.4rem 0; font-size: 0.9rem; }
   .days { display: flex; flex-direction: column; gap: 0.5rem; max-height: 50vh; overflow-y: auto; }
-  .day { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.25rem; }
+  .day { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.25rem; }
   .day.full { border-color: var(--ok); }
   .past { font-size: 0.9rem; color: var(--muted); }
   .past.claimed { color: var(--text); }

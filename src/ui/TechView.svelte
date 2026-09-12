@@ -84,7 +84,7 @@
   section { margin-top: 1rem; }
   section.future { opacity: 0.6; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; }
-  .node { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem; background: var(--panel-2); }
+  .node { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem; background: var(--panel-2); }
   .node.done { border-color: var(--ok); }
   .node.ready { border-color: var(--accent); }
   .icon { font-size: 1.1rem; }
