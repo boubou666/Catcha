@@ -1,5 +1,6 @@
 import type { ExpeditionReport, PalInstance, SaveState } from '../data/types';
-import { EXPEDITION_POST, expeditionById, FAIL_GOLD_SHARE, MAX_CHANCE, MAX_REPORTS, MIN_CHANCE } from '../data/expeditions';
+import { EXPEDITION_POST, EXPEDITIONS, expeditionById, FAIL_GOLD_SHARE, MAX_CHANCE, MAX_REPORTS, MIN_CHANCE, type ExpeditionDef } from '../data/expeditions';
+import { itemName } from '../data/items';
 import { addItem, earnGold } from './inventory';
 import { grantInstanceExp, instanceByUid, isAway } from './party';
 import { isUnlocked } from './progress';
@@ -85,4 +86,35 @@ export function tickExpeditions(save: SaveState, dtSec: number, rand: Rng = Math
 
 export function clearReports(save: SaveState): void {
   save.base.reports = [];
+}
+
+// ---- filtering ----------------------------------------------------------------------
+
+export interface DestinationFilter { query: string; hideLocked: boolean }
+export const DEFAULT_DESTINATION_FILTER: DestinationFilter = { query: '', hideLocked: false };
+
+/** Destinations whose name or loot matches every search word; optionally only unlocked ones. */
+export function filterDestinations(save: SaveState, f: DestinationFilter): ExpeditionDef[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return EXPEDITIONS.filter((e) => {
+    if (f.hideLocked && !isUnlocked(save, e.unlock)) return false;
+    if (words.length === 0) return true;
+    const hay = [e.name, 'gold', ...e.loot.items.map((d) => itemName(d.itemId))].join(' ').toLowerCase();
+    return words.every((w) => hay.includes(w));
+  });
+}
+
+/** Reports whose destination or loot matches every search word, newest first. */
+export function filterReports(save: SaveState, query: string): ExpeditionReport[] {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return [...save.base.reports].reverse().filter((r) => {
+    if (words.length === 0) return true;
+    const hay = [expeditionById(r.defId).name, r.success ? 'success' : 'failed', ...Object.keys(r.items).map(itemName)].join(' ').toLowerCase();
+    return words.every((w) => hay.includes(w));
+  });
+}
+
+/** The strongest `n` members for a trip, by memberScore. */
+export function bestMembers(pool: PalInstance[], n: number): PalInstance[] {
+  return [...pool].sort((a, b) => memberScore(b) - memberScore(a)).slice(0, n);
 }

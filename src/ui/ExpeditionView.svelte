@@ -3,7 +3,9 @@
   import { palById } from '../data/pals';
   import { itemName } from '../data/items';
   import { EXPEDITIONS, EXPEDITION_POST, expeditionById } from '../data/expeditions';
-  import { available, expeditionSlots, sendBlocker, successChance, type SendBlock } from '../engine/expedition';
+  import { available, bestMembers, DEFAULT_DESTINATION_FILTER, expeditionSlots, filterDestinations, filterReports, sendBlocker, successChance, type DestinationFilter, type SendBlock } from '../engine/expedition';
+  import { DEFAULT_FILTER, filterBox, isFiltering, type BoxFilter } from '../engine/boxfilter';
+  import BoxFilterBar from './BoxFilterBar.svelte';
   import { describeRequirement, isUnlocked } from '../engine/progress';
   import { formatDuration } from './format';
   import PalIcon from './PalIcon.svelte';
@@ -11,7 +13,18 @@
 
   const save = $derived(game.save);
   const slots = $derived(expeditionSlots(save));
-  const idle = $derived(available(save).sort((a, b) => b.level - a.level || a.palId - b.palId));
+  const idle = $derived(available(save));
+
+  // destinations + reports share one search; the member list has the usual Box filter bar
+  let dest = $state<DestinationFilter>({ ...DEFAULT_DESTINATION_FILTER });
+  const destinations = $derived(filterDestinations(save, dest));
+  const reports = $derived(filterReports(save, dest.query));
+  const PICK_DEFAULTS: BoxFilter = { ...DEFAULT_FILTER, status: 'idle', sort: 'attack' };
+  let filter = $state<BoxFilter>({ ...PICK_DEFAULTS });
+  const idleSet = $derived(new Set(idle.map((p) => p.uid)));
+  const candidates = $derived(filterBox(save, filter).filter((p) => idleSet.has(p.uid)));
+  const filtering = $derived(isFiltering(filter, PICK_DEFAULTS));
+  const clear = () => { filter = { ...PICK_DEFAULTS, sort: filter.sort }; };
 
   let defId = $state(EXPEDITIONS[0].id);
   let picked = $state<string[]>([]);
@@ -34,6 +47,9 @@
   }
   function sendNow() {
     if (game.sendExpedition(defId, picked)) picked = [];
+  }
+  function pickBest() {
+    picked = bestMembers(candidates, def.size).map((p) => p.uid);
   }
   const pct = (n: number) => `${Math.round(n * 100)}%`;
   const lootText = (id: string) => {
@@ -68,9 +84,16 @@
 {/if}
 
 <section>
-  <h3>Destination</h3>
+  <div class="row">
+    <h3 class="grow">Destination <span class="muted">{destinations.length < EXPEDITIONS.length ? `${destinations.length} of ${EXPEDITIONS.length}` : EXPEDITIONS.length}</span></h3>
+    <input type="search" placeholder="Search destination, loot…" bind:value={dest.query} aria-label="Search destinations" />
+    <label class="chk"><input type="checkbox" bind:checked={dest.hideLocked} /> Hide locked</label>
+  </div>
+  {#if destinations.length === 0}
+    <p class="muted">No destination matches. <button class="small" onclick={() => (dest = { ...DEFAULT_DESTINATION_FILTER })}>Clear</button></p>
+  {/if}
   <div class="dests">
-    {#each EXPEDITIONS as e (e.id)}
+    {#each destinations as e (e.id)}
       {@const open = isUnlocked(save, e.unlock)}
       <button class="dest" class:active={e.id === defId} class:locked={!open} onclick={() => (defId = e.id)}
         title={open ? lootText(e.id) : describeRequirement(e.unlock)}>
@@ -86,12 +109,22 @@
   <div class="row">
     <h3 class="grow">Party <span class="muted">{picked.length} / {def.size}</span></h3>
     <span class="chance" class:good={chance >= 0.75} class:bad={chance > 0 && chance < 0.4}>Success {pct(chance)}</span>
+    <button class="small" disabled={candidates.length === 0} onclick={pickBest} title="Fill the party with the strongest Pals in the list below">Pick best</button>
+    {#if picked.length}<button class="small" onclick={() => (picked = [])}>Clear picks</button>{/if}
     <button class="primary small" disabled={!!block} title={block ? BLOCK[block] : ''} onclick={sendNow}>Send</button>
   </div>
   {#if block && picked.length > 0}<div class="warn small">{BLOCK[block]}</div>{/if}
   <p class="muted small">Chance is judged against a full party at Lv {def.level}. Stars and attack passives count. Members are unavailable until they return.</p>
+  <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search idle Pals" hideStatus>
+    {#snippet heading()}
+      <span class="grow muted small">Idle Pals {filtering ? `${candidates.length} of ${idle.length}` : idle.length}</span>
+    {/snippet}
+  </BoxFilterBar>
+  {#if idle.length > 0 && candidates.length === 0}
+    <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+  {/if}
   <div class="list scroll">
-    {#each idle as p (p.uid)}
+    {#each candidates as p (p.uid)}
       {@const on = picked.includes(p.uid)}
       <label class="pick row" class:on>
         <input type="checkbox" checked={on} disabled={!on && picked.length >= def.size} onchange={() => toggle(p.uid)} />
@@ -110,8 +143,9 @@
       <h3 class="grow">Reports</h3>
       <button class="small" onclick={() => game.clearReports()}>Clear</button>
     </div>
+    {#if reports.length === 0}<p class="muted small">No report matches the search.</p>{/if}
     <div class="list">
-      {#each save.base.reports as r (r.at + r.defId)}
+      {#each reports as r (r.at + r.defId)}
         <div class="report row" class:fail={!r.success}>
           <span class="grow"><b>{expeditionById(r.defId).name}</b> — {r.success ? 'success' : 'failed'}</span>
           <span class="muted small">+{r.gold.toLocaleString()} gold{Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}</span>
@@ -141,4 +175,7 @@
   .trip-bar > span { background: var(--accent-2); }
   .eta { min-width: 3.5rem; text-align: right; }
   .report.fail { opacity: 0.7; }
+  input[type='search'] { min-width: 10rem; max-width: 16rem; }
+  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
+  .chk input { min-height: 0; width: auto; }
 </style>

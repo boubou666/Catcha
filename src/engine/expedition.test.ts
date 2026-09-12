@@ -5,7 +5,7 @@ import { assignWorker } from './base';
 import { setPair, BREEDING_FARM } from './breeding';
 import { condenseCandidates } from './condense';
 import { applyOffline } from './offline';
-import { available, expeditionSlots, memberScore, send, sendBlocker, successChance, tickExpeditions } from './expedition';
+import { available, bestMembers, DEFAULT_DESTINATION_FILTER, expeditionSlots, filterDestinations, filterReports, memberScore, send, sendBlocker, successChance, tickExpeditions } from './expedition';
 import { EXPEDITION_POST, EXPEDITIONS, expeditionById, MAX_CHANCE, MIN_CHANCE } from '../data/expeditions';
 import { itemById } from '../data/items';
 import { REGIONS, routeById, towerById } from '../data/regions';
@@ -124,5 +124,39 @@ describe('migration v8 → v9', () => {
     expect(s.version).toBe(SAVE_VERSION);
     expect(s.base.expeditions).toEqual([]);
     expect(s.base.reports).toEqual([]);
+  });
+});
+
+describe('expedition filters', () => {
+  it('filters destinations by name, loot and lock state', () => {
+    const s = newState();
+    expect(filterDestinations(s, DEFAULT_DESTINATION_FILTER)).toEqual(EXPEDITIONS);
+    expect(filterDestinations(s, { query: 'windswept', hideLocked: false }).map((e) => e.id)).toEqual(['scout_hills']);
+    expect(filterDestinations(s, { query: 'flame organ', hideLocked: false }).map((e) => e.id)).toContain('syndicate_camp');
+    expect(filterDestinations(s, { query: 'gold', hideLocked: false })).toEqual(EXPEDITIONS);
+    const open = filterDestinations(s, { query: '', hideLocked: true });
+    expect(open.length).toBeGreaterThan(0);
+    expect(open.length).toBeLessThan(EXPEDITIONS.length);
+    expect(filterDestinations(s, { query: 'zzz', hideLocked: false })).toEqual([]);
+  });
+
+  it('filters reports by destination, outcome and loot, newest first', () => {
+    const s = newState();
+    s.base.reports = [
+      { defId: 'scout_hills', success: true, gold: 100, items: { wood: 30 }, at: 1 },
+      { defId: 'syndicate_camp', success: false, gold: 100, items: {}, at: 2 },
+    ];
+    expect(filterReports(s, '').map((r) => r.at)).toEqual([2, 1]);
+    expect(filterReports(s, 'failed').map((r) => r.defId)).toEqual(['syndicate_camp']);
+    expect(filterReports(s, 'wood').map((r) => r.defId)).toEqual(['scout_hills']);
+    expect(filterReports(s, 'scout success')).toHaveLength(1);
+  });
+
+  it('picks the strongest members for a trip', () => {
+    const weak = makeInstance(1, 5), mid = makeInstance(1, 10), strong = makeInstance(1, 10);
+    strong.stars = 2;
+    const best = bestMembers([weak, strong, mid], 2);
+    expect(best.map((p) => p.uid)).toEqual([strong.uid, mid.uid]);
+    expect(bestMembers([weak], 3)).toEqual([weak]);
   });
 });

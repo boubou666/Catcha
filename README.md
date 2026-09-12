@@ -190,6 +190,9 @@ status ready / in progress / claimed / missed, kind), and a **History** section:
 are frozen into `save.dailyHistory` (last 90 days, one record per date) with their final progress; the view
 shows a streak (consecutive days with all three claimed, reaching today or yesterday), quests claimed, bonuses
 and gold from quests, then each past day newest first. The filters apply to history too.
+Expeditions: a destination search (name or loot, with "hide locked") that also filters the reports, the
+usual Box filter bar over idle Pals for the party, and a **Pick best** button that fills the party with the
+strongest listed Pals by expedition score.
 
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
