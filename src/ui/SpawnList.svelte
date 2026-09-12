@@ -1,12 +1,18 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
   import { ELEMENTS } from '../data/types';
-  import { DEFAULT_SPAWN_FILTER, filterSpawns, isSpawnFiltering, routeSpawns, SPAWN_STATUS_LABEL, type SpawnFilter } from '../engine/arenafilter';
+  import { DEFAULT_SPAWN_FILTER, filterSpawns, isSpawnFiltering, spawnTable, SPAWN_STATUS_LABEL, type SpawnFilter, type SpawnTable } from '../engine/arenafilter';
+  import { catchPreview } from '../engine/catch';
+  import { catchText } from './catchText';
+  import { palById } from '../data/pals';
   import PalIcon from './PalIcon.svelte';
 
+  // Defaults to the current route; a realm passes its wave pool and guardian.
+  let { spawns, where, guardian }: { spawns?: SpawnTable; where?: string; guardian?: number } = $props();
   let filter = $state<SpawnFilter>({ ...DEFAULT_SPAWN_FILTER });
   let open = $state(false);
-  const all = $derived(routeSpawns(game.save, game.route, game.watched));
+  const all = $derived(spawnTable(game.save, spawns ?? game.route.spawns, game.watched));
+  const guardianPv = $derived(guardian !== undefined ? catchPreview(game.save, guardian) : null);
   const rows = $derived(filterSpawns(all, filter));
   const filtering = $derived(isSpawnFiltering(filter));
   const clear = () => { filter = { ...DEFAULT_SPAWN_FILTER }; };
@@ -14,7 +20,7 @@
 </script>
 
 <div class="row head">
-  <span class="grow muted small">On {game.route.name} <b>{filtering ? `${rows.length} of ${all.length}` : all.length}</b> species</span>
+  <span class="grow muted small">{where ?? `On ${game.route.name}`} <b>{filtering ? `${rows.length} of ${all.length}` : all.length}</b> species</span>
   <input type="search" placeholder="Search…" bind:value={filter.query} aria-label="Search spawns" />
   <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
 </div>
@@ -42,11 +48,19 @@
         <b>{r.name}</b> <span class="muted small">#{r.no}{r.elements.length ? ` · ${r.elements.join('/')}` : ''}{r.status === 'seen' ? ' · seen' : r.status === 'caught' ? ' · caught' : ''}</span>
       </span>
       <span class="muted small chance">{pct(r.chance)}</span>
+      <span class="small chance odds" class:no={!r.catch.throws} title={`Catch: ${catchText(r.catch)}`}>🎯 {r.catch.throws ? pct(r.catch.chance) : '—'}</span>
       <button class="small watch" class:on={r.watched} onclick={() => game.toggleWatch(r.palId)} title={r.watched ? 'Stop watching' : 'Toast me when this Pal spawns'}>👀</button>
     </div>
   {/each}
+  {#if guardian !== undefined && guardianPv}
+    <div class="spawn row guardian" class:here={game.wild?.palId === guardian && game.wild?.kind === 'dungeonBoss'}>
+      <PalIcon palId={guardian} size={28} />
+      <span class="grow"><b>{palById(guardian).name}</b> <span class="muted small">· guardian, after the last wave</span></span>
+      <span class="small chance odds" class:no={!guardianPv.throws} title={`Catch: ${catchText(guardianPv)}`}>🎯 {guardianPv.throws ? pct(guardianPv.chance) : '—'}</span>
+    </div>
+  {/if}
 </div>
-<p class="muted tiny">Odds are each species' share of the route's spawn table. Watched Pals pop a toast when they appear (this device only).</p>
+<p class="muted tiny">First number: each species' share of the spawn table. 🎯: catch odds with the sphere your policy picks (Settings → Catching). Watched Pals pop a toast when they appear (this device only).</p>
 
 <style>
   .head { margin-bottom: 0.3rem; }
@@ -63,6 +77,9 @@
   .spawn.here { border-color: var(--accent); }
   .spawn.missing { opacity: 0.7; }
   .chance { min-width: 2.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+  .odds { color: var(--accent-2); min-width: 3.6rem; font-weight: 700; }
+  .odds.no { color: var(--muted); font-weight: 400; }
+  .guardian { border-style: dashed; }
   .watch { opacity: 0.5; }
   .watch.on { opacity: 1; border-color: var(--accent); }
 </style>

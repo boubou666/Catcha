@@ -1,5 +1,6 @@
 import type { Element, RouteDef, SaveState } from '../data/types';
 import { palById } from '../data/pals';
+import { catchPreview, type CatchPreview } from './catch';
 
 export type SpawnStatus = 'caught' | 'seen' | 'missing';
 export interface SpawnFilter { query: string; status: SpawnStatus | 'any'; element: Element | 'any'; watchedOnly: boolean }
@@ -14,17 +15,25 @@ export interface SpawnRow {
   status: SpawnStatus;
   elements: Element[];   // empty until seen
   watched: boolean;
+  catch: CatchPreview;   // what beating one would throw, and the odds
 }
+
+export type SpawnTable = readonly { palId: number; weight: number }[];
 
 /** The route's spawn table with odds and Paldeck status, most common first. */
 export function routeSpawns(save: SaveState, route: RouteDef, watched: ReadonlySet<number> = new Set()): SpawnRow[] {
-  const total = route.spawns.reduce((s, x) => s + x.weight, 0);
-  return route.spawns
+  return spawnTable(save, route.spawns, watched);
+}
+
+/** Any spawn table (a route, a realm's wave pool) with spawn share, catch odds and Paldeck status, most common first. */
+export function spawnTable(save: SaveState, spawns: SpawnTable, watched: ReadonlySet<number> = new Set()): SpawnRow[] {
+  const total = spawns.reduce((s, x) => s + x.weight, 0);
+  return spawns
     .map((s) => {
       const def = palById(s.palId);
       const e = save.paldeck[def.id];
       const status: SpawnStatus = (e?.caught ?? 0) > 0 ? 'caught' : e?.seen ? 'seen' : 'missing';
-      return { palId: def.id, name: status === 'missing' ? '???' : def.name, no: def.no, chance: s.weight / total, status, elements: status === 'missing' ? [] : def.elements, watched: watched.has(def.id) };
+      return { palId: def.id, name: status === 'missing' ? '???' : def.name, no: def.no, chance: s.weight / total, status, elements: status === 'missing' ? [] : def.elements, watched: watched.has(def.id), catch: catchPreview(save, def.id) };
     })
     .sort((a, b) => b.chance - a.chance || a.no.localeCompare(b.no));
 }

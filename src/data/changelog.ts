@@ -20,7 +20,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tighter tab rows on phones.',
       'Alpha fights are now timed: 5 minutes to win, like the towers’ 10.',
       'Alphas can be caught, like in Palworld: a sphere is thrown when you beat one, at 35% of the normal rate — better spheres and Effigies help. A caught Alpha keeps its boss level.',
-      'The arena and the Alpha buttons now show your catch odds (or why nothing would be thrown — the “Already caught” policy defaults to no throw, to save spheres early on). Catch settings moved from the Merchant to Settings → Catching; the 🎯 line in the arena jumps there. Towers and raids get the same line: “no catch” for a tower boss, and the egg with its ✨ Lucky odds for a raid; Sealed Realm buttons show the guardian’s odds.',
+      'The arena and the Alpha buttons now show your catch odds (or why nothing would be thrown — the “Already caught” policy defaults to no throw, to save spheres early on). Catch settings moved from the Merchant to Settings → Catching; the 🎯 line in the arena jumps there. Towers and raids get the same line: “no catch” for a tower boss, and the egg with its ✨ Lucky odds for a raid; Sealed Realm buttons show the guardian’s odds, and “Who lives here?” — on a route or inside a realm — lists every species with its 🎯 catch odds next to its spawn share.',
       'The page no longer scrolls as a whole — the columns scroll on their own, so the header and arena stay put.',
     ],
   },

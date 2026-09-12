@@ -99,10 +99,13 @@
         {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? 'Hide' : 'Who lives here?'}</button>{/if}
       {:else}
         <button class="small" onclick={() => game.flee()}>{run ? 'Leave realm' : wild.kind === 'raid' ? 'Give up (slab lost)' : 'Retreat'}</button>
+        {#if run && !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? 'Hide' : 'Who lives here?'}</button>{/if}
       {/if}
     </div>
     {#if showHere && !compact && wild.kind === 'wild'}
       <div class="here"><SpawnList /></div>
+    {:else if showHere && !compact && run && runDef}
+      <div class="here"><SpawnList spawns={runDef.pool} where="Waves in {runDef.name}:" guardian={runDef.boss.palId} /></div>
     {/if}
   {/if}
 </div>

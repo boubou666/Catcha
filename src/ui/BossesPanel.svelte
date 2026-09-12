@@ -3,6 +3,7 @@
   import { palById } from '../data/pals';
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { catchPreview } from '../engine/catch';
+  import { spawnTable } from '../engine/arenafilter';
   import { catchText } from './catchText';
   import { describeRequirement, isUnlocked } from '../engine/progress';
   import { dungeonsOf } from '../data/dungeons';
@@ -115,7 +116,7 @@
     {@const pv = catchPreview(game.save, d.boss.palId)}
     <div class="row realm-row">
       <button class="realm-btn" class:primary={unlocked && clears === 0} disabled={!game.canEnter(d.id)} onclick={() => game.enterDungeon(d.id)}
-        title={unlocked ? `${d.waves} waves of Lv ${d.level} Pals, then ${bossName(d.id)} — ${d.timeLimitSec / 60} min. Waves and the guardian can be caught at normal odds. Guardian ${bossName(d.id)}: ${catchText(pv)}.` : describeRequirement(d.unlock)}>
+        title={unlocked ? `${d.waves} waves of Lv ${d.level} Pals, then ${bossName(d.id)} — ${d.timeLimitSec / 60} min. Waves and the guardian can be caught at normal odds. Waves: ${spawnTable(game.save, d.pool).map((r) => `${r.name} ${r.catch.throws ? `${Math.round(r.catch.chance * 100)}%` : '—'}`).join(', ')}. Guardian ${bossName(d.id)}: ${catchText(pv)}.` : describeRequirement(d.unlock)}>
         🗝 {d.name} <span class="muted">Lv {d.level}{clears ? ` · cleared ×${clears}` : ''}</span>{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {bossName(d.id)} {pv.throws ? `${Math.round(pv.chance * 100)}%` : '—'}</span>{/if}
       </button>
     </div>
