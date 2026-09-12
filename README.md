@@ -20,6 +20,10 @@ build → craft → Alpha). Each step checks the save state and advances on its 
 for steps that live on another tab; it can be skipped at any time and replayed from Settings → About. Steps live
 in `src/engine/tutorial.ts`; saves from before it existed are marked done.
 
+Progress → Stats shows lifetime statistics (they survive Ascension): time played, gold earned and spent, defeats by
+kind and by element, spheres thrown and catch rate per tier, Paldeck and Box counts, strongest Pal, base output
+counters and world completion. Counters live in `save.stats`; the report is built by `src/engine/stats.ts`.
+
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.
 

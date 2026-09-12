@@ -10,8 +10,9 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
-    version: '0.8.0', date: '2026-09-12', title: 'Tutorial',
+    version: '0.8.0', date: '2026-09-12', title: 'Tutorial and statistics',
     items: [
+      'A Stats tab under Progress: time played, gold, defeats by kind and element, catch rates per sphere, Paldeck, base and world completion.',
       'A ten-step tutorial for new saves that follows what you actually do — attack, catch, clear a route, research, put a Pal to work, build, craft, beat an Alpha.',
       'Skip it any time; replay it from Settings → About.',
     ],

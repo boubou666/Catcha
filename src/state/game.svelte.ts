@@ -413,6 +413,7 @@ export class Game {
     const cost = s.price * n;
     if (this.save.player.gold < cost) return false;
     this.save.player.gold -= cost;
+    this.save.stats.goldSpent += cost;
     this.save.inventory[s.itemId] = (this.save.inventory[s.itemId] ?? 0) + n;
     return true;
   }

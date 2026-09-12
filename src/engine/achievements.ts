@@ -2,7 +2,11 @@ import type { SaveState } from '../data/types';
 import { ACHIEVEMENTS, POINT_GOLD_BONUS, type AchievementDef } from '../data/achievements';
 
 export function newStats(): SaveState['stats'] {
-  return { defeated: 0, clicks: 0, caught: 0, luckyCaught: 0, hatched: 0, luckyHatched: 0, crafted: 0, expeditions: 0, goldEarned: 0, playSeconds: 0, defeatedByElement: {} };
+  return {
+    defeated: 0, clicks: 0, caught: 0, luckyCaught: 0, hatched: 0, luckyHatched: 0, crafted: 0, expeditions: 0,
+    goldEarned: 0, goldSpent: 0, playSeconds: 0, throws: 0, condensed: 0, luckyDefeated: 0,
+    defeatedByElement: {}, defeatedByKind: {}, throwsByTier: {}, caughtByTier: {},
+  };
 }
 
 export function isUnlocked(save: SaveState, id: string): boolean {

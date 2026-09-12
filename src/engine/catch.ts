@@ -43,11 +43,14 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
 
   const itemId = SPHERES[tier].itemId;
   save.inventory[itemId] -= 1;
+  save.stats.throws += 1;
+  save.stats.throwsByTier[tier] = (save.stats.throwsByTier[tier] ?? 0) + 1;
 
   const chance = catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch') * prestigeMult(save, 'catch'));
   if (rand() < chance) {
     addToBox(save, makeInstance(wild.palId, wild.level, wild.lucky, rollWildPassives(palById(wild.palId), wild.lucky, rand)));
     save.stats.caught += 1;
+    save.stats.caughtByTier[tier] = (save.stats.caughtByTier[tier] ?? 0) + 1;
     if (wild.lucky) save.stats.luckyCaught += 1;
     return { outcome: 'caught', tier, chance };
   }

@@ -44,5 +44,6 @@ export function condense(save: SaveState, targetUid: string): PalInstance[] | nu
   const gone = new Set(fed.map((p) => p.uid));
   save.box = save.box.filter((p) => !gone.has(p.uid));
   target.stars = (target.stars + 1) as PalInstance['stars'];
+  save.stats.condensed += 1;
   return fed;
 }

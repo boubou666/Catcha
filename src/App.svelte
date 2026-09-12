@@ -28,9 +28,10 @@
   import UpdateBanner from './ui/UpdateBanner.svelte';
   import WhatsNew from './ui/WhatsNew.svelte';
   import TutorialPanel from './ui/TutorialPanel.svelte';
+  import StatsView from './ui/StatsView.svelte';
   import { whatsNew } from './state/whatsnew.svelte';
 
-  type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings';
+  type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings' | 'stats';
   type Group = { id: string; label: string; tabs: { id: Tab; label: string }[] };
   const WORLD: Group = { id: 'world', label: 'World', tabs: [{ id: 'routes', label: 'Routes' }, { id: 'bosses', label: 'Bosses' }, { id: 'log', label: 'Log' }] };
   const GROUPS: Group[] = [
@@ -43,7 +44,7 @@
       { id: 'shop', label: 'Merchant' }, { id: 'expedition', label: 'Expeditions' },
     ] },
     { id: 'progress', label: 'Progress', tabs: [
-      { id: 'tech', label: 'Tech' }, { id: 'daily', label: 'Daily' }, { id: 'achievements', label: 'Achievements' },
+      { id: 'tech', label: 'Tech' }, { id: 'daily', label: 'Daily' }, { id: 'achievements', label: 'Achievements' }, { id: 'stats', label: 'Stats' },
       { id: 'prestige', label: 'Ascension' }, { id: 'settings', label: 'Settings' },
     ] },
   ];
@@ -129,6 +130,7 @@
         {:else if tab === 'settings'}<SettingsView />
         {:else if tab === 'prestige'}<PrestigeView />
         {:else if tab === 'compare'}<CompareView />
+        {:else if tab === 'stats'}<StatsView />
         {:else}<AchievementsView />{/if}
       </div>
     </section>

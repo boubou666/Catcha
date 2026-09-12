@@ -5,7 +5,7 @@ import { newStats } from './achievements';
 import { newTutorial, TUTORIAL } from './tutorial';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 17;
+export const SAVE_VERSION = 18;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -124,6 +124,10 @@ export function migrate(raw: unknown): SaveState | null {
     // existing players have already found their feet
     s.tutorial ??= { step: TUTORIAL.length - 1, done: true };
     s.version = 17;
+  }
+  if (s.version === 17) {
+    s.stats = { ...newStats(), ...(s.stats ?? {}) };   // new counters start at zero
+    s.version = 18;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

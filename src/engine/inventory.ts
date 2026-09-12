@@ -34,7 +34,7 @@ export function canAfford(save: SaveState, cost: Cost, times = 1): boolean {
 export function spend(save: SaveState, cost: Cost, times = 1): boolean {
   if (!canAfford(save, cost, times)) return false;
   for (const [id, n] of Object.entries(cost)) {
-    if (id === GOLD) save.player.gold -= n * times;
+    if (id === GOLD) { save.player.gold -= n * times; save.stats.goldSpent += n * times; }
     else save.inventory[id] -= n * times;
   }
   return true;

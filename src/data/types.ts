@@ -15,6 +15,7 @@ export type WorkType =
 
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
+export type WildKind = 'wild' | 'alpha' | 'tower' | 'dungeon' | 'dungeonBoss' | 'raid';
 export type SphereTier = 'pal' | 'mega' | 'giga' | 'hyper' | 'ultra' | 'legendary';
 export const SPHERE_TIERS: SphereTier[] = ['pal', 'mega', 'giga', 'hyper', 'ultra', 'legendary'];
 
@@ -191,8 +192,12 @@ export interface SaveState {
   stats: {
     defeated: number; clicks: number; caught: number; luckyCaught: number;
     hatched: number; luckyHatched: number; crafted: number; expeditions: number;
-    goldEarned: number; playSeconds: number;
+    goldEarned: number; goldSpent: number; playSeconds: number;
+    throws: number; condensed: number; luckyDefeated: number;
     defeatedByElement: Partial<Record<Element, number>>;
+    defeatedByKind: Partial<Record<WildKind, number>>;
+    throwsByTier: Partial<Record<SphereTier, number>>;
+    caughtByTier: Partial<Record<SphereTier, number>>;
   };
   achievements: string[];                // unlocked ids
   daily: DailyState | null;              // today's quests; regenerated when the day changes

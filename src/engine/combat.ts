@@ -1,4 +1,4 @@
-import type { RouteDef, SaveState } from '../data/types';
+import type { RouteDef, SaveState, WildKind } from '../data/types';
 import { palById } from '../data/pals';
 import { elementMult } from '../data/elements';
 import { partyInstances, grantExp } from './party';
@@ -16,7 +16,7 @@ export interface Wild {
   hp: number;
   maxHp: number;
   lucky: boolean;
-  kind: 'wild' | 'alpha' | 'tower' | 'dungeon' | 'dungeonBoss' | 'raid';
+  kind: WildKind;
   refId?: string;      // alpha / tower id
   deadlineAt?: number; // epoch ms, tower time limit
 }
@@ -70,6 +70,8 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
   const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp') * prestigeMult(save, 'exp'));
   earnGold(save, gold);
   save.stats.defeated += 1;
+  if (wild.lucky) save.stats.luckyDefeated += 1;
+  save.stats.defeatedByKind[wild.kind] = (save.stats.defeatedByKind[wild.kind] ?? 0) + 1;
   for (const e of def.elements) save.stats.defeatedByElement[e] = (save.stats.defeatedByElement[e] ?? 0) + 1;
   grantExp(save, exp);
 
