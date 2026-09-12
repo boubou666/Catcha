@@ -4,7 +4,7 @@
   import { itemName } from '../data/items';
   import { JOB_ICON } from '../data/base';
   import type { WorkType } from '../data/types';
-  import { breedingInfoFor, habitatOf, isSeen, ownedCopies } from '../engine/paldex';
+  import { breedingInfoFor, DEFAULT_DETAIL_FILTER, filterBreedingInfo, filterHabitat, habitatOf, isDetailFiltering, isSeen, ownedCopies, PAIR_KIND_LABEL, type DetailFilter } from '../engine/paldex';
   import { routeById } from '../data/regions';
   import { isUnlocked, describeRequirement } from '../engine/progress';
   import { dungeonById } from '../data/dungeons';
@@ -18,8 +18,17 @@
   const def = $derived(palById(palId));
   const seen = $derived(isSeen(save, def));
   const caught = $derived((save.paldeck[palId]?.caught ?? 0) > 0);
-  const habitat = $derived(habitatOf(palId));
-  const breeding = $derived(breedingInfoFor(save, palId));
+  let filter = $state<DetailFilter>({ ...DEFAULT_DETAIL_FILTER });
+  const allHabitat = $derived(habitatOf(palId));
+  const allBreeding = $derived(breedingInfoFor(save, palId));
+  const habitat = $derived(filterHabitat(save, allHabitat, filter));
+  const breeding = $derived(filterBreedingInfo(save, allBreeding, filter));
+  const filtering = $derived(isDetailFiltering(filter));
+  const clear = () => { filter = { ...DEFAULT_DETAIL_FILTER }; };
+  const places = (h: typeof allHabitat) => h.routes.length + h.alphas.length + h.towers.length + h.realms.length + h.raids.length;
+  const pairs = (b: typeof allBreeding) => b.producedBy.length + b.parentOf.length;
+  // controls only once there is enough to sift through
+  const showControls = $derived(places(allHabitat) + pairs(allBreeding) >= 4);
   const owned = $derived(ownedCopies(save, palId));
   const work = $derived(Object.entries(def.work) as [WorkType, number][]);
   const pct = (n: number) => `${Math.round(n * 100)}%`;
@@ -62,10 +71,23 @@
       </section>
     {/if}
 
+    {#if showControls}
+      <div class="row controls">
+        <input type="search" placeholder="Search places, partners…" bind:value={filter.query} aria-label="Search habitat and breeding" />
+        <label class="chk"><input type="checkbox" bind:checked={filter.unlockedOnly} /> Reachable only</label>
+        <select bind:value={filter.pairs} aria-label="Pair kind">
+          {#each Object.entries(PAIR_KIND_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+        </select>
+        {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+      </div>
+    {/if}
+
     <section>
-      <h3>Habitat</h3>
-      {#if habitat.routes.length + habitat.alphas.length + habitat.towers.length + habitat.realms.length + habitat.raids.length === 0}
+      <h3>Habitat {#if filtering}<span class="muted small">{places(habitat)} of {places(allHabitat)}</span>{/if}</h3>
+      {#if places(allHabitat) === 0}
         <div class="muted small">Not found in the wild.</div>
+      {:else if places(habitat) === 0}
+        <div class="muted small">No place matches.</div>
       {/if}
       <ul class="small">
         {#each habitat.routes as r}
@@ -81,9 +103,10 @@
     </section>
 
     <section>
-      <h3>Breeding</h3>
+      <h3>Breeding {#if filtering}<span class="muted small">{pairs(breeding)} of {pairs(allBreeding)}</span>{/if}</h3>
       <ul class="small">
-        <li>{seen ? def.name : 'It'} × {seen ? def.name : 'itself'} → {seen ? def.name : 'itself'} <span class="muted">(same species breeds true)</span></li>
+        {#if !filtering}<li>{seen ? def.name : 'It'} × {seen ? def.name : 'itself'} → {seen ? def.name : 'itself'} <span class="muted">(same species breeds true)</span></li>{/if}
+        {#if filtering && pairs(breeding) === 0}<li class="muted">No pair matches.</li>{/if}
         {#each breeding.producedBy as p}
           <li><button class="link" onclick={() => onselect(p.a)}>{name(p.a)}</button> × <button class="link" onclick={() => onselect(p.b)}>{name(p.b)}</button> → {seen ? def.name : '???'}
             <span class="muted">{p.special ? '(special combo)' : '(by breeding rank, from species you own)'}</span></li>
@@ -91,7 +114,7 @@
         {#each breeding.parentOf as p}
           <li>{seen ? def.name : '???'} × <button class="link" onclick={() => onselect(p.partner)}>{name(p.partner)}</button> → <button class="link" onclick={() => onselect(p.child)}>{name(p.child)}</button> <span class="muted">(special combo)</span></li>
         {/each}
-        {#if breeding.producedBy.length === 0 && !def.variantOf}
+        {#if !filtering && allBreeding.producedBy.length === 0 && !def.variantOf}
           <li class="muted">No owned pair lands on this rank yet — catch more species and check back.</li>
         {/if}
       </ul>
@@ -112,4 +135,10 @@
   .job { margin-right: 0.35rem; white-space: nowrap; }
   .tiny { font-size: 0.75rem; padding: 0.05rem 0.4rem; margin-left: 0.3rem; }
   .link { background: none; border: none; padding: 0; color: var(--accent-2); cursor: pointer; font: inherit; text-decoration: underline; }
+  .controls { margin-top: 1rem; }
+  .controls input[type='search'] { min-width: 8rem; flex: 1; max-width: 14rem; font-size: 0.85rem; }
+  .controls select { font-size: 0.85rem; }
+  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
+  .chk input { min-height: 0; width: auto; }
+  h3 .small { font-weight: 400; text-transform: none; letter-spacing: 0; }
 </style>

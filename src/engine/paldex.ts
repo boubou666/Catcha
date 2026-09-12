@@ -1,8 +1,9 @@
-import type { PalDef, SaveState } from '../data/types';
+import type { PalDef, Requirement, SaveState } from '../data/types';
 import { PALS, palById } from '../data/pals';
-import { REGIONS } from '../data/regions';
-import { DUNGEONS } from '../data/dungeons';
-import { RAIDS } from '../data/raids';
+import { alphaById, REGIONS, routeById, towerById } from '../data/regions';
+import { DUNGEONS, dungeonById } from '../data/dungeons';
+import { RAIDS, raidById } from '../data/raids';
+import { isUnlocked } from './progress';
 import { childOf, comboKey, SPECIAL_COMBOS } from './breeding';
 
 export interface Habitat {
@@ -47,7 +48,7 @@ const ownedSpecies = (save: SaveState) => PALS.filter((p) => (save.paldeck[p.id]
  * How to breed a species: every special combo that yields it, then — among species the player owns —
  * pairs whose rank average lands on it. Base species only for the formula (subspecies come from combos).
  */
-export function breedingInfoFor(save: SaveState, palId: number, maxPairs = 12): BreedingInfo {
+export function breedingInfoFor(save: SaveState, palId: number, maxPairs = 40): BreedingInfo {
   const def = palById(palId);
   const producedBy: BreedingInfo['producedBy'] = [];
   const parentOf: BreedingInfo['parentOf'] = [];
@@ -81,3 +82,42 @@ export function ownedCopies(save: SaveState, palId: number) {
 }
 
 export const isSeen = (save: SaveState, def: PalDef) => !!save.paldeck[def.id]?.seen;
+
+// ---- detail-view filtering ----------------------------------------------------------------
+
+export type PairKind = 'any' | 'special' | 'rank';
+export interface DetailFilter { query: string; unlockedOnly: boolean; pairs: PairKind }
+export const DEFAULT_DETAIL_FILTER: DetailFilter = { query: '', unlockedOnly: false, pairs: 'any' };
+export const PAIR_KIND_LABEL: Record<PairKind, string> = { any: 'All pairs', special: 'Special combos', rank: 'By breeding rank' };
+
+export function isDetailFiltering(f: DetailFilter): boolean {
+  return f.query.trim() !== '' || f.unlockedOnly || f.pairs !== 'any';
+}
+
+const words = (q: string) => q.toLowerCase().split(/\s+/).filter(Boolean);
+const matchAll = (ws: string[], text: string) => ws.every((w) => text.toLowerCase().includes(w));
+const seenName = (save: SaveState, id: number) => (isSeen(save, palById(id)) ? palById(id).name : '???');
+
+/** Habitat entries whose place, region or role matches every search word; optionally only places you can reach. */
+export function filterHabitat(save: SaveState, h: Habitat, f: DetailFilter): Habitat {
+  const ws = words(f.query);
+  const open = (req: Requirement) => !f.unlockedOnly || isUnlocked(save, req);
+  return {
+    routes: h.routes.filter((r) => open(routeById(r.routeId).unlock) && matchAll(ws, `${r.routeName} ${r.regionName} route lv ${r.level}`)),
+    alphas: h.alphas.filter((a) => open(alphaById(a.alphaId).unlock) && matchAll(ws, `alpha ${a.regionName} lv ${a.level}`)),
+    towers: h.towers.filter((t) => open(towerById(t.towerId).unlock) && matchAll(ws, `tower ${t.name} ${t.boss}`)),
+    realms: h.realms.filter((d) => open(dungeonById(d.dungeonId).unlock) && matchAll(ws, `realm ${d.name} ${d.role}`)),
+    raids: h.raids.filter((r) => open(raidById(r.raidId).unlock) && matchAll(ws, `raid ${r.name}`)),
+  };
+}
+
+/** Breeding pairs by kind, with every search word matched against the (seen) names involved. */
+export function filterBreedingInfo(save: SaveState, info: BreedingInfo, f: DetailFilter): BreedingInfo {
+  const ws = words(f.query);
+  return {
+    ...info,
+    producedBy: info.producedBy.filter((p) =>
+      (f.pairs === 'any' || (f.pairs === 'special') === p.special) && matchAll(ws, `${seenName(save, p.a)} ${seenName(save, p.b)} ${p.special ? 'special' : 'rank'}`)),
+    parentOf: info.parentOf.filter((p) => f.pairs !== 'rank' && matchAll(ws, `${seenName(save, p.partner)} ${seenName(save, p.child)} special`)),
+  };
+}

@@ -182,6 +182,11 @@ of idle Pals with a "Parent A / Parent B" button, and — once one parent is pic
 partner would give shown on its card and matched by the search too (`partnerCandidates`), so you can type
 the species you want.
 
+The Paldeck detail view (habitat + breeding recipes) gets its own controls once there are four or more
+entries: a search over places and partners (unseen partners stay ??? and don't match), a "reachable only"
+toggle for habitat, and a pair-kind select (special combos / by breeding rank); the rank list now shows up to
+40 pairs (`filterHabitat` / `filterBreedingInfo` in `src/engine/paldex.ts`).
+
 Paldeck search and filters work the same way (`src/engine/paldeckfilter.ts`): search by name, number or
 element; filter by status (caught / seen / never seen), region (met on its routes, Alphas or tower), element,
 work, rarity, subspecies only; sort by number, name, copies or rarity. Pals you haven't seen only ever

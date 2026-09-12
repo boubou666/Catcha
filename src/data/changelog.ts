@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'Paldeck detail: search a Pal\'s habitat and breeding pairs, show reachable places only, or only special combos / rank pairs; up to 40 rank pairs listed.',
       'What\'s new: search the whole changelog or pin a version.',
       'Notification centre: a 🔔 in the header keeps every toast of the session with an unread badge, search, kind and unread filters — and lets you choose which kinds still pop up.',
       'Welcome-back summary: sorted by biggest change, with search and Gained / Consumed / Events views when there is a lot to read.',

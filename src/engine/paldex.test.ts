@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newState } from './save';
-import { breedingInfoFor, habitatOf, ownedCopies } from './paldex';
+import { breedingInfoFor, DEFAULT_DETAIL_FILTER, filterBreedingInfo, filterHabitat, habitatOf, isDetailFiltering, ownedCopies } from './paldex';
 import { PALS, palById } from '../data/pals';
 import { childOf } from './breeding';
 import { addToBox, makeInstance } from './party';
@@ -63,5 +63,38 @@ describe('owned copies', () => {
     expect(o.count).toBe(2);
     expect(o.best?.uid).toBe(b.uid);
     expect(palById(1).name).toBe('Lamball');
+  });
+});
+
+describe('detail-view filter', () => {
+  it('filters habitat by text and reachability, keeping unseen partners hidden in breeding', () => {
+    const save = newState();
+    // Chillet (55): Alpha in Windswept + realm guardian + routes later on; nothing reachable on a fresh save
+    const h = habitatOf(55);
+    expect(h.alphas.length + h.realms.length).toBeGreaterThan(0);
+    const reachable = filterHabitat(save, h, { ...DEFAULT_DETAIL_FILTER, unlockedOnly: true });
+    expect(reachable.alphas).toEqual([]);
+    expect(filterHabitat(save, h, { ...DEFAULT_DETAIL_FILTER, query: 'alpha' }).alphas).toEqual(h.alphas);
+    expect(filterHabitat(save, h, { ...DEFAULT_DETAIL_FILTER, query: 'alpha' }).realms).toEqual([]);
+    expect(filterHabitat(save, h, { ...DEFAULT_DETAIL_FILTER, query: 'zzz' })).toEqual({ routes: [], alphas: [], towers: [], realms: [], raids: [] });
+    expect(isDetailFiltering(DEFAULT_DETAIL_FILTER)).toBe(false);
+
+    // Lamball's habitat: Plateau, reachable from the start
+    const lam = habitatOf(1);
+    expect(filterHabitat(save, lam, { ...DEFAULT_DETAIL_FILTER, unlockedOnly: true }).routes.map((r) => r.routeId)).toEqual(['plateau']);
+    expect(filterHabitat(save, lam, { ...DEFAULT_DETAIL_FILTER, query: 'windswept' }).routes).toHaveLength(1);
+  });
+
+  it('filters breeding pairs by kind and by seen names', () => {
+    const save = newState();
+    const info = breedingInfoFor(save, 1031);                 // Gobfin Ignis: special combo only
+    expect(info.producedBy.every((p) => p.special)).toBe(true);
+    expect(filterBreedingInfo(save, info, { ...DEFAULT_DETAIL_FILTER, pairs: 'rank' }).producedBy).toEqual([]);
+    expect(filterBreedingInfo(save, info, { ...DEFAULT_DETAIL_FILTER, pairs: 'special' }).producedBy).toEqual(info.producedBy);
+    const partner = info.producedBy[0].a === 31 ? info.producedBy[0].b : info.producedBy[0].a;
+    const partnerName = palById(partner).name.toLowerCase();
+    expect(filterBreedingInfo(save, info, { ...DEFAULT_DETAIL_FILTER, query: partnerName }).producedBy).toEqual([]);   // unseen: hidden
+    save.paldeck[partner] = { seen: true, caught: 0 };
+    expect(filterBreedingInfo(save, info, { ...DEFAULT_DETAIL_FILTER, query: partnerName }).producedBy).toHaveLength(1);
   });
 });
