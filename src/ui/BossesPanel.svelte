@@ -112,10 +112,11 @@
   {#each dungeonsOf(game.region.id) as d (d.id)}
     {@const unlocked = dungeonUnlocked(game.save, d.id)}
     {@const clears = dungeonClears(game.save, d.id)}
+    {@const pv = catchPreview(game.save, d.boss.palId)}
     <div class="row realm-row">
       <button class="realm-btn" class:primary={unlocked && clears === 0} disabled={!game.canEnter(d.id)} onclick={() => game.enterDungeon(d.id)}
-        title={unlocked ? `${d.waves} waves of Lv ${d.level} Pals, then ${bossName(d.id)} — ${d.timeLimitSec / 60} min. Waves and the guardian can be caught.` : describeRequirement(d.unlock)}>
-        🗝 {d.name} <span class="muted">Lv {d.level}{clears ? ` · cleared ×${clears}` : ''}</span>
+        title={unlocked ? `${d.waves} waves of Lv ${d.level} Pals, then ${bossName(d.id)} — ${d.timeLimitSec / 60} min. Waves and the guardian can be caught at normal odds. Guardian ${bossName(d.id)}: ${catchText(pv)}.` : describeRequirement(d.unlock)}>
+        🗝 {d.name} <span class="muted">Lv {d.level}{clears ? ` · cleared ×${clears}` : ''}</span>{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {bossName(d.id)} {pv.throws ? `${Math.round(pv.chance * 100)}%` : '—'}</span>{/if}
       </button>
     </div>
   {/each}
