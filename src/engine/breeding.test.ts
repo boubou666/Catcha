@@ -10,6 +10,8 @@ import {
 } from './breeding';
 import { PALS, palById } from '../data/pals';
 
+const R = () => 0.99; // deterministic: no egg mutations
+
 function farm(...palIds: number[]) {
   const save = newState();
   save.base.structures[BREEDING_FARM] = 1;
@@ -75,16 +77,16 @@ describe('tick', () => {
   it('eats a Cake per egg, incubates by rarity, hatches into the box', () => {
     const { save, insts: [a, b] } = farm(1, 1);
     setPair(save, a.uid, b.uid);
-    tickBreeding(save, 60);
+    tickBreeding(save, 60, R);
     expect(save.base.breeding!.progress).toBeNull(); // no cake → nothing starts
     save.inventory[CAKE] = 2;
-    tickBreeding(save, BREED_SEC / 2);
+    tickBreeding(save, BREED_SEC / 2, R);
     expect(save.inventory[CAKE]).toBe(1);
     expect(save.base.breeding!.progress).toBeCloseTo(0.5);
-    tickBreeding(save, BREED_SEC / 2);
-    expect(save.base.eggs).toEqual([{ palId: 1, remaining: INCUBATION_SEC.common }]);
+    tickBreeding(save, BREED_SEC / 2, R);
+    expect(save.base.eggs).toEqual([{ palId: 1, remaining: INCUBATION_SEC.common, passives: [] }]);
     expect(save.base.breeding!.progress).toBeNull(); // next cake is taken when time resumes
-    const hatched = tickBreeding(save, INCUBATION_SEC.common);
+    const hatched = tickBreeding(save, INCUBATION_SEC.common, R);
     expect(hatched).toEqual([1]);
     expect(save.inventory[CAKE]).toBe(0);
     expect(save.base.breeding!.progress).toBeCloseTo(INCUBATION_SEC.common / BREED_SEC);
@@ -97,7 +99,7 @@ describe('tick', () => {
     const { save, insts: [a, b] } = farm(1, 2);
     setPair(save, a.uid, b.uid);
     save.inventory[CAKE] = 3;
-    tickBreeding(save, BREED_SEC * 10);
+    tickBreeding(save, BREED_SEC * 10, R);
     expect(save.inventory[CAKE]).toBe(0);
     expect(save.base.breeding!.progress).toBeNull();
     // 3 eggs laid at t=300/600/900, all common (2 min) → hatched by t=3000
@@ -108,9 +110,9 @@ describe('tick', () => {
     const { save, insts: [a, b] } = farm(1, 1);
     setPair(save, a.uid, b.uid);
     save.inventory[CAKE] = 1;
-    tickBreeding(save, BREED_SEC);
+    tickBreeding(save, BREED_SEC, R);
     clearPair(save);
-    expect(tickBreeding(save, INCUBATION_SEC.common)).toEqual([1]);
+    expect(tickBreeding(save, INCUBATION_SEC.common, R)).toEqual([1]);
   });
   it('offline replay hatches and reports', () => {
     const { save, insts: [a, b] } = farm(1, 1);

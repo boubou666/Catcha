@@ -3,6 +3,7 @@
   import { palById } from '../data/pals';
   import { expToLevel, instanceAttack } from '../engine/formulas';
   import PalIcon from './PalIcon.svelte';
+  import PassiveChips from './PassiveChips.svelte';
   import type { Snippet } from 'svelte';
 
   import { JOB_ICON } from '../data/base';
@@ -28,6 +29,7 @@
         · {#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}
       {/if}
     </div>
+    {#if inst.passives.length > 0}<div class="passives"><PassiveChips ids={inst.passives} /></div>{/if}
     <div class="bar exp"><span style:width="{expPct}%"></span></div>
   </div>
   {#if children}<div class="row">{@render children()}</div>{/if}
@@ -39,4 +41,5 @@
   .stars { color: var(--accent); }
   .bar { height: 4px; margin-top: 0.25rem; }
   .job { margin-right: 0.25rem; white-space: nowrap; }
+  .passives { margin-top: 0.2rem; }
 </style>

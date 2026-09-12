@@ -2,6 +2,7 @@ import type { PalDef, PalInstance, Rarity, SaveState } from '../data/types';
 import { PALS, palById } from '../data/pals';
 import { countOf } from './inventory';
 import { addToBox, instanceByUid, makeInstance } from './party';
+import { inheritPassives, type Rng } from './passives';
 
 export const BREEDING_FARM = 'breeding_farm';
 export const CAKE = 'cake';
@@ -110,7 +111,7 @@ export function clearPair(save: SaveState): void {
 // ---- tick -----------------------------------------------------------------------
 
 /** Advance breeding and incubation by dtSec. Returns the Paldeck ids that hatched. */
-export function tickBreeding(save: SaveState, dtSec: number): number[] {
+export function tickBreeding(save: SaveState, dtSec: number, rand: Rng = Math.random): number[] {
   const base = save.base;
   for (const egg of base.eggs) egg.remaining -= dtSec;   // eggs laid below only age for the rest of the tick
 
@@ -133,7 +134,8 @@ export function tickBreeding(save: SaveState, dtSec: number): number[] {
           left -= need;
           b.progress = null;
           const palId = childOf(parents[0].palId, parents[1].palId);
-          base.eggs.push({ palId, remaining: INCUBATION_SEC[palById(palId).rarity] - left });
+          const passives = inheritPassives(parents[0], parents[1], palById(palId), rand);
+          base.eggs.push({ palId, remaining: INCUBATION_SEC[palById(palId).rarity] - left, passives });
         }
       }
     }
@@ -141,7 +143,7 @@ export function tickBreeding(save: SaveState, dtSec: number): number[] {
 
   const hatched: number[] = [];
   for (const egg of base.eggs.filter((e) => e.remaining <= 0)) {
-    addToBox(save, makeInstance(egg.palId, 1));
+    addToBox(save, makeInstance(egg.palId, 1, false, egg.passives));
     hatched.push(egg.palId);
   }
   if (hatched.length) base.eggs = base.eggs.filter((e) => e.remaining > 0);

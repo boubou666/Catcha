@@ -7,8 +7,8 @@ export function newUid(): string {
   return `${Date.now().toString(36)}-${(uidCounter++).toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export function makeInstance(palId: number, level: number, lucky = false): PalInstance {
-  return { uid: newUid(), palId, level, exp: 0, stars: 0, lucky, passives: [] };
+export function makeInstance(palId: number, level: number, lucky = false, passives: string[] = []): PalInstance {
+  return { uid: newUid(), palId, level, exp: 0, stars: 0, lucky, passives };
 }
 
 export function addToBox(save: SaveState, inst: PalInstance): void {

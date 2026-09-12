@@ -1,12 +1,12 @@
 import type { PalInstance } from '../data/types';
 import { palById } from '../data/pals';
+import { passiveMult } from './passives';
 
 // Balance knobs. Everything here is a starting point — see DESIGN.md §8.
 
 export const PARTY_SIZE = 5;
 export const LUCKY_CHANCE = 1 / 300;
 export const LUCKY_HP_MULT = 3;
-export const LUCKY_ATTACK_MULT = 1.2;
 
 export const wildHp = (level: number) => 25 + 10 * Math.pow(level, 1.5);
 
@@ -15,7 +15,7 @@ export function instanceAttack(inst: PalInstance): number {
   return (def.baseAttack / 10)
     * (1 + 0.08 * inst.level)
     * (1 + 0.1 * inst.stars)
-    * (inst.lucky ? LUCKY_ATTACK_MULT : 1);
+    * passiveMult(inst, 'attack');
 }
 
 export const clickDamage = (playerLevel: number, weaponTier: number) =>

@@ -125,6 +125,7 @@ export interface BreedingPair {
 export interface Egg {
   palId: number;
   remaining: number;                     // incubation seconds left
+  passives: string[];                    // decided when laid
 }
 
 export interface BaseState {

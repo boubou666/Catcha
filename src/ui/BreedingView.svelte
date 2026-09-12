@@ -10,6 +10,8 @@
   import { formatDuration } from './format';
   import PalIcon from './PalIcon.svelte';
   import PalCard from './PalCard.svelte';
+  import PassiveChips from './PassiveChips.svelte';
+  import { MUTATION_CHANCE } from '../data/passives';
 
   const save = $derived(game.save);
   const hasFarm = $derived(structureLevel(save, BREEDING_FARM) > 0);
@@ -35,6 +37,10 @@
     return p ? `${palById(p.palId).name} Lv ${p.level}${p.stars ? ' ' + '★'.repeat(p.stars) : ''}${p.lucky ? ' ✨' : ''}` : '';
   };
   const activeChild = $derived(parents ? childOf(parents[0].palId, parents[1].palId) : null);
+  const inheritable = (a?: { passives: string[] }, b?: { passives: string[] }) =>
+    [...new Set([...(a?.passives ?? []), ...(b?.passives ?? [])])].filter((id) => id !== 'lucky' && id !== 'legend');
+  const activePool = $derived(parents ? inheritable(parents[0], parents[1]) : []);
+  const previewPool = $derived(inheritable(save.box.find((p) => p.uid === aUid), save.box.find((p) => p.uid === bUid)));
   const eggEta = (remaining: number) => formatDuration(Math.max(0, remaining) * 1000);
 </script>
 
@@ -53,6 +59,10 @@
       <span class="muted">Offspring:</span>
       {#if activeChild !== null}<PalIcon palId={activeChild} size={28} /> <b>{palById(activeChild).name}</b>{/if}
       <span class="muted small">· incubates {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)}</span>
+    </div>
+    <div class="row child muted small">
+      <span>Passives it can inherit:</span>
+      {#if activePool.length}<PassiveChips ids={activePool} />{:else}<span>none — {Math.round(MUTATION_CHANCE * 100)}% chance of a random one per slot</span>{/if}
     </div>
     {#if pair?.progress !== null && pair}
       <div class="bar grow"><span style:width="{pair.progress * 100}%"></span></div>
@@ -78,6 +88,7 @@
   <div class="row child">
     {#if preview !== null}
       <span class="muted">Offspring:</span> <PalIcon palId={preview} size={28} /> <b>{palById(preview).name}</b>
+      {#if previewPool.length}<span class="muted small">· may inherit</span> <PassiveChips ids={previewPool} />{/if}
     {/if}
     <span class="grow"></span>
     <button class="primary small" disabled={!aUid || !bUid || !!block} title={block ? BLOCK_TEXT[block] : ''}

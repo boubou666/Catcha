@@ -90,7 +90,8 @@ Crafting (spheres, weapons, structures) consumes resources and takes time scaled
 
 - Breeding Farm: pick 2 box Pals + 1 Cake → egg after T minutes → incubator → hatch.
 - Child = lookup in `specialCombos` table (e.g. Relaxaurus + Sparkit = Relaxaurus Lux), else the Pal whose `breedPower` is closest to `(a + b) / 2` (ties → lower Paldeck #). This is the real game's rule and it's cheap to implement.
-- Hatched Pals inherit up to 4 passive skills from a small pool (`+10% attack`, `+work speed`…). *(not yet)*
+- Hatched Pals inherit up to 4 passive skills from a small pool (`+10% attack`, `+work speed`…). Implemented:
+  `data/passives.ts` + `engine/passives.ts`; wild catches roll too; Lucky/Legend are granted, never rolled.
 - Implemented: `engine/breeding.ts`. Simplifications for now: Cake is a Workbench recipe (no cooking station), eggs
   incubate automatically and hatch straight into the box, parents are locked out of party/base while paired.
 - Condensing: feed N duplicates → star 1–4, each star +10% stats & work. N = 4, 16, 32, 64.

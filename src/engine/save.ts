@@ -3,7 +3,7 @@ import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -69,6 +69,10 @@ export function migrate(raw: unknown): SaveState | null {
     // v5 got the numbering wrong; this is the corrected Paldeck (Chillet #55, Grizzbolt #103, region 2 shifted).
     remapPalIds(s as SaveState, {36:50,37:51,38:52,39:53,40:54,41:55,42:56,46:60,47:61,48:62,49:63,50:64,51:65,52:66,53:67,54:68,55:69,56:70,66:81,71:86,74:89,78:93,88:103,89:104});
     s.version = 6;
+  }
+  if (s.version === 6 && s.base) {
+    for (const e of s.base.eggs) e.passives ??= [];
+    s.version = 7;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

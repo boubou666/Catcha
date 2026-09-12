@@ -5,6 +5,7 @@ import { addItem, canAfford, spend, countOf, type Cost } from './inventory';
 import { detachFromBreeding, instanceByUid } from './party';
 import { isUnlocked } from './progress';
 import { recipeUnlocked, structureUnlocked, techMult } from './tech';
+import { passiveMult } from './passives';
 
 export function newBase(): BaseState {
   return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [] };
@@ -40,7 +41,7 @@ export function unassignWorker(save: SaveState, uid: string): void {
 export function workLevels(save: SaveState): Record<WorkType, number> {
   const out = Object.fromEntries(JOBS.map((j) => [j.type, 0])) as Record<WorkType, number>;
   for (const inst of baseWorkers(save)) {
-    const mult = 1 + RATES.starBonus * inst.stars;
+    const mult = (1 + RATES.starBonus * inst.stars) * passiveMult(inst, 'work');
     for (const [job, lvl] of Object.entries(palById(inst.palId).work)) {
       out[job as WorkType] += (lvl ?? 0) * mult;
     }
@@ -84,7 +85,8 @@ export function globalMult(save: SaveState, levels = workLevels(save)): number {
 
 export function foodPerMinute(save: SaveState, levels = workLevels(save)): number {
   const saving = Math.min(RATES.coolingCap, levels.Cooling * RATES.coolingSaving);
-  return save.base.workers.length * RATES.foodPerWorker * (1 - saving);
+  const mouths = baseWorkers(save).reduce((s, inst) => s + passiveMult(inst, 'food'), 0);
+  return mouths * RATES.foodPerWorker * (1 - saving);
 }
 
 export interface BaseRates {
@@ -116,7 +118,7 @@ export function computeRates(save: SaveState): BaseRates {
   if (lvl('ranch') > 0) {
     for (const inst of baseWorkers(save)) {
       const farm = palById(inst.palId).farmDrop;
-      if (farm) add(farm.itemId, farm.perMinute * (1 + RATES.starBonus * inst.stars) * mult);
+      if (farm) add(farm.itemId, farm.perMinute * (1 + RATES.starBonus * inst.stars) * passiveMult(inst, 'work') * mult);
     }
   }
 

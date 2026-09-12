@@ -73,4 +73,9 @@ Tech tree: 2 tech points per level. Structures and recipes must be researched (l
 prerequisites) before they can be built or crafted; passive techs multiply click damage, party attack,
 base output, catch rate, exp and gold. Tree lives in `src/data/tech.ts`.
 
-Next: passives, dungeons, expeditions, raids, balance pass — see DESIGN.md §10.
+Passive skills: wild catches roll 0–4 from an 18-skill pool (Brave, Artisan, Diet Lover, Slacker…)
+affecting attack, work and food; Lucky Pals always carry *Lucky*, legendary species *Legend*. Eggs
+inherit a random subset of both parents' passives with a 10% mutation chance per free slot. Pool in
+`src/data/passives.ts`.
+
+Next: dungeons, expeditions, raids, balance pass — see DESIGN.md §10.
