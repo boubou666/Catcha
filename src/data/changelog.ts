@@ -23,6 +23,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Compare: Pals are added from a searchable, filterable list instead of a dropdown.',
       'Items: each item now shows where it comes from and what uses it; search and filter by category, usage, missing items, and sort.',
       'Craft: search recipes by name, output or ingredient; filter by kind and status (craftable now / unlocked / locked); sort by work or name.',
+      'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Fix: Low Grade Medical Supplies dropped by Pals were a separate item from the Medicine consumable — merged, so drops now treat workers.',
     ],
   },

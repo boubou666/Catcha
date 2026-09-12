@@ -180,7 +180,9 @@ jobs, the merchant, recipes) and what consumes it (recipes, structures); search 
 filters cover category, "used in crafting or building", "show items I don't have" and sort by name / count /
 category (`src/engine/itemsfilter.ts`). Craft has the same treatment (`src/engine/craftfilter.ts`): search by
 recipe, output or ingredient; filter by kind (spheres / materials / food / weapons) and status (craftable now,
-unlocked, locked); hide owned weapons; sort by work needed or name.
+unlocked, locked); hide owned weapons; sort by work needed or name. Tech (`src/engine/techfilter.ts`): search by tech name,
+description, what it unlocks (structure / recipe name) or prerequisite; filter by kind, boosted stat, status
+(researchable now / not researched / researched) and hide levels above yours; the level grouping is kept.
 
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
