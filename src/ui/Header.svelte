@@ -3,6 +3,7 @@
   import { expToLevel } from '../engine/formulas';
   import { SPHERES } from '../data/spheres';
   import { SPHERE_TIERS } from '../data/types';
+  import { achievementPoints } from '../engine/achievements';
 
   const player = $derived(game.save.player);
   const expPct = $derived((player.exp / expToLevel(player.level + 1)) * 100);
@@ -40,7 +41,7 @@
 
   <div class="stat">
     <div class="label">💰 {Math.floor(player.gold).toLocaleString()}</div>
-    <div class="muted small">Effigies: {player.effigies} · Tech pts: {player.techPoints}</div>
+    <div class="muted small">Effigies: {player.effigies} · Tech pts: {player.techPoints} · 🏆 {achievementPoints(game.save)}</div>
   </div>
 
   <div class="stat grow">

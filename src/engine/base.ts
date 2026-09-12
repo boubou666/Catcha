@@ -189,6 +189,7 @@ export function cancelCraft(save: SaveState, index: number): void {
 }
 
 function completeCraft(save: SaveState, recipeId: string): void {
+  save.stats.crafted += 1;
   const out = recipeById(recipeId).output;
   if (out.kind === 'item') addItem(save, out.itemId, out.n);
   else save.player.weaponTier = Math.max(save.player.weaponTier, out.tier);

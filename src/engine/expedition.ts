@@ -1,6 +1,6 @@
 import type { ExpeditionReport, PalInstance, SaveState } from '../data/types';
 import { EXPEDITION_POST, expeditionById, FAIL_GOLD_SHARE, MAX_CHANCE, MAX_REPORTS, MIN_CHANCE } from '../data/expeditions';
-import { addItem } from './inventory';
+import { addItem, earnGold } from './inventory';
 import { grantInstanceExp, instanceByUid, isAway } from './party';
 import { isUnlocked } from './progress';
 import { passiveMult } from './passives';
@@ -62,7 +62,8 @@ export function tickExpeditions(save: SaveState, dtSec: number, rand: Rng = Math
     const success = rand() < successChance(ex.defId, members);
     const report: ExpeditionReport = { defId: ex.defId, success, gold: 0, items: {}, at: Date.now() };
     report.gold = Math.round(def.loot.gold * (success ? 1 : FAIL_GOLD_SHARE));
-    save.player.gold += report.gold;
+    earnGold(save, report.gold);
+    save.stats.expeditions += 1;
     if (success) {
       for (const drop of def.loot.items) {
         if (rand() < drop.chance) {

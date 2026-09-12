@@ -202,7 +202,7 @@ Why Svelte 5: the whole game is "a thousand numbers that change 10× a second"; 
 3. Base with Mining / Lumbering / Kindling / Handiwork → sphere crafting.
 4. Breeding, condensing, tech tree.
 5. Regions 2–7, one at a time, balancing as you go.
-6. Dungeons, expeditions, raids, Lucky Pals, achievements.
+6. Dungeons, expeditions, raids, Lucky Pals, achievements. ✓ (achievements: points → +1% gold each)
 
 ## 11. Legal / assets
 

@@ -5,11 +5,18 @@ export type Cost = Record<string, number>;
 
 export const GOLD = 'gold';
 
+/** Add gold to the wallet and to the lifetime tally. */
+export function earnGold(save: SaveState, n: number): void {
+  if (n <= 0) return;
+  save.player.gold += n;
+  save.stats.goldEarned += n;
+}
+
 /** Give n of an item. Gold Coins (Mau's produce) go straight to the wallet. */
 export function addItem(save: SaveState, itemId: string, n: number): void {
   if (n <= 0) return;
   if (itemId === 'gold_coin' || itemId === GOLD) {
-    save.player.gold += n;
+    earnGold(save, n);
     return;
   }
   save.inventory[itemId] = (save.inventory[itemId] ?? 0) + n;

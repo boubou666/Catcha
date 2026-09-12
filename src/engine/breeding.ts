@@ -124,6 +124,8 @@ export function tickBreeding(save: SaveState, dtSec: number, rand: Rng = Math.ra
   const hatched: number[] = [];
   for (const egg of base.eggs.filter((e) => e.remaining <= 0)) {
     addToBox(save, makeInstance(egg.palId, 1, egg.lucky ?? false, egg.passives));
+    save.stats.hatched += 1;
+    if (egg.lucky) save.stats.luckyHatched += 1;
     hatched.push(egg.palId);
   }
   if (hatched.length) base.eggs = base.eggs.filter((e) => e.remaining > 0);

@@ -186,5 +186,11 @@ export interface SaveState {
     sphereForNew: SpherePolicy;          // sphere to throw at a Pal not yet in the Paldeck
     sphereForDupe: SpherePolicy;         // sphere to throw at an already-caught species
   };
+  stats: {
+    defeated: number; clicks: number; caught: number; luckyCaught: number;
+    hatched: number; luckyHatched: number; crafted: number; expeditions: number;
+    goldEarned: number; playSeconds: number;
+  };
+  achievements: string[];                // unlocked ids
   lastSavedAt: number;
 }

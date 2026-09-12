@@ -3,7 +3,7 @@ import { dungeonById, type DungeonDef } from '../data/dungeons';
 import { palById } from '../data/pals';
 import { pickWeighted, type Rng, type Wild } from './combat';
 import { wildHp } from './formulas';
-import { addItem } from './inventory';
+import { addItem, earnGold } from './inventory';
 import { isUnlocked } from './progress';
 
 /** Live state of a run. Not saved — leaving the page forfeits the run (loot already granted stays). */
@@ -51,7 +51,7 @@ export interface Chest { gold: number; items: Record<string, number>; effigies: 
 export function completeRun(save: SaveState, def: DungeonDef, rand: Rng = Math.random): Chest {
   const first = dungeonClears(save, def.id) === 0;
   const chest: Chest = { gold: def.loot.gold, items: {}, effigies: first ? def.firstClear.effigies : 0 };
-  save.player.gold += chest.gold;
+  earnGold(save, chest.gold);
   for (const drop of def.loot.items) {
     if (rand() < drop.chance) {
       const n = drop.min + Math.floor(rand() * (drop.max - drop.min + 1));

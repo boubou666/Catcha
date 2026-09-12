@@ -120,6 +120,10 @@ Legendary Sphere chance and the boss's egg, which inherits passives from the par
 (same rule as breeding, with your five fighters as the parent pool) and has a 10% / 15% / 25% chance to
 be Lucky. Data in `src/data/raids.ts`.
 
+Achievements: 63 across combat, collection, base, breeding, exploration and economy, worth 179 points;
+every point is a permanent +1% gold from defeated Pals. Lifetime stats (defeats, catches, crafts, gold…)
+are tracked from save v13 onward. Defined in `src/data/achievements.ts`.
+
 Every system in DESIGN.md is built and the numbers have been through a model-based balance pass
 (`npm run balance`): on-level kills sit at 4–6 s from region 1 to 7, Alphas at 2–4 min, towers at
 ~60–65% of their 10-minute limit for an on-level party, raids at 75–96%. Real play will still find things.

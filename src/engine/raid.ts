@@ -3,7 +3,7 @@ import { ALTAR, raidById, type RaidDef } from '../data/raids';
 import { INCUBATION_SEC } from './breeding';
 import { palById } from '../data/pals';
 import { passiveById } from '../data/passives';
-import { addItem, countOf } from './inventory';
+import { addItem, countOf, earnGold } from './inventory';
 import { isUnlocked } from './progress';
 import type { Rng, Wild } from './combat';
 import { inheritFromParents } from './passives';
@@ -38,7 +38,7 @@ export interface RaidChest { gold: number; items: Record<string, number>; egg: b
 /** Grant the win: chest, the boss's egg (inheriting passives from the winning party), win count. */
 export function completeRaid(save: SaveState, def: RaidDef, rand: Rng = Math.random): RaidChest {
   const chest: RaidChest = { gold: def.reward.gold, items: {}, egg: def.reward.egg, passives: [], lucky: false };
-  save.player.gold += chest.gold;
+  earnGold(save, chest.gold);
   for (const drop of def.reward.items) {
     if (rand() < drop.chance) {
       const n = drop.min + Math.floor(rand() * (drop.max - drop.min + 1));

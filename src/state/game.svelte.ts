@@ -19,6 +19,8 @@ import { clearReports, send } from '../engine/expedition';
 import { expeditionById } from '../data/expeditions';
 import { completeRaid, describeRaidChest, summon, summonBlocker } from '../engine/raid';
 import { raidById } from '../data/raids';
+import { checkAchievements } from '../engine/achievements';
+import { earnGold } from '../engine/inventory';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
@@ -37,6 +39,7 @@ export class Game {
   offline = $state<OfflineReport | null>(null);   // "while you were away" summary, until dismissed
   run = $state<DungeonRun | null>(null);           // active Sealed Realm run
   private sinceSave = 0;
+  private sinceCheck = 0;
 
   constructor() {
     const loaded = loadState();
@@ -107,6 +110,9 @@ export class Game {
         this.hit((this.dps * dtMs) / 1000);
       }
     }
+    this.save.stats.playSeconds += dtMs / 1000;
+    this.sinceCheck += dtMs;
+    if (this.sinceCheck >= 1000) { this.sinceCheck = 0; this.unlockAchievements(); }
     const world = tickWorld(this.save, dtMs / 1000);
     for (const palId of world.hatched) this.push(`An egg hatched: ${palById(palId).name}!`);
     for (const r of world.returned) this.push(`${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} — +${r.gold.toLocaleString()} gold${Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}.`);
@@ -114,7 +120,11 @@ export class Game {
     if (this.sinceSave >= AUTOSAVE_MS) this.persist();
   }
 
-  click() { this.hit(this.clickDmg); }
+  click() { this.save.stats.clicks += 1; this.hit(this.clickDmg); }
+
+  private unlockAchievements() {
+    for (const a of checkAchievements(this.save)) this.push(`🏆 Achievement: ${a.name} — ${a.desc} (+${a.points} pts)`);
+  }
 
   private hit(dmg: number) {
     const w = this.wild;
@@ -154,7 +164,7 @@ export class Game {
       const alpha = alphaById(w.refId);
       if (!save.progress.alphas.includes(w.refId)) {
         save.progress.alphas.push(w.refId);
-        save.player.gold += alpha.reward.gold;
+        earnGold(save, alpha.reward.gold);
         save.player.effigies += alpha.reward.effigies ?? 0;
         this.push(`Alpha ${def.name} defeated! +${alpha.reward.gold} gold, +${alpha.reward.effigies ?? 0} effigies.`);
       } else {

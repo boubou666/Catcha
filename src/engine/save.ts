@@ -1,9 +1,10 @@
 import type { SaveState } from '../data/types';
 import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
+import { newStats } from './achievements';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -18,6 +19,8 @@ export function newState(): SaveState {
     tech: [],
     progress: { route: STARTING_ROUTE, routeKills: {}, alphas: [], towers: [], dungeons: {}, raids: {} },
     settings: { sphereForNew: 'pal', sphereForDupe: 'none' },
+    stats: newStats(),
+    achievements: [],
     lastSavedAt: Date.now(),
   };
 }
@@ -94,6 +97,11 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 11 && s.base) {
     for (const e of s.base.eggs) e.lucky ??= false;
     s.version = 12;
+  }
+  if (s.version === 12) {
+    s.stats ??= newStats();
+    s.achievements ??= [];
+    s.version = 13;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

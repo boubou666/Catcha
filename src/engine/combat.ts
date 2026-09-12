@@ -2,7 +2,8 @@ import type { RouteDef, SaveState } from '../data/types';
 import { palById } from '../data/pals';
 import { elementMult } from '../data/elements';
 import { partyInstances, grantExp } from './party';
-import { addItem } from './inventory';
+import { addItem, earnGold } from './inventory';
+import { achievementGoldMult } from './achievements';
 import { techMult } from './tech';
 import { expReward, goldReward, instanceAttack, LUCKY_CHANCE, LUCKY_HP_MULT, wildHp } from './formulas';
 
@@ -64,9 +65,10 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
   const bossMult = { wild: 1, dungeon: 2, alpha: 10, dungeonBoss: 12, tower: 25, raid: 40 }[wild.kind];
   const luckyMult = wild.lucky ? 5 : 1;
 
-  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold'));
+  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold') * achievementGoldMult(save));
   const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp'));
-  save.player.gold += gold;
+  earnGold(save, gold);
+  save.stats.defeated += 1;
   grantExp(save, exp);
 
   const drops: Record<string, number> = {};
