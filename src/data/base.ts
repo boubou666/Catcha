@@ -77,6 +77,8 @@ export const STRUCTURES: StructureDef[] = [
     costs: [{ wood: 100, stone: 20, fiber: 20 }] },
   { id: 'condenser', name: 'Pal Essence Condenser', desc: 'Feed duplicate Pals into one to add stars: +10% attack and work per star (4 / 16 / 32 / 64 dupes).',
     costs: [{ ingot: 20, paldium: 50, stone: 30 }] },
+  { id: 'expedition_post', name: 'Expedition Post', desc: 'Send idle Pals on timed expeditions for loot and exp. One concurrent trip per level.',
+    costs: [{ wood: 50, stone: 30, paldium: 10 }, { wood: 200, stone: 100, ingot: 5 }, { wood: 500, stone: 300, ingot: 20 }] },
   { id: 'palbox', name: 'Palbox Expansion', desc: '+1 worker slot per level.',
     costs: [
       { gold: 150, paldium: 5 }, { gold: 300, paldium: 10 }, { gold: 600, paldium: 15 },

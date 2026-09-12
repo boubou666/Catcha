@@ -1,7 +1,7 @@
 import type { PalDef, PalInstance, Rarity, SaveState } from '../data/types';
 import { PALS, palById } from '../data/pals';
 import { countOf } from './inventory';
-import { addToBox, instanceByUid, makeInstance } from './party';
+import { addToBox, instanceByUid, isAway, makeInstance } from './party';
 import { inheritPassives, type Rng } from './passives';
 
 export const BREEDING_FARM = 'breeding_farm';
@@ -84,7 +84,7 @@ export function breedingParents(save: SaveState): [PalInstance, PalInstance] | n
 /** Idle box Pals: not in the party, not working, not already paired. */
 export function breedable(save: SaveState): PalInstance[] {
   return save.box.filter((p) =>
-    !save.party.includes(p.uid) && !save.base.workers.includes(p.uid) && !isBreeding(save, p.uid));
+    !save.party.includes(p.uid) && !save.base.workers.includes(p.uid) && !isBreeding(save, p.uid) && !isAway(save, p.uid));
 }
 
 export type PairBlock = 'no-farm' | 'same-pal' | 'busy';

@@ -3,7 +3,7 @@ import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -77,6 +77,11 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 7 && s.progress) {
     s.progress.dungeons ??= {};
     s.version = 8;
+  }
+  if (s.version === 8 && s.base) {
+    s.base.expeditions ??= [];
+    s.base.reports ??= [];
+    s.version = 9;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

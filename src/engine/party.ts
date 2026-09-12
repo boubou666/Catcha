@@ -20,6 +20,23 @@ export function addToBox(save: SaveState, inst: PalInstance): void {
   if (save.party.length < PARTY_SIZE) save.party.push(inst.uid);
 }
 
+/** Away on an expedition — untouchable until it returns. */
+export function isAway(save: SaveState, uid: string): boolean {
+  return save.base.expeditions.some((e) => e.members.includes(uid));
+}
+
+/** Level up one Pal by an amount of exp (expeditions, etc.). */
+export function grantInstanceExp(inst: PalInstance, amount: number): boolean {
+  inst.exp += amount;
+  let up = false;
+  while (inst.exp >= expToLevel(inst.level + 1)) {
+    inst.exp -= expToLevel(inst.level + 1);
+    inst.level += 1;
+    up = true;
+  }
+  return up;
+}
+
 /** A Pal that takes another job or leaves the box breaks up its breeding pair. */
 export function detachFromBreeding(save: SaveState, uid: string): void {
   const b = save.base.breeding;
@@ -60,7 +77,7 @@ export function grantExp(save: SaveState, amount: number): PalInstance[] {
 
 /** Add a box Pal to the party. Pulls it off base duty if it was working. */
 export function addToParty(save: SaveState, uid: string): boolean {
-  if (save.party.length >= PARTY_SIZE || save.party.includes(uid) || !instanceByUid(save, uid)) return false;
+  if (save.party.length >= PARTY_SIZE || save.party.includes(uid) || !instanceByUid(save, uid) || isAway(save, uid)) return false;
   save.base.workers = save.base.workers.filter((u) => u !== uid);
   detachFromBreeding(save, uid);
   save.party.push(uid);
@@ -72,6 +89,7 @@ export function removeFromParty(save: SaveState, uid: string): void {
 }
 
 export function release(save: SaveState, uid: string): void {
+  if (isAway(save, uid)) return;
   removeFromParty(save, uid);
   save.base.workers = save.base.workers.filter((u) => u !== uid);
   detachFromBreeding(save, uid);

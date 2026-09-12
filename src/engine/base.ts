@@ -2,13 +2,13 @@ import type { BaseState, PalInstance, SaveState, WorkType } from '../data/types'
 import { palById } from '../data/pals';
 import { BASE_SLOTS, FOOD_ITEM, JOBS, QUEUE_CAP, RATES, recipeById, structureById, STRUCTURES } from '../data/base';
 import { addItem, canAfford, spend, countOf, type Cost } from './inventory';
-import { detachFromBreeding, instanceByUid } from './party';
+import { detachFromBreeding, instanceByUid, isAway } from './party';
 import { isUnlocked } from './progress';
 import { recipeUnlocked, structureUnlocked, techMult } from './tech';
 import { passiveMult } from './passives';
 
 export function newBase(): BaseState {
-  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [] };
+  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [], expeditions: [], reports: [] };
 }
 
 // ---- workers ---------------------------------------------------------------
@@ -25,7 +25,7 @@ export function isWorker(save: SaveState, uid: string): boolean {
 
 /** Move a box Pal to the base. Removes it from the party. */
 export function assignWorker(save: SaveState, uid: string): boolean {
-  if (isWorker(save, uid) || !instanceByUid(save, uid)) return false;
+  if (isWorker(save, uid) || !instanceByUid(save, uid) || isAway(save, uid)) return false;
   if (save.base.workers.length >= save.base.slots) return false;
   save.party = save.party.filter((u) => u !== uid);
   detachFromBreeding(save, uid);

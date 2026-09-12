@@ -83,4 +83,9 @@ cap with 1.5–1.8× HP, then a catchable guardian, inside five minutes. Clearin
 by region and Effigies on the first clear; leaving or timing out keeps what the waves dropped. Defined
 in `src/data/dungeons.ts`.
 
-Next: expeditions, raids, balance pass — see DESIGN.md §10.
+Expeditions: build the Expedition Post (1–3 concurrent trips) and send idle Pals on seven timed
+destinations (10 min → 8 h). Success odds depend on members' levels, stars and attack passives against
+a full party at the recommended level; success pays a chest, failure a quarter of the gold; members
+gain exp either way and are locked until they return. Resolves offline. Data in `src/data/expeditions.ts`.
+
+Next: raids, balance pass — see DESIGN.md §10.

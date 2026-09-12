@@ -56,6 +56,8 @@ export const TECHS: TechDef[] = [
   // level 8
   S('breeding_farm', 'Breeding Farm', 8, 3, 'Pair Pals to produce eggs.', ['s_ranch']),
   R('cake', 'Cake', 8, 2, 'Bake Cake for the Breeding Farm.', ['s_breeding_farm']),
+  // level 9
+  S('expedition_post', 'Expedition Post', 9, 2, 'Send idle Pals on expeditions.'),
   // level 10
   S('condenser', 'Pal Essence Condenser', 10, 3, 'Condense duplicates into stars.', ['s_furnace']),
   M('training_2', 'Pal Training II', 10, 3, 'attack', 1.15, '+15% party attack.', ['training_1']),

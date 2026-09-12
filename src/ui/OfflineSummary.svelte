@@ -2,6 +2,7 @@
   import { game } from '../state/game.svelte';
   import { itemName } from '../data/items';
   import { palById } from '../data/pals';
+  import { expeditionById } from '../data/expeditions';
   import { OFFLINE_CAP_MS } from '../engine/offline';
   import { formatDuration, signed } from './format';
 
@@ -35,6 +36,9 @@
           {/each}
           {#if report.hatched.length > 0}
             <tr><td>Eggs hatched</td><td class="n gain">{report.hatched.map((id) => palById(id).name).join(', ')}</td></tr>
+          {/if}
+          {#if report.returned.length > 0}
+            <tr><td>Expeditions back</td><td class="n">{report.returned.map((r) => `${expeditionById(r.defId).name} (${r.success ? 'success' : 'failed'})`).join(', ')}</td></tr>
           {/if}
           {#if report.crafted > 0}
             <tr><td>Crafts finished</td><td class="n gain">{report.crafted}</td></tr>

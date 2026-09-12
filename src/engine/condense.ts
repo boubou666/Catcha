@@ -1,5 +1,5 @@
 import type { PalInstance, SaveState } from '../data/types';
-import { instanceByUid } from './party';
+import { instanceByUid, isAway } from './party';
 import { structureLevel } from './base';
 
 export const CONDENSER = 'condenser';
@@ -21,7 +21,7 @@ export function condenseCandidates(save: SaveState, target: PalInstance): PalIns
       p.palId === target.palId && p.uid !== target.uid
       && p.stars === 0 && !p.lucky
       && !save.party.includes(p.uid) && !save.base.workers.includes(p.uid)
-      && p.uid !== save.base.breeding?.a && p.uid !== save.base.breeding?.b)
+      && p.uid !== save.base.breeding?.a && p.uid !== save.base.breeding?.b && !isAway(save, p.uid))
     .sort((a, b) => a.level - b.level || a.exp - b.exp);
 }
 

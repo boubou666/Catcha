@@ -15,6 +15,8 @@ import { research, techMult } from '../engine/tech';
 import { bossName, completeRun, describeChest, dungeonUnlocked, isBossWave, spawnFor, startRun, type DungeonRun } from '../engine/dungeon';
 import { dungeonById } from '../data/dungeons';
 import { itemName } from '../data/items';
+import { clearReports, send } from '../engine/expedition';
+import { expeditionById } from '../data/expeditions';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
@@ -102,7 +104,9 @@ export class Game {
         this.hit((this.dps * dtMs) / 1000);
       }
     }
-    for (const palId of tickWorld(this.save, dtMs / 1000).hatched) this.push(`An egg hatched: ${palById(palId).name}!`);
+    const world = tickWorld(this.save, dtMs / 1000);
+    for (const palId of world.hatched) this.push(`An egg hatched: ${palById(palId).name}!`);
+    for (const r of world.returned) this.push(`${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} — +${r.gold.toLocaleString()} gold${Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}.`);
     this.sinceSave += dtMs;
     if (this.sinceSave >= AUTOSAVE_MS) this.persist();
   }
@@ -201,6 +205,16 @@ export class Game {
     this.push('Retreated.');
     this.spawn();
   }
+
+  // ---- expeditions -------------------------------------------------------
+
+  sendExpedition(defId: string, uids: string[]): boolean {
+    const ok = send(this.save, defId, uids);
+    if (ok) this.push(`${uids.length} Pal${uids.length === 1 ? '' : 's'} left for ${expeditionById(defId).name}.`);
+    return ok;
+  }
+
+  clearReports() { clearReports(this.save); }
 
   // ---- dungeons ----------------------------------------------------------
 

@@ -128,6 +128,20 @@ export interface Egg {
   passives: string[];                    // decided when laid
 }
 
+export interface Expedition {
+  defId: string;
+  members: string[];                     // PalInstance uids, locked until return
+  remaining: number;                     // seconds
+}
+
+export interface ExpeditionReport {
+  defId: string;
+  success: boolean;
+  gold: number;
+  items: Record<string, number>;
+  at: number;                            // epoch ms
+}
+
 export interface BaseState {
   slots: number;                         // worker capacity
   workers: string[];                     // PalInstance uids (never also in the party)
@@ -136,6 +150,8 @@ export interface BaseState {
   acc: Record<string, number>;           // fractional production carry, keyed by item / 'food' / 'smelt'
   breeding: BreedingPair | null;
   eggs: Egg[];                           // all incubate in parallel
+  expeditions: Expedition[];
+  reports: ExpeditionReport[];           // newest first, capped
 }
 
 export interface SaveState {

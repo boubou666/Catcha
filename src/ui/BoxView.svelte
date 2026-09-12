@@ -5,6 +5,7 @@
   import { structureLevel } from '../engine/base';
   import { condenseBlocker, condenseCandidates, condenseCost, CONDENSER, type CondenseBlock } from '../engine/condense';
   import { isBreeding } from '../engine/breeding';
+  import { isAway } from '../engine/party';
   import PalCard from './PalCard.svelte';
 
   let query = $state('');
@@ -43,6 +44,7 @@
     <PalCard {inst} showWork>
       {#if game.save.base.workers.includes(inst.uid)}<span class="muted small">at base</span>{/if}
       {#if isBreeding(game.save, inst.uid)}<span class="muted small">breeding</span>{/if}
+      {#if isAway(game.save, inst.uid)}<span class="muted small">on expedition</span>{/if}
       {#if cost !== null}
         <button class="small star" class:ready={!block} disabled={!!block} onclick={() => game.condense(inst.uid)}
           title={block ? BLOCK_TEXT[block] : `Condense ${cost} ${palById(inst.palId).name}s into this one`}>

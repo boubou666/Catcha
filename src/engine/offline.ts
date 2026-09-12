@@ -1,4 +1,4 @@
-import type { SaveState } from '../data/types';
+import type { ExpeditionReport, SaveState } from '../data/types';
 import { tickWorld } from './tick';
 
 export const OFFLINE_CAP_MS = 24 * 60 * 60 * 1000;
@@ -12,6 +12,7 @@ export interface OfflineReport {
   items: Record<string, number>;          // delta per item, positive or negative
   crafted: number;                        // queue entries completed
   hatched: number[];                      // Paldeck ids that hatched
+  returned: ExpeditionReport[];           // expeditions that came back
   weaponTier?: number;                    // set if a weapon finished
 }
 
@@ -30,8 +31,11 @@ export function applyOffline(save: SaveState, elapsedMs: number): OfflineReport 
   const weapon = save.player.weaponTier;
 
   const hatched: number[] = [];
+  const returned: ExpeditionReport[] = [];
   for (let left = simulated / 1000; left > 0; left -= OFFLINE_STEP_SEC) {
-    hatched.push(...tickWorld(save, Math.min(OFFLINE_STEP_SEC, left)).hatched);
+    const r = tickWorld(save, Math.min(OFFLINE_STEP_SEC, left));
+    hatched.push(...r.hatched);
+    returned.push(...r.returned);
   }
 
   const items: Record<string, number> = {};
@@ -46,9 +50,10 @@ export function applyOffline(save: SaveState, elapsedMs: number): OfflineReport 
     items,
     crafted: queued - save.base.queue.length,
     hatched,
+    returned,
   };
   if (save.player.weaponTier > weapon) report.weaponTier = save.player.weaponTier;
 
-  const empty = report.gold === 0 && report.crafted === 0 && Object.keys(items).length === 0 && !report.weaponTier && hatched.length === 0;
+  const empty = report.gold === 0 && report.crafted === 0 && Object.keys(items).length === 0 && !report.weaponTier && hatched.length === 0 && returned.length === 0;
   return empty ? null : report;
 }
