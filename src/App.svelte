@@ -205,8 +205,8 @@
     /* two tight nav rows: segmented groups, then a scrolling strip of tab chips */
     .groups { gap: 0.25rem; margin-bottom: 0.3rem; }
     .groups button { font-size: 0.68rem; letter-spacing: 0.04em; padding: 0.15rem 0.3rem; min-height: 30px; --c: 5px; }
-    .tabs { gap: 0.2rem; padding: 0 0.3rem; margin-bottom: -1px; }
-    .tabs button { font-size: 0.8rem; padding: 0.15rem 0.5rem 0.3rem; min-height: 30px; --c: 5px; }
+    .tabs { gap: 0.2rem; padding: 2px; margin-bottom: 0.3rem; }
+    .tabs button { font-size: 0.8rem; padding: 0.15rem 0.5rem; min-height: 30px; --c: 5px; }
     .tab-body { padding-top: 0.6rem; }
     /* one column on phones: the sticky arena stays put while the rest scrolls */
     main.mobile > section { overflow: visible; }
@@ -216,10 +216,11 @@
   .groups { display: flex; gap: 0.35rem; margin-bottom: 0.5rem; }
   .groups button { flex: 1; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; }
   .groups button.active { background: linear-gradient(180deg, #7fe3ff, #35d0ff); color: var(--on-accent); border-color: #d9f6ff; }
-  .tabs { display: flex; gap: 0.3rem; margin-bottom: -2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 0 0.5rem; position: relative; z-index: 1; }
+  .tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tabs button { flex: 0 0 auto; border-radius: var(--radius-sm) var(--radius-sm) 0 0; border-bottom: none; box-shadow: none; background: var(--panel-2); padding: 0.3rem 0.65rem 0.45rem; font-size: 0.9rem; }
-  .tabs button.active { background: var(--tab-active); color: var(--text); border-color: var(--accent-2); font-weight: 900; }
-  .tab-body { border-top-left-radius: 0; }
+  /* opaque chips: the strip sits over the sky, so translucent tabs read as white-on-pale-blue */
+  .tabs button { flex: 0 0 auto; --c: 6px; background: var(--tab-bg); color: var(--tab-text); border-color: var(--border-soft); padding: 0.3rem 0.7rem; font-size: 0.9rem; }
+  .tabs button:hover:not(:disabled) { color: var(--text); border-color: var(--accent-2); }
+  .tabs button.active { background: linear-gradient(180deg, #7fe3ff, #35d0ff); color: var(--on-accent); border-color: #d9f6ff; font-weight: 900; }
   .tab-body { min-height: 200px; }
 </style>

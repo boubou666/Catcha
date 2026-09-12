@@ -30,7 +30,8 @@
   --option-bg: #10203a;
   --title: #fff;
   --title-glow: 0 0 14px rgba(53, 208, 255, 0.9), 0 2px 0 rgba(0, 0, 0, 0.35);
-  --tab-active: rgba(53, 208, 255, 0.18);
+  --tab-bg: rgba(var(--navy), 0.92);
+  --tab-text: #c9d8e8;
   --chamfer: 14px;
   --radius: 6px;
   --radius-sm: 4px;
@@ -66,7 +67,8 @@
   --option-bg: #fffaf0;
   --title: #1f2a44;
   --title-glow: 0 2px 0 rgba(255, 255, 255, 0.8);
-  --tab-active: rgba(26, 155, 199, 0.16);
+  --tab-bg: rgba(255, 250, 240, 0.95);
+  --tab-text: #4b5a75;
   color-scheme: light;
 }
 

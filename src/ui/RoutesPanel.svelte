@@ -88,7 +88,7 @@
 
 <style>
   .regions { margin-bottom: 0.6rem; }
-  .regions button.active { background: var(--tab-active); color: var(--text); border-color: var(--accent-2); }
+  .regions button.active { background: linear-gradient(180deg, #7fe3ff, #35d0ff); color: var(--on-accent); border-color: #d9f6ff; }
   .head { margin-bottom: 0.4rem; }
   .head h3 { margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .routes { display: flex; flex-direction: column; gap: 0.25rem; }
