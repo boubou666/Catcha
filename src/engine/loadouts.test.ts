@@ -3,7 +3,7 @@ import { newState, migrate, SAVE_VERSION } from './save';
 import { addToBox, makeInstance, release } from './party';
 import { assignWorker } from './base';
 import { ascend } from './ascend';
-import { applyLoadout, deleteLoadout, filterLoadouts, loadoutReadiness, MAX_LOADOUTS, memberState, renameLoadout, saveLoadout, updateLoadout } from './loadouts';
+import { applyLoadout, DEFAULT_LOADOUT_FILTER, deleteLoadout, filterLoadouts, isLoadoutFiltering, loadoutReadiness, loadoutStatus, MAX_LOADOUTS, memberState, renameLoadout, saveLoadout, updateLoadout, type LoadoutFilter } from './loadouts';
 
 function setup() {
   const s = newState();
@@ -82,5 +82,30 @@ describe('loadouts', () => {
     saveLoadout(t, 'Keep me');
     t.progress.towers.push('rayne');
     expect(ascend(t, [])!.loadouts.map((l) => l.name)).toEqual(['Keep me']);
+  });
+});
+
+describe('loadout filter', () => {
+  it('filters by readiness and sorts by newest, name or availability', () => {
+    const { s, pals } = setup();
+    const a = saveLoadout(s, 'Alpha squad')!;                  // 5 members, all in party
+    a.createdAt = 1;
+    s.party = [pals[5].uid];
+    const b = saveLoadout(s, 'Bravo')!;                        // just Celaray
+    b.createdAt = 2;
+    s.base.expeditions = [{ defId: 'x', members: [pals[0].uid], remaining: 10 }];   // one of Alpha's away
+    release(s, pals[5].uid);                                   // Bravo's only member gone
+    expect(loadoutStatus(s, a)).toBe('partial');
+    expect(loadoutStatus(s, b)).toBe('none');
+    const f = (over: Partial<LoadoutFilter>): LoadoutFilter => ({ ...DEFAULT_LOADOUT_FILTER, ...over });
+    expect(filterLoadouts(s, f({})).map((l) => l.name)).toEqual(['Bravo', 'Alpha squad']);            // newest first
+    expect(filterLoadouts(s, f({ sort: 'name' })).map((l) => l.name)).toEqual(['Alpha squad', 'Bravo']);
+    expect(filterLoadouts(s, f({ sort: 'ready' })).map((l) => l.name)).toEqual(['Alpha squad', 'Bravo']);
+    expect(filterLoadouts(s, f({ status: 'partial' })).map((l) => l.name)).toEqual(['Alpha squad']);
+    expect(filterLoadouts(s, f({ status: 'none' })).map((l) => l.name)).toEqual(['Bravo']);
+    expect(filterLoadouts(s, f({ status: 'full' }))).toEqual([]);
+    expect(isLoadoutFiltering(DEFAULT_LOADOUT_FILTER)).toBe(false);
+    expect(isLoadoutFiltering(f({ sort: 'name' }))).toBe(false);
+    expect(filterLoadouts(s, 'bravo').map((l) => l.name)).toEqual(['Bravo']);                        // string form still works
   });
 });

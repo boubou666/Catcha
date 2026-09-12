@@ -183,7 +183,8 @@ an "Add from the Box" picker under the slots — idle Pals sorted by attack by d
 workers and breeding pairs can be pulled; expedition members can't). Party loadouts (Pals → Party): save the current party under a name (up to 12), then Load swaps the whole
 team — current members go back to the Box, saved members are pulled off base duty or out of a breeding pair
 under the usual rules, and anyone away on an expedition or no longer owned is skipped with a warning.
-Update overwrites with the current party; rename, delete, search by name or member species. Stored in the
+Update overwrites with the current party; rename, delete; search by name or member species, filter by
+readiness (everyone / some / nobody available) and sort by newest, name or most available. Stored in the
 save (`save.loadouts`, v21) and kept through Ascension (`src/engine/loadouts.ts`). The Base tab uses it twice: over the
 Workers list (status pinned to the base) and as the "Assign from the Box" picker; both default to the
 "Work suitability" sort, which ranks by the job chosen in the work filter, or overall suitability if none.

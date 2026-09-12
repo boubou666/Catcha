@@ -71,12 +71,39 @@ export function loadoutReadiness(save: SaveState, lo: Loadout): { ready: number;
   return { ready, total: lo.uids.length };
 }
 
-/** Loadouts whose name or (owned) member species match every search word. */
-export function filterLoadouts(save: SaveState, query: string): Loadout[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  return save.loadouts.filter((lo) => {
+export type LoadoutStatus = 'full' | 'partial' | 'none';
+export type LoadoutSort = 'newest' | 'name' | 'ready';
+export interface LoadoutFilter { query: string; status: LoadoutStatus | 'any'; sort: LoadoutSort }
+export const DEFAULT_LOADOUT_FILTER: LoadoutFilter = { query: '', status: 'any', sort: 'newest' };
+export const LOADOUT_STATUS_LABEL: Record<LoadoutStatus | 'any', string> = { any: 'Any status', full: 'Everyone available', partial: 'Some unavailable', none: 'Nobody available' };
+export const LOADOUT_SORT_LABEL: Record<LoadoutSort, string> = { newest: 'Newest', name: 'Name', ready: 'Most available' };
+
+export function loadoutStatus(save: SaveState, lo: Loadout): LoadoutStatus {
+  const r = loadoutReadiness(save, lo);
+  return r.ready === 0 ? 'none' : r.ready === r.total ? 'full' : 'partial';
+}
+
+export function isLoadoutFiltering(f: LoadoutFilter): boolean {
+  return f.query.trim() !== '' || f.status !== 'any';
+}
+
+/** Loadouts whose name or (owned) member species match every search word, by readiness, sorted. */
+export function filterLoadouts(save: SaveState, f: LoadoutFilter | string): Loadout[] {
+  const filter: LoadoutFilter = typeof f === 'string' ? { ...DEFAULT_LOADOUT_FILTER, query: f } : f;
+  const words = filter.query.toLowerCase().split(/\s+/).filter(Boolean);
+  const rows = save.loadouts.filter((lo) => {
+    if (filter.status !== 'any' && loadoutStatus(save, lo) !== filter.status) return false;
     const members = lo.uids.map((u) => instanceByUid(save, u)).filter((p) => !!p).map((p) => palById(p.palId).name);
     const hay = [lo.name, ...members].join(' ').toLowerCase();
     return words.every((w) => hay.includes(w));
   });
+  switch (filter.sort) {
+    case 'newest': rows.sort((a, b) => b.createdAt - a.createdAt); break;
+    case 'name': rows.sort((a, b) => a.name.localeCompare(b.name)); break;
+    case 'ready': rows.sort((a, b) => {
+      const ra = loadoutReadiness(save, a), rb = loadoutReadiness(save, b);
+      return rb.ready / rb.total - ra.ready / ra.total || rb.ready - ra.ready || a.name.localeCompare(b.name);
+    }); break;
+  }
+  return rows;
 }
