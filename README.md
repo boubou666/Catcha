@@ -80,7 +80,8 @@ src/
 Balance knobs live in `src/engine/formulas.ts` and `src/data/spheres.ts`. Alpha fights have a 5-minute clock
 (`ALPHA_TIME_LIMIT_SEC` in `src/data/regions.ts`); towers, realms and raids carry their own limits.
 Beating an Alpha throws a sphere like any wild Pal, at `ALPHA_CATCH_PENALTY` (35%) of the normal chance;
-a caught Alpha keeps its boss level. Tower bosses cannot be caught.
+a caught Alpha keeps its boss level. Tower bosses (a human and their Pal) cannot be caught, and raids
+give an egg instead of a throw — the arena line and the Bosses buttons say so, with the egg's Lucky odds.
 
 ## Data
 

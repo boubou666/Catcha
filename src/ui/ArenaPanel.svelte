@@ -8,6 +8,7 @@
   import SpawnList from './SpawnList.svelte';
   import { catchPreview } from '../engine/catch';
   import { catchText } from './catchText';
+  import { raidById } from '../data/raids';
   import { ui } from '../state/ui.svelte';
 
   /** compact: the sticky mobile bar (smaller art, one-line stats) */
@@ -30,6 +31,10 @@
   const catchable = $derived(!!wild && (wild.kind === 'wild' || wild.kind === 'alpha' || wild.kind === 'dungeon' || wild.kind === 'dungeonBoss'));
   const preview = $derived(wild && catchable ? catchPreview(game.save, wild.palId, wild.lucky, wild.kind === 'alpha') : null);
   const catchLine = $derived(preview ? catchText(preview) : '');
+  // towers and raids never throw a sphere: say so where the odds would be
+  const raid = $derived(wild?.kind === 'raid' && wild.refId ? raidById(wild.refId) : null);
+  const noCatchLine = $derived(wild?.kind === 'tower' ? 'not catchable — a tower boss is a human and their Pal' : raid ? `no sphere — win for a ${raid.name} egg (✨ ${Math.round(raid.luckyChance * 100)}% Lucky)` : '');
+  const noCatchShort = $derived(wild?.kind === 'tower' ? 'no catch' : raid ? `🥚 ${Math.round(raid.luckyChance * 100)}% ✨` : '');
   const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toFixed(n < 10 ? 1 : 0));
   const showHere = $derived(ui.spawnListOpen);
 </script>
@@ -53,7 +58,7 @@
         <div class="muted tiny">
           {fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)}{#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
           · DPS <b>{game.dps.toFixed(1)}</b>
-          {#if preview}· 🎯 {preview.throws ? `${Math.round(preview.chance * 100)}%` : 'no throw'}{/if}
+          {#if preview}· 🎯 {preview.throws ? `${Math.round(preview.chance * 100)}%` : 'no throw'}{:else if noCatchShort}· {noCatchShort}{/if}
           {#if wild.kind === 'wild'} · {Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}
           {:else} · <button class="tiny flee" onclick={() => game.flee()}>{run ? 'Leave' : wild.kind === 'raid' ? 'Give up' : 'Retreat'}</button>{/if}
         </div>
@@ -78,7 +83,8 @@
         <div class="muted small">{fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)} HP
           {#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
         </div>
-        {#if preview}<button class="link catch" class:no={!preview.throws} onclick={() => (ui.requestTab = 'settings')} title="Catch settings">🎯 Catch: {catchLine}</button>{/if}
+        {#if preview}<button class="link catch" class:no={!preview.throws} onclick={() => (ui.requestTab = 'settings')} title="Catch settings">🎯 Catch: {catchLine}</button>
+        {:else if noCatchLine}<div class="small catch" class:no={wild.kind === 'tower'} class:egg={!!raid}>{raid ? '🥚' : '🎯'} Catch: {noCatchLine}</div>{/if}
       </div>
     </div>
 
@@ -111,6 +117,8 @@
   .catch { color: var(--accent-2); margin-top: 0.15rem; font-size: 0.85rem; background: none; border: none; padding: 0; clip-path: none; text-align: left; cursor: pointer; font-weight: 700; }
   .catch:hover { text-decoration: underline; background: none; }
   .catch.no { color: var(--muted); }
+  .catch.egg { color: var(--accent); cursor: default; }
+  .catch.egg:hover { text-decoration: none; }
   .bar.hp > span { background: var(--danger); }
   .attack { width: 100%; padding: 0.9rem; font-size: 1.2rem; font-weight: 900; border-radius: var(--radius); box-shadow: var(--shadow); margin: 0.75rem 0 0.5rem; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .small { font-size: 0.85rem; }
