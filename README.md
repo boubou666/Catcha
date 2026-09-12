@@ -216,7 +216,10 @@ progress / locked) and element filters; results group by region and travel on cl
 (`src/engine/routefilter.ts`). Without a filter the panel shows the current region as before. The Bosses
 panel does the same over Alphas, towers, Sealed Realms and raids across reachable regions (name, kind,
 region, element, level; beaten / available / locked; element), starting the fight on click
-(`src/engine/bossfilter.ts`). The Log keeps the last 200 entries of the session with a time and a category
+(`src/engine/bossfilter.ts`). The arena's "Who lives here?" (under Routes on mobile) lists the current
+route's spawn table with odds and Paldeck status — unseen species show as ??? with their number — with
+search, status / element / watched filters, and a 👀 watch per species that toasts when it spawns (per
+device, `catcha.watch` in localStorage; `src/engine/arenafilter.ts`). The Log keeps the last 200 entries of the session with a time and a category
 inferred from the message (`classifyLog` in `src/engine/logfilter.ts`); it shows the recent dozen, expands
 on demand, and has a search plus a category select.
 

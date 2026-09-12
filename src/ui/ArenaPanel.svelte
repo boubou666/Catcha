@@ -5,6 +5,7 @@
   import { routeQuota } from '../engine/prestige';
   import { dungeonById } from '../data/dungeons';
   import PalIcon from './PalIcon.svelte';
+  import SpawnList from './SpawnList.svelte';
 
   /** compact: the sticky mobile bar (smaller art, one-line stats) */
   let { compact = false }: { compact?: boolean } = $props();
@@ -24,6 +25,7 @@
   });
   const secondsLeft = $derived(wild?.deadlineAt ? Math.max(0, Math.ceil((wild.deadlineAt - now) / 1000)) : null);
   const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toFixed(n < 10 ? 1 : 0));
+  let showHere = $state(false);
 </script>
 
 <div class="panel arena" class:compact>
@@ -56,10 +58,14 @@
       <span>Party DPS: <b>{game.dps.toFixed(1)}</b></span>
       {#if wild.kind === 'wild'}
         <span>· Route progress: <b>{Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}</b></span>
+        {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (showHere = !showHere)} aria-expanded={showHere}>{showHere ? 'Hide' : 'Who lives here?'}</button>{/if}
       {:else}
         <button class="small" onclick={() => game.flee()}>{run ? 'Leave realm' : wild.kind === 'raid' ? 'Give up (slab lost)' : 'Retreat'}</button>
       {/if}
     </div>
+    {#if showHere && !compact && wild.kind === 'wild'}
+      <div class="here"><SpawnList /></div>
+    {/if}
   {/if}
 </div>
 
@@ -76,4 +82,6 @@
   .compact { padding: 0.6rem 0.75rem; }
   .compact .name { font-size: 1rem; }
   .compact .attack { padding: 0.7rem; margin: 0.5rem 0 0.35rem; }
+  .here { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+  button.active { border-color: var(--accent); color: var(--accent); }
 </style>

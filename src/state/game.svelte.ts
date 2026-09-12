@@ -38,6 +38,10 @@ const AUTOSAVE_MS = 30_000;
 const TICK_MS = 100;
 const MAX_TICK_MS = 5_000; // anything longer is a suspend/sleep gap and goes through applyOffline
 const LOG_LINES = 200;
+const WATCH_KEY = 'catcha.watch';
+function loadWatched(): Set<number> {
+  try { const raw = localStorage.getItem(WATCH_KEY); return new Set(raw ? (JSON.parse(raw) as number[]) : []); } catch { return new Set(); }
+}
 
 export type ToastKind = 'info' | 'success' | 'gold' | 'warn';
 
@@ -272,6 +276,17 @@ export class Game {
   spawn() {
     this.wild = spawnWild(this.route);
     if (this.wild.lucky) { this.emit('luckySpawn'); this.notify(`✨ A Lucky ${palById(this.wild.palId).name} appeared!`, 'warn', 5000); }
+    else if (this.watched.has(this.wild.palId)) this.notify(`👀 ${palById(this.wild.palId).name} is here!`, 'info', 3000);
+  }
+
+  // ---- watch list (per device, not part of the save) ----------------------
+
+  watched = $state<Set<number>>(loadWatched());
+  toggleWatch(palId: number) {
+    const next = new Set(this.watched);
+    if (next.has(palId)) next.delete(palId); else next.add(palId);
+    this.watched = next;
+    try { localStorage.setItem(WATCH_KEY, JSON.stringify([...next])); } catch { /* ignore */ }
   }
 
   // ---- navigation --------------------------------------------------------
