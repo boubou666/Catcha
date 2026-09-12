@@ -123,6 +123,8 @@
     }
   }
 
+  $effect(() => { const t = ui.requestTab; if (t) { ui.requestTab = null; select(t as Tab); } });
+
   onMount(() => {
     const stop = game.start();
     const off = game.on((e) => { play(e); buzz(e); });

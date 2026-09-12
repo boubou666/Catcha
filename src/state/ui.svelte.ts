@@ -6,6 +6,7 @@ class UiIntents {
   shortcutsOpen = $state(false);
   notificationsOpen = $state(false);
   spawnListOpen = $state(false);
+  requestTab = $state<string | null>(null);   // a view asks the app to switch tabs
 
   takePaldeck(): number | null { const v = this.paldeckSelect; this.paldeckSelect = null; return v; }
   takeBoxQuery(): string | null { const v = this.boxQuery; this.boxQuery = null; return v; }

@@ -5,5 +5,5 @@ import { SPHERES } from '../data/spheres';
 export function catchText(p: CatchPreview): string {
   if (p.throws) return `${Math.round(p.chance * 100)}% with a ${SPHERES[p.tier].name}`;
   if (p.reason === 'no-spheres') return 'no spheres left — Merchant';
-  return p.dupe ? 'no throw — already caught (Merchant → Catch settings)' : 'no throw — policy (Merchant → Catch settings)';
+  return p.dupe ? 'no throw — already caught (Settings → Catching)' : 'no throw — policy (Settings → Catching)';
 }

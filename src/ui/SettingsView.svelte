@@ -10,6 +10,14 @@
   import TutorialSteps from './TutorialSteps.svelte';
   import KeyBindings from './KeyBindings.svelte';
   import { theme, type ThemeChoice } from '../state/theme.svelte';
+  import { SPHERES } from '../data/spheres';
+  import { SPHERE_TIERS, type SpherePolicy } from '../data/types';
+  import ItemIcon from './ItemIcon.svelte';
+  const policies: { value: SpherePolicy; label: string }[] = [
+    { value: 'none', label: "Don't throw" },
+    ...SPHERE_TIERS.map((t) => ({ value: t, label: SPHERES[t].name })),
+  ];
+  const stock = (t: SpherePolicy) => (t === 'none' ? '' : ` (×${save.inventory[SPHERES[t].itemId] ?? 0})`);
   const THEMES: { value: ThemeChoice; label: string; desc: string }[] = [
     { value: 'dark', label: 'Dark HUD', desc: 'Navy glass panels over the Palpagos sky — the default.' },
     { value: 'light', label: 'Light HUD', desc: 'Cream glass with ink text; easier in bright daylight.' },
@@ -126,7 +134,20 @@
 {#if show('catching')}
 <section>
   <h3>Catching</h3>
-  <p class="muted small">Sphere policies live under <b>Merchant → Catch settings</b>.</p>
+  <p class="muted small">A sphere is thrown automatically when you defeat a wild Pal or an Alpha. Choose which one — or none — for species you haven't caught yet and for ones you already own. If the chosen tier is out of stock, the next lower one is thrown.</p>
+  <div class="row policies">
+    <label class="grow policy">New species
+      <select value={save.settings.sphereForNew} onchange={(e) => game.setSpherePolicy('new', e.currentTarget.value as SpherePolicy)}>
+        {#each policies as p}<option value={p.value}>{p.label}{stock(p.value)}</option>{/each}
+      </select>
+    </label>
+    <label class="grow policy">Already caught
+      <select value={save.settings.sphereForDupe} onchange={(e) => game.setSpherePolicy('dupe', e.currentTarget.value as SpherePolicy)}>
+        {#each policies as p}<option value={p.value}>{p.label}{stock(p.value)}</option>{/each}
+      </select>
+    </label>
+  </div>
+  <p class="muted small">Duplicates are what breeding, condensing and the base run on — throwing at them costs spheres, so it starts off. Spheres: {#each SPHERE_TIERS as t}{#if (save.inventory[SPHERES[t].itemId] ?? 0) > 0}<span class="chip"><ItemIcon id={SPHERES[t].itemId} size={14} /> {SPHERES[t].name} ×{save.inventory[SPHERES[t].itemId]}</span>{/if}{/each}{#if SPHERE_TIERS.every((t) => !(save.inventory[SPHERES[t].itemId] ?? 0))}none — buy or craft some{/if}</p>
 </section>
 {/if}
 
@@ -182,5 +203,7 @@
   .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
   .chip { font-size: 0.8rem; padding: 0.15rem 0.6rem; border-radius: 999px; }
   .chip.on { border-color: var(--accent); color: var(--accent); }
+  .policy { display: flex; flex-direction: column; gap: 0.25rem; font-weight: 700; }
+  .policies { align-items: flex-start; }
   .steps { margin-top: 0.5rem; }
 </style>

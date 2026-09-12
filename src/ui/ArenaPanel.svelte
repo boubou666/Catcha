@@ -78,7 +78,7 @@
         <div class="muted small">{fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)} HP
           {#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
         </div>
-        {#if preview}<div class="small catch" class:no={!preview.throws}>🎯 Catch: {catchLine}</div>{/if}
+        {#if preview}<button class="link catch" class:no={!preview.throws} onclick={() => (ui.requestTab = 'settings')} title="Catch settings">🎯 Catch: {catchLine}</button>{/if}
       </div>
     </div>
 
@@ -108,7 +108,8 @@
   .tag.realm { background: var(--accent-2); }
   .tag.raid { background: #7b2cbf; }
   .bar.hp { margin: 0.35rem 0; }
-  .catch { color: var(--accent-2); margin-top: 0.15rem; }
+  .catch { color: var(--accent-2); margin-top: 0.15rem; font-size: 0.85rem; background: none; border: none; padding: 0; clip-path: none; text-align: left; cursor: pointer; font-weight: 700; }
+  .catch:hover { text-decoration: underline; background: none; }
   .catch.no { color: var(--muted); }
   .bar.hp > span { background: var(--danger); }
   .attack { width: 100%; padding: 0.9rem; font-size: 1.2rem; font-weight: 900; border-radius: var(--radius); box-shadow: var(--shadow); margin: 0.75rem 0 0.5rem; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }

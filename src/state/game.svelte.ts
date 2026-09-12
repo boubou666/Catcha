@@ -259,7 +259,7 @@ export class Game {
       const res = tryCatch(save, w);
       if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name}!`); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
       else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
-      else this.push(`No sphere thrown at Alpha ${def.name} — check Merchant → Catch settings.`);
+      else this.push(`No sphere thrown at Alpha ${def.name} — see Settings → Catching.`);
     }
     if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
       if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;

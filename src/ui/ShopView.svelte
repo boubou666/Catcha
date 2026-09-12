@@ -1,7 +1,7 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
   import { SPHERES } from '../data/spheres';
-  import { SPHERE_TIERS, type SpherePolicy } from '../data/types';
+  import { SPHERE_TIERS } from '../data/types';
   import { STOCK, SELL_SHARE } from '../data/shop';
   import { describeRequirement } from '../engine/progress';
   import { DEFAULT_SHOP_FILTER, filterSellable, filterStock, isShopFiltering, SHOP_SORT_LABEL, type ShopFilter } from '../engine/shop';
@@ -10,10 +10,6 @@
 
   const save = $derived(game.save);
   const gold = $derived(save.player.gold);
-  const policies: { value: SpherePolicy; label: string }[] = [
-    { value: 'none', label: "Don't catch" },
-    ...SPHERE_TIERS.map((t) => ({ value: t, label: SPHERES[t].name })),
-  ];
 
   let side = $state<'buy' | 'sell'>('buy');
   let filter = $state<ShopFilter>({ ...DEFAULT_SHOP_FILTER });
@@ -97,20 +93,7 @@
   </div>
 {/if}
 
-<h2 class="settings">Catch settings</h2>
-<div class="row">
-  <label class="grow">New species
-    <select value={save.settings.sphereForNew} onchange={(e) => game.setSpherePolicy('new', e.currentTarget.value as SpherePolicy)}>
-      {#each policies as p}<option value={p.value}>{p.label}</option>{/each}
-    </select>
-  </label>
-  <label class="grow">Already caught
-    <select value={save.settings.sphereForDupe} onchange={(e) => game.setSpherePolicy('dupe', e.currentTarget.value as SpherePolicy)}>
-      {#each policies as p}<option value={p.value}>{p.label}</option>{/each}
-    </select>
-  </label>
-</div>
-<p class="muted small">If the chosen sphere is out of stock, the next lower tier is thrown instead.</p>
+<p class="muted small">Which sphere gets thrown, and whether to throw at species you already own, is under <b>Settings → Catching</b>.</p>
 
 <style>
   .gold { font-weight: 600; color: var(--accent); }
@@ -121,8 +104,6 @@
   .item { padding: 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .item.locked { opacity: 0.6; }
   .price { white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .settings { margin-top: 1.5rem; }
-  label { display: flex; flex-direction: column; gap: 0.25rem; }
   .small { font-size: 0.8rem; }
   input[type='search'] { min-width: 8rem; flex: 1; max-width: 14rem; }
   button.active { border-color: var(--accent); color: var(--accent); }
