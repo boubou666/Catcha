@@ -11,6 +11,8 @@ import { clickDamage, wildHp } from '../engine/formulas';
 import { assignWorker, build, cancelCraft, enqueue, tickBase, unassignWorker } from '../engine/base';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
+import { condense } from '../engine/condense';
+import { instanceByUid } from '../engine/party';
 
 const AUTOSAVE_MS = 30_000;
 const TICK_MS = 100;
@@ -190,6 +192,13 @@ export class Game {
   }
 
   cancelCraft(index: number) { cancelCraft(this.save, index); }
+
+  condense(uid: string) {
+    const fed = condense(this.save, uid);
+    const target = instanceByUid(this.save, uid);
+    if (!fed || !target) return;
+    this.push(`${palById(target.palId).name} condensed to ${'★'.repeat(target.stars)} (${fed.length} ${palById(target.palId).name}s consumed).`);
+  }
 
   // ---- merchant / settings ----------------------------------------------
 

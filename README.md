@@ -54,4 +54,8 @@ workers eat Red Berries and slow down when hungry. Knobs: `src/data/base.ts` (RA
 Offline progress: on load (and after a laptop-sleep gap) the base is simulated in 60 s chunks for the
 time away, capped at 24 h, and a summary shows the deltas. Combat never runs offline.
 
-Next: breeding, condensing, tech tree — see DESIGN.md §10.
+Condensing: build the Pal Essence Condenser, then feed 4 / 16 / 32 / 64 idle duplicates into a Pal
+from the Box for ★1–★4 (+10% attack and work per star). Lucky, starred, party and base Pals are never
+consumed.
+
+Next: breeding, tech tree — see DESIGN.md §10.

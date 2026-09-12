@@ -73,6 +73,8 @@ export const STRUCTURES: StructureDef[] = [
     costs: [{ stone: 20, wood: 10, flame_organ: 5 }] },
   { id: 'ranch', name: 'Ranch', desc: 'Farming Pals produce their own goods.',
     costs: [{ wood: 50, stone: 20, wool: 10 }] },
+  { id: 'condenser', name: 'Pal Essence Condenser', desc: 'Feed duplicate Pals into one to add stars: +10% attack and work per star (4 / 16 / 32 / 64 dupes).',
+    costs: [{ ingot: 20, paldium: 50, stone: 30 }] },
   { id: 'palbox', name: 'Palbox Expansion', desc: '+1 worker slot per level.',
     costs: [
       { gold: 150, paldium: 5 }, { gold: 300, paldium: 10 }, { gold: 600, paldium: 15 },
