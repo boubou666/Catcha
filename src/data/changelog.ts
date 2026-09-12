@@ -19,6 +19,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'A one-line arena bar on phones with a tall ⚔ Attack button.',
       'Tighter tab rows on phones.',
       'Alpha fights are now timed: 5 minutes to win, like the towers’ 10.',
+      'Alphas can be caught, like in Palworld: a sphere is thrown when you beat one, at 35% of the normal rate — better spheres and Effigies help. A caught Alpha keeps its boss level.',
       'The page no longer scrolls as a whole — the columns scroll on their own, so the header and arena stay put.',
     ],
   },

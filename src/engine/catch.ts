@@ -1,19 +1,20 @@
 import type { Rarity, SaveState, SphereTier } from '../data/types';
 import { SPHERE_TIERS } from '../data/types';
 import { palById } from '../data/pals';
-import { BASE_CATCH_RATE, EFFIGY_CAPTURE_BONUS, LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
+import { ALPHA_CATCH_PENALTY, BASE_CATCH_RATE, EFFIGY_CAPTURE_BONUS, LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
 import { addToBox, makeInstance } from './party';
 import { techMult } from './tech';
 import { prestigeMult } from './prestige';
 import { rollWildPassives } from './passives';
 import type { Rng, Wild } from './combat';
 
-export function catchChance(rarity: Rarity, tier: SphereTier, effigies: number, lucky: boolean, mult = 1): number {
+export function catchChance(rarity: Rarity, tier: SphereTier, effigies: number, lucky: boolean, mult = 1, alpha = false): number {
   const chance = BASE_CATCH_RATE[rarity]
     * SPHERES[tier].mult
     * mult
     * (1 + EFFIGY_CAPTURE_BONUS * effigies)
-    * (lucky ? LUCKY_CATCH_PENALTY : 1);
+    * (lucky ? LUCKY_CATCH_PENALTY : 1)
+    * (alpha ? ALPHA_CATCH_PENALTY : 1);
   return Math.min(0.99, chance);
 }
 
@@ -46,7 +47,7 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
   save.stats.throws += 1;
   save.stats.throwsByTier[tier] = (save.stats.throwsByTier[tier] ?? 0) + 1;
 
-  const chance = catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch') * prestigeMult(save, 'catch'));
+  const chance = catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch') * prestigeMult(save, 'catch'), wild.kind === 'alpha');
   if (rand() < chance) {
     addToBox(save, makeInstance(wild.palId, wild.level, wild.lucky, rollWildPassives(palById(wild.palId), wild.lucky, rand)));
     save.stats.caught += 1;

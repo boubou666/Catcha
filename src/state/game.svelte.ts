@@ -254,6 +254,13 @@ export class Game {
     if (byClick) this.emit('defeat');   // idle kills stay silent — otherwise it's a thud every few seconds forever
     if (save.player.level > levelBefore) { this.emit('levelUp'); this.notify(`Level ${save.player.level}!`, 'success'); }
 
+    if (w.kind === 'alpha') {
+      // Alphas can be caught, at a reduced rate; the throw uses the same sphere policy
+      const res = tryCatch(save, w);
+      if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name}!`); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
+      else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
+      else this.push(`No sphere thrown at Alpha ${def.name} — check Merchant → Catch settings.`);
+    }
     if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
       if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
       const res = tryCatch(save, w);

@@ -5,6 +5,7 @@ import { REGIONS, routeById } from '../data/regions';
 import { itemById } from '../data/items';
 import { newState } from './save';
 import { catchChance, chooseSphere, tryCatch } from './catch';
+import { ALPHA_CATCH_PENALTY } from '../data/spheres';
 import { applyDefeat, partyDps, spawnWild } from './combat';
 import { addToBox, grantExp, makeInstance } from './party';
 import { expToLevel, PARTY_SIZE } from './formulas';
@@ -126,5 +127,21 @@ describe('progress', () => {
     expect(isUnlocked(save, routeById('cove').unlock)).toBe(false);
     save.progress.alphas.push('chillet');
     expect(isUnlocked(save, routeById('cove').unlock)).toBe(true);
+  });
+});
+
+describe('catching Alphas', () => {
+  it('applies the Alpha penalty and catches at the boss level', () => {
+    expect(catchChance('uncommon', 'pal', 0, false, 1, true)).toBeCloseTo(catchChance('uncommon', 'pal', 0, false) * ALPHA_CATCH_PENALTY);
+    const save = newState();
+    const alpha = { palId: 55, level: 11, hp: 0, maxHp: 1, lucky: false, kind: 'alpha' as const, refId: 'chillet' };
+    const res = tryCatch(save, alpha, () => 0);
+    expect(res.outcome).toBe('caught');
+    expect(save.box[0]).toMatchObject({ palId: 55, level: 11 });
+    expect(save.inventory.sphere_pal).toBe(19);
+    save.settings.sphereForDupe = 'pal';
+    expect(tryCatch(save, alpha, () => 0.99).outcome).toBe('failed');
+    save.settings.sphereForDupe = 'none';
+    expect(tryCatch(save, alpha, () => 0).outcome).toBe('skipped');    // already caught + no dupe sphere: no throw
   });
 });

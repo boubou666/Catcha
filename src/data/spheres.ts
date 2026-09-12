@@ -27,4 +27,6 @@ export const BASE_CATCH_RATE: Record<Rarity, number> = {
 };
 
 export const LUCKY_CATCH_PENALTY = 0.5;
+/** Alphas can be caught like in Palworld, but they resist: their catch chance is multiplied by this. */
+export const ALPHA_CATCH_PENALTY = 0.35;
 export const EFFIGY_CAPTURE_BONUS = 0.02; // +2% capture power per effigy
