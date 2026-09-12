@@ -197,6 +197,7 @@ export interface SaveState {
   achievements: string[];                // unlocked ids
   daily: DailyState | null;              // today's quests; regenerated when the day changes
   prestige: { relics: number; ascensions: number; upgrades: Record<string, number> };
+  tutorial: { step: number; done: boolean };
   lastSavedAt: number;
 }
 

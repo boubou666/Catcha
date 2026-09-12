@@ -15,6 +15,11 @@ Share → Add to Home Screen) and keeps working offline after the first load. Wh
 haven't seen open once. Entries live in `src/data/changelog.ts` — add one at the top when shipping
 something players should know about.
 
+New saves get a ten-step tutorial card above the tabs (attack → catch → party → clear a route → research → worker →
+build → craft → Alpha). Each step checks the save state and advances on its own, with a "Take me there" button
+for steps that live on another tab; it can be skipped at any time and replayed from Settings → About. Steps live
+in `src/engine/tutorial.ts`; saves from before it existed are marked done.
+
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.
 

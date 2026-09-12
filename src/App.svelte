@@ -27,6 +27,7 @@
   import Toasts from './ui/Toasts.svelte';
   import UpdateBanner from './ui/UpdateBanner.svelte';
   import WhatsNew from './ui/WhatsNew.svelte';
+  import TutorialPanel from './ui/TutorialPanel.svelte';
   import { whatsNew } from './state/whatsnew.svelte';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings';
@@ -99,6 +100,7 @@
       </section>
     {/if}
     <section class="right">
+      <TutorialPanel {tab} go={(t) => select(t as Tab)} />
       <nav class="groups">
         {#each groups as g (g.id)}
           <button class:active={group.id === g.id} onclick={() => selectGroup(g)}>{g.label}</button>

@@ -94,7 +94,10 @@
 <section>
   <h3>About</h3>
   <p class="muted small">Catcha version <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}. Changelog v{LATEST_VERSION}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
-  <button class="small" onclick={() => whatsNew.showAll()}>What's new</button>
+  <div class="row">
+    <button class="small" onclick={() => whatsNew.showAll()}>What's new</button>
+    <button class="small" onclick={() => game.restartTutorial()} disabled={!game.save.tutorial.done}>{game.save.tutorial.done ? 'Replay tutorial' : 'Tutorial in progress'}</button>
+  </div>
 </section>
 
 <style>

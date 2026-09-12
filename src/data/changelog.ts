@@ -10,6 +10,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.8.0', date: '2026-09-12', title: 'Tutorial',
+    items: [
+      'A ten-step tutorial for new saves that follows what you actually do — attack, catch, clear a route, research, put a Pal to work, build, craft, beat an Alpha.',
+      'Skip it any time; replay it from Settings → About.',
+    ],
+  },
+  {
     version: '0.7.0', date: '2026-09-12', title: 'Polish: sounds, toasts, install',
     items: [
       'Sound effects, synthesized in the browser — toggle and volume in Settings.',

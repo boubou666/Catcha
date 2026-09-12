@@ -17,6 +17,7 @@ export function ascend(save: SaveState, keepUids: string[]): SaveState | null {
   next.paldeck = save.paldeck;
   next.achievements = save.achievements;
   next.stats = save.stats;
+  next.tutorial = save.tutorial;
   next.daily = save.daily;
   next.settings = save.settings;
   next.prestige = { relics: save.prestige.relics + relics, ascensions: save.prestige.ascensions + 1, upgrades: save.prestige.upgrades };

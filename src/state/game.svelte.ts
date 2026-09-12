@@ -28,6 +28,7 @@ import { earnGold } from '../engine/inventory';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
+import { advanceTutorial, currentStep, finishTutorial } from '../engine/tutorial';
 import { condense } from '../engine/condense';
 import { instanceByUid } from '../engine/party';
 
@@ -40,7 +41,7 @@ export type ToastKind = 'info' | 'success' | 'gold' | 'warn';
 
 export type GameEvent =
   | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
-  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone';
+  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep';
 
 export class Game {
   save = $state<SaveState>(newState());
@@ -125,6 +126,12 @@ export class Game {
 
   dismissOffline() { this.offline = null; }
 
+  // ---- tutorial ----------------------------------------------------------
+
+  get tutorialStep() { return currentStep(this.save); }
+  skipTutorial() { finishTutorial(this.save); this.persist(); }
+  restartTutorial() { this.save.tutorial = { step: 0, done: false }; advanceTutorial(this.save); this.persist(); }
+
   tick(dtMs: number) {
     const w = this.wild;
     if (w) {
@@ -141,6 +148,11 @@ export class Game {
     if (this.sinceCheck >= 1000) {
       this.sinceCheck = 0;
       this.unlockAchievements();
+      if (advanceTutorial(this.save)) {
+        this.emit('tutorialStep');
+        const next = currentStep(this.save);
+        if (next) this.notify(`📖 Next: ${next.title}`, 'success');
+      }
       if (rollDaily(this.save)) { this.push('A new day — fresh daily quests are up.'); this.notify('📅 New daily quests are up', 'info'); }
     }
     const queued = this.save.base.queue.length;

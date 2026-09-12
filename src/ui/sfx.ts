@@ -2,7 +2,7 @@
 
 export type Sfx =
   | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
-  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone';
+  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep';
 
 const PREF_KEY = 'catcha.sound';
 
@@ -98,6 +98,7 @@ const SOUNDS: Record<Sfx, (a: { ctx: AudioContext; master: GainNode }, t: number
   realmClear: (a, t) => [659, 784, 1047].forEach((f, i) => tone(a, f, t + i * 0.1, 0.3, { type: 'triangle', gain: 0.14 })),
   ascend: (a, t) => { tone(a, 220, t, 1.6, { type: 'sine', gain: 0.14, to: 1760 }); [523, 659, 784, 1047, 1319].forEach((f, i) => tone(a, f, t + 0.8 + i * 0.1, 0.5, { type: 'triangle', gain: 0.1 })); },
   craftDone: (a, t) => tone(a, 1000, t, 0.06, { type: 'triangle', gain: 0.08, to: 1400 }),
+  tutorialStep: (a, t) => { tone(a, 1047, t, 0.08, { gain: 0.1 }); tone(a, 1568, t + 0.09, 0.18, { gain: 0.1 }); },
 };
 
 const MIN_GAP_MS: Partial<Record<Sfx, number>> = { click: 30, defeat: 60, craftDone: 120 };
@@ -133,6 +134,7 @@ const PATTERNS: Partial<Record<Sfx, number | number[]>> = {
   summon: 250,
   realmClear: [40, 40, 90],
   ascend: [80, 60, 80, 60, 80, 60, 300],
+  tutorialStep: [20, 30, 40],
 };
 
 let coarse: boolean | null = null;
