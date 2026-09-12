@@ -100,3 +100,22 @@ describe('region 3', () => {
     expect(palById(towerById('axel').palId).name).toBe('Orserk');
   });
 });
+
+describe('region 4', () => {
+  it('opens after the Axel tower and ends at Marcus & Faleris', () => {
+    const save = newState();
+    expect(isUnlocked(save, routeById('foothills').unlock)).toBe(false);
+    save.progress.towers.push('axel');
+    expect(isUnlocked(save, routeById('foothills').unlock)).toBe(true);
+    save.progress.alphas.push('helzephyr', 'menasting', 'blazamut');
+    save.progress.routeKills.pidf = 350;
+    expect(isUnlocked(save, towerById('marcus').unlock)).toBe(true);
+    expect(palById(towerById('marcus').palId).name).toBe('Faleris');
+  });
+  it('subspecies point at a real base species', () => {
+    for (const p of PALS) if (p.variantOf) {
+      expect(p.id).toBe(1000 + p.variantOf);
+      expect(palById(p.variantOf).variantOf).toBeUndefined();
+    }
+  });
+});

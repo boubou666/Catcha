@@ -279,7 +279,73 @@ export const PALS: PalDef[] = [
   { id: 106, name: 'Orserk',     elements: ['Dragon', 'Electric'], rarity: 'legendary', baseHp: 100, baseAttack: 130, baseDefense: 100, breedPower: 90,
     work: { Electricity: 4, Handiwork: 2, Gathering: 1, Transporting: 3 },
     drops: [d('electric_organ', 1, 4, 6), d('high_quality_pal_oil', 1, 2, 4)], partnerSkill: 'Ferocious Thunder Dragon' },
+
+  // region 4 — Mount Obsidian. Subspecies use id = 1000 + base (shown as #NNNB).
+  { id: 96,  name: 'Blazamut',   elements: ['Fire', 'Ground'],   rarity: 'epic',      baseHp: 100, baseAttack: 125, baseDefense: 120, breedPower: 205,
+    work: { Kindling: 4, Mining: 4 },
+    drops: [d('flame_organ', 1, 3, 5), d('ore', 1, 4, 8)], partnerSkill: 'Magma Kaiser' },
+  { id: 97,  name: 'Helzephyr',  elements: ['Dark'],             rarity: 'epic',      baseHp: 100, baseAttack: 125, baseDefense: 100, breedPower: 200,
+    work: { Transporting: 3 },
+    drops: [d('venom_gland', 1, 2, 4), d('small_pal_soul', 0.6)], partnerSkill: 'Wings of Death' },
+  { id: 98,  name: 'Astegon',    elements: ['Dragon', 'Dark'],   rarity: 'epic',      baseHp: 100, baseAttack: 125, baseDefense: 125, breedPower: 151,
+    work: { Handiwork: 1, Mining: 4 },
+    drops: [d('ore', 1, 5, 8), d('ingot', 0.7, 1, 2)], partnerSkill: 'Black Ankylosaur' },
+  { id: 99,  name: 'Menasting',  elements: ['Dark', 'Ground'],   rarity: 'epic',      baseHp: 100, baseAttack: 100, baseDefense: 140, breedPower: 160,
+    work: { Lumbering: 2, Mining: 3 },
+    drops: [d('venom_gland', 1, 2, 4), d('high_quality_pal_oil', 0.6, 1, 2)], partnerSkill: 'Steel Scorpion' },
+  { id: 101, name: 'Jormuntide', elements: ['Dragon', 'Water'],   rarity: 'epic',      baseHp: 130, baseAttack: 120, baseDefense: 100, breedPower: 313,
+    work: { Watering: 4 },
+    drops: [d('pal_fluids', 1, 4, 7), d('high_quality_pal_oil', 1, 1, 3)], partnerSkill: 'Stormbringer Sea Dragon' },
+  { id: 102, name: 'Suzaku',     elements: ['Fire'],             rarity: 'epic',      baseHp: 120, baseAttack: 105, baseDefense: 105, breedPower: 200,
+    work: { Kindling: 3 },
+    drops: [d('flame_organ', 1, 4, 6)], partnerSkill: 'Wings of Flame' },
+  { id: 105, name: 'Faleris',    elements: ['Fire'],             rarity: 'legendary', baseHp: 100, baseAttack: 105, baseDefense: 110, breedPower: 105,
+    work: { Kindling: 3, Transporting: 3 },
+    drops: [d('flame_organ', 1, 4, 6), d('high_quality_pal_oil', 1, 2, 4)], partnerSkill: 'Scorching Predator' },
+
+  { id: 1031, name: 'Gobfin Ignis',    variantOf: 31, elements: ['Fire'],           rarity: 'uncommon', baseHp: 90,  baseAttack: 90,  baseDefense: 90,  breedPower: 1240,
+    work: { Kindling: 2, Transporting: 1 },
+    drops: [d('flame_organ', 1, 1, 2), d('ruby', 0.05)], partnerSkill: 'Angry Shark' },
+  { id: 1039, name: 'Incineram Noct',  variantOf: 39, elements: ['Dark'],           rarity: 'rare',     baseHp: 95,  baseAttack: 105, baseDefense: 85,  breedPower: 590,
+    work: { Handiwork: 2, Mining: 1, Transporting: 2 },
+    drops: [d('horn', 1), d('leather', 1, 1, 2)], partnerSkill: 'Flameclaw Hunter' },
+  { id: 1044, name: 'Leezpunk Ignis',  variantOf: 44, elements: ['Fire'],           rarity: 'common',   baseHp: 80,  baseAttack: 100, baseDefense: 70,  breedPower: 1150,
+    work: { Kindling: 1, Handiwork: 1, Gathering: 1, Transporting: 1 },
+    drops: [d('flame_organ', 1), d('small_pal_soul', 0.2)], partnerSkill: 'Sixth Sense' },
+  { id: 1055, name: 'Chillet Ignis',   variantOf: 55, elements: ['Fire', 'Dragon'], rarity: 'rare',     baseHp: 80,  baseAttack: 80,  baseDefense: 80,  breedPower: 1230,
+    work: { Kindling: 2, Lumbering: 1 },
+    drops: [d('flame_organ', 1, 2, 3), d('leather', 1, 1, 2)], partnerSkill: 'Wriggling Weasel' },
+  { id: 1058, name: 'Pyrin Noct',      variantOf: 58, elements: ['Fire', 'Dark'],   rarity: 'rare',     baseHp: 100, baseAttack: 95,  baseDefense: 90,  breedPower: 750,
+    work: { Kindling: 2, Lumbering: 2 },
+    drops: [d('flame_organ', 1, 2, 4), d('leather', 1, 1, 2)], partnerSkill: 'Black Hare' },
+  { id: 1062, name: 'Dazzi Noct',      variantOf: 62, elements: ['Dark', 'Electric'], rarity: 'common', baseHp: 70,  baseAttack: 80,  baseDefense: 70,  breedPower: 1290,
+    work: { Electricity: 1, Handiwork: 1, Transporting: 1 },
+    drops: [d('electric_organ', 1), d('venom_gland', 0.5)], partnerSkill: 'Lady of Lightning' },
+  { id: 1072, name: 'Bushi Noct',      variantOf: 72, elements: ['Fire', 'Dark'],   rarity: 'rare',     baseHp: 80,  baseAttack: 125, baseDefense: 80,  breedPower: 640,
+    work: { Kindling: 2, Handiwork: 1, Lumbering: 3, Gathering: 1, Transporting: 2 },
+    drops: [d('ingot', 0.6, 1, 2), d('bone', 0.6)], partnerSkill: 'Brandish Blade' },
+  { id: 1075, name: 'Katress Ignis',   variantOf: 75, elements: ['Fire', 'Dark'],   rarity: 'uncommon', baseHp: 90,  baseAttack: 105, baseDefense: 70,  breedPower: 1000,
+    work: { Kindling: 2, Handiwork: 2, Transporting: 2 },
+    drops: [d('flame_organ', 1, 1, 2), d('small_pal_soul', 0.3)], partnerSkill: 'Bewitching Cat' },
+  { id: 1076, name: 'Wixen Noct',      variantOf: 76, elements: ['Fire', 'Dark'],   rarity: 'uncommon', baseHp: 90,  baseAttack: 110, baseDefense: 80,  breedPower: 790,
+    work: { Kindling: 2, Handiwork: 3, Transporting: 2 },
+    drops: [d('flame_organ', 1, 2, 3)], partnerSkill: 'Fox Fire' },
+  { id: 1081, name: 'Kelpsea Ignis',   variantOf: 81, elements: ['Fire'],           rarity: 'common',   baseHp: 70,  baseAttack: 70,  baseDefense: 70,  breedPower: 1300,
+    work: { Kindling: 1, Farming: 1 }, farmDrop: { itemId: 'flame_organ', perMinute: 0.15 },
+    drops: [d('flame_organ', 1, 1, 2)], partnerSkill: 'Flame Spray' },
+  { id: 1084, name: 'Blazehowl Noct',  variantOf: 84, elements: ['Fire', 'Dark'],   rarity: 'epic',     baseHp: 105, baseAttack: 115, baseDefense: 80,  breedPower: 480,
+    work: { Kindling: 3, Lumbering: 2 },
+    drops: [d('flame_organ', 1, 3, 5), d('bone', 0.6, 1, 2)], partnerSkill: 'Darkflame Lion' },
+  { id: 1101, name: 'Jormuntide Ignis', variantOf: 101, elements: ['Fire', 'Dragon'], rarity: 'epic', baseHp: 130, baseAttack: 130, baseDefense: 100, breedPower: 313,
+    work: { Kindling: 4 },
+    drops: [d('flame_organ', 1, 4, 7), d('high_quality_pal_oil', 1, 1, 3)], partnerSkill: 'Stormbringer Lava Dragon' },
 ];
+
+/** Paldeck label: "#031" for base species, "#031B" for a subspecies. */
+export function paldeckNumber(def: PalDef): string {
+  const base = def.variantOf ?? def.id;
+  return `#${String(base).padStart(3, '0')}${def.variantOf ? 'B' : ''}`;
+}
 
 const BY_ID = new Map(PALS.map((p) => [p.id, p]));
 

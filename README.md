@@ -42,8 +42,10 @@ that includes them.
 
 ## Status
 
-Three regions: Windswept Hills (Lv 1–15, Zoe & Grizzbolt), Marsh & Bamboo Groves (Lv 15–25,
-Lily & Lyleen) and Twilight Dunes (Lv 25–35, Axel & Orserk) — 21 routes, 8 Alphas, 89 Pals. Catching,
+Four regions: Windswept Hills (Lv 1–15, Zoe & Grizzbolt), Marsh & Bamboo Groves (Lv 15–25, Lily &
+Lyleen), Twilight Dunes (Lv 25–35, Axel & Orserk) and Mount Obsidian (Lv 35–45, Marcus & Faleris) —
+28 routes, 11 Alphas, 108 Pals including 12 subspecies (Gobfin Ignis, Pyrin Noct…). Subspecies use
+id = 1000 + base, show as `#031B`, and only come from same-species pairs or `SPECIAL_COMBOS`. Catching,
 party, Paldeck, merchant, save/export/import. Each region opens when the previous tower falls; a region
 switcher appears above the routes.
 
@@ -69,4 +71,4 @@ Tech tree: 2 tech points per level. Structures and recipes must be researched (l
 prerequisites) before they can be built or crafted; passive techs multiply click damage, party attack,
 base output, catch rate, exp and gold. Tree lives in `src/data/tech.ts`.
 
-Next: passives, region 4 (Mount Obsidian), dungeons — see DESIGN.md §10.
+Next: passives, region 5 (Astral Mountains), dungeons — see DESIGN.md §10.

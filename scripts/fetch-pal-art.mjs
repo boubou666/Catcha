@@ -38,8 +38,8 @@ async function main() {
   await mkdir(OUT, { recursive: true });
 
   const wanted = PALS.flatMap((p) => [
-    { title: `${p.name}_icon.png`, file: `${p.id}_icon.png` },
-    { title: `${p.name}.png`, file: `${p.id}.png` },
+    { title: `${p.name.replaceAll(' ', '_')}_icon.png`, file: `${p.id}_icon.png` },
+    { title: `${p.name.replaceAll(' ', '_')}.png`, file: `${p.id}.png` },
   ]);
   const todo = [];
   for (const w of wanted) if (force || !(await exists(join(OUT, w.file)))) todo.push(w);

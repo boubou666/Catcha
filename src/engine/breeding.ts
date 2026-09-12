@@ -14,7 +14,14 @@ export const INCUBATION_SEC: Record<Rarity, number> = {
  * Fixed-outcome pairs, keyed "lowerId+higherId". Palworld's specials mostly produce
  * subspecies (Jolthog Cryst, Mau Cryst…) that aren't in the roster yet — add them here as they land.
  */
-export const SPECIAL_COMBOS: Record<string, number> = {};
+export const SPECIAL_COMBOS: Record<string, number> = {
+  '9+31': 1031,    // Gobfin + Rooby        → Gobfin Ignis
+  '39+66': 1039,   // Incineram + Maraith   → Incineram Noct
+  '44+70': 1044,   // Leezpunk + Flambelle  → Leezpunk Ignis
+  '58+75': 1058,   // Pyrin + Katress       → Pyrin Noct
+  '9+81': 1081,    // Kelpsea + Rooby       → Kelpsea Ignis
+  '84+94': 1084,   // Blazehowl + Felbat    → Blazehowl Noct
+};
 
 export function comboKey(a: number, b: number): string {
   return a < b ? `${a}+${b}` : `${b}+${a}`;
@@ -22,7 +29,8 @@ export function comboKey(a: number, b: number): string {
 
 /**
  * Palworld's rule: same species breeds true; a special combo wins; otherwise the child is the
- * species whose breedPower is closest to the parents' average (ties → lower Paldeck #).
+ * base species whose breedPower is closest to the parents' average (ties → lower Paldeck #).
+ * Subspecies never come out of the formula — only from a special combo or a same-species pair.
  */
 export function childOf(aId: number, bId: number, pals: PalDef[] = PALS, combos = SPECIAL_COMBOS): number {
   if (aId === bId) return aId;
@@ -32,6 +40,7 @@ export function childOf(aId: number, bId: number, pals: PalDef[] = PALS, combos 
   let best = pals[0];
   let bestDist = Infinity;
   for (const p of pals) {
+    if (p.variantOf) continue;
     const d = Math.abs(p.breedPower - target);
     if (d < bestDist || (d === bestDist && p.id < best.id)) { best = p; bestDist = d; }
   }

@@ -1,10 +1,10 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { PALS } from '../data/pals';
+  import { PALS, paldeckNumber } from '../data/pals';
   import PalIcon from './PalIcon.svelte';
 
   const entries = $derived(
-    [...PALS].sort((a, b) => a.id - b.id).map((def) => {
+    [...PALS].sort((a, b) => (a.variantOf ?? a.id) - (b.variantOf ?? b.id) || a.id - b.id).map((def) => {
       const e = game.save.paldeck[def.id];
       return { def, seen: !!e?.seen, caught: e?.caught ?? 0 };
     }),
@@ -18,7 +18,7 @@
   {#each entries as { def, seen, caught } (def.id)}
     <div class="entry" class:caught={caught > 0} class:seen={seen && caught === 0}>
       <PalIcon palId={def.id} size={44} unknown={!seen} />
-      <div class="num">#{String(def.id).padStart(3, '0')}</div>
+      <div class="num">{paldeckNumber(def)}</div>
       <div class="name">{seen ? def.name : '???'}</div>
       {#if caught > 0}<div class="muted small">×{caught}</div>{/if}
     </div>

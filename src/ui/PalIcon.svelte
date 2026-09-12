@@ -15,7 +15,12 @@
   } = $props();
 
   const def = $derived(palById(palId));
-  const src = $derived(`${import.meta.env.BASE_URL}pals/${palId}${render ? '' : '_icon'}.png`);
+  const iconSrc = $derived(`${import.meta.env.BASE_URL}pals/${palId}_icon.png`);
+  const renderSrc = $derived(`${import.meta.env.BASE_URL}pals/${palId}.png`);
+  // A missing full render falls back to the icon before giving up on art entirely.
+  let renderMissing = $state(false);
+  $effect(() => { renderMissing = missing.has(renderSrc); });
+  const src = $derived(render && !renderMissing ? renderSrc : iconSrc);
   const colors = $derived(def.elements.map((e) => ELEMENT_COLORS[e]));
   const background = $derived(
     colors.length > 1
@@ -25,7 +30,13 @@
   const initials = $derived(unknown ? '?' : def.name.slice(0, 2).toUpperCase());
 
   let failed = $state(false);
-  $effect(() => { failed = missing.has(src); });
+  $effect(() => { failed = missing.has(iconSrc); });
+
+  function onError() {
+    missing.add(src);
+    if (src === renderSrc) renderMissing = true;
+    else failed = true;
+  }
 </script>
 
 <div
@@ -42,7 +53,7 @@
 >
   {#if !failed}
     <img {src} alt={unknown ? '???' : def.name} draggable="false"
-      onerror={() => { missing.add(src); failed = true; }} />
+      onerror={onError} />
   {:else}
     {initials}
   {/if}

@@ -93,7 +93,36 @@ const dunes: RegionDef = {
   },
 };
 
-export const REGIONS: RegionDef[] = [windswept, marsh, dunes];
+// ---------------------------------------------------------------------------
+// Region 4 — Mount Obsidian (Lv 35–45) · Marcus & Faleris
+
+const R4 = 'obsidian';
+
+const obsidian: RegionDef = {
+  id: R4, name: 'Mount Obsidian',
+  routes: ([
+    ['foothills', 'Obsidian Foothills',     36, 'Fire',   [[41, 20], [1031, 25], [1081, 25], [1044, 20], [58, 10]],          { kind: 'tower', id: 'axel' }, 220],
+    ['lava',      'Lava Flats',             38, 'Fire',   [[1058, 20], [76, 20], [72, 20], [1062, 20], [1075, 20]],          { kind: 'routeCleared', id: 'foothills' }, 240],
+    ['nightpath', 'Ashen Night Path',       39, 'Dark',   [[1039, 25], [1072, 20], [1076, 20], [97, 10], [1075, 25]],        { kind: 'routeCleared', id: 'lava' }, 260],
+    ['caldera',   'Caldera Descent',        41, 'Fire',   [[84, 20], [1084, 15], [88, 15], [74, 25], [1055, 25]],            { kind: 'alpha', id: 'helzephyr' }, 280],
+    ['furnace',   'Furnace Cavern',         42, 'Ground', [[99, 10], [88, 25], [71, 25], [98, 5], [96, 5], [67, 30]],        { kind: 'routeCleared', id: 'caldera' }, 300],
+    ['serpent',   "Serpent's Lava Lake",    44, 'Dragon', [[1101, 10], [101, 10], [1055, 20], [71, 20], [102, 10], [85, 15], [95, 15]], { kind: 'alpha', id: 'menasting' }, 320],
+    ['pidf',      'PIDF Outpost',           45, 'Fire',   [[102, 15], [96, 10], [98, 10], [74, 25], [1084, 20], [97, 20]],   { kind: 'alpha', id: 'blazamut' }, 350],
+  ] as RouteArgs[]).map((a) => route(R4, a)),
+  alphas: [
+    { id: 'helzephyr', regionId: R4, palId: 97, level: 38, hpMult: 24, unlock: { kind: 'routeCleared', id: 'nightpath' }, reward: { gold: 25000, effigies: 5 } },
+    { id: 'menasting', regionId: R4, palId: 99, level: 42, hpMult: 28, unlock: { kind: 'routeCleared', id: 'furnace' },   reward: { gold: 35000, effigies: 5 } },
+    { id: 'blazamut',  regionId: R4, palId: 96, level: 45, hpMult: 32, unlock: { kind: 'routeCleared', id: 'serpent' },   reward: { gold: 50000, effigies: 6 } },
+  ],
+  tower: {
+    id: 'marcus', regionId: R4,
+    name: 'PIDF Tower', boss: 'Marcus & Faleris', palId: 105, level: 45,
+    hp: 180_000, timeLimitSec: 600,
+    unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'blazamut' }, { kind: 'routeCleared', id: 'pidf' }] },
+  },
+};
+
+export const REGIONS: RegionDef[] = [windswept, marsh, dunes, obsidian];
 
 const ROUTES = new Map(REGIONS.flatMap((r) => r.routes).map((r) => [r.id, r]));
 const ALPHAS = new Map(REGIONS.flatMap((r) => r.alphas).map((a) => [a.id, a]));

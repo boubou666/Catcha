@@ -5,7 +5,7 @@ import { assignWorker } from './base';
 import { condenseCandidates } from './condense';
 import { applyOffline } from './offline';
 import {
-  BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, breedable, childOf, clearPair,
+  BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, SPECIAL_COMBOS, breedable, childOf, clearPair, comboKey,
   pairBlocker, setPair, tickBreeding,
 } from './breeding';
 import { PALS, palById } from '../data/pals';
@@ -132,5 +132,22 @@ describe('migration', () => {
     expect(s.version).toBe(SAVE_VERSION);
     expect(s.base.breeding).toBeNull();
     expect(s.base.eggs).toEqual([]);
+  });
+});
+
+describe('subspecies', () => {
+  it('never come out of the average formula, only from combos or same-species pairs', () => {
+    for (const a of PALS) for (const b of PALS) {
+      const child = palById(childOf(a.id, b.id));
+      if (child.variantOf) {
+        const viaCombo = SPECIAL_COMBOS[comboKey(a.id, b.id)] === child.id;
+        expect(viaCombo || (a.id === b.id && a.id === child.id)).toBe(true);
+      }
+    }
+  });
+  it('real combos produce the subspecies', () => {
+    expect(palById(childOf(9, 31)).name).toBe('Gobfin Ignis');
+    expect(palById(childOf(75, 58)).name).toBe('Pyrin Noct');
+    expect(childOf(1031, 1031)).toBe(1031);
   });
 });
