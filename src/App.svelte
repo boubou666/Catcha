@@ -20,25 +20,39 @@
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
 
-  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'expedition' | 'tech' | 'paldeck' | 'items' | 'shop' | 'achievements' | 'daily' | 'settings' | 'prestige' | 'compare';
-  const TABS: { id: Tab; label: string }[] = [
-    { id: 'party', label: 'Party' },
-    { id: 'box', label: 'Box' },
-    { id: 'compare', label: 'Compare' },
-    { id: 'base', label: 'Base' },
-    { id: 'craft', label: 'Craft' },
-    { id: 'breed', label: 'Breeding' },
-    { id: 'expedition', label: 'Expeditions' },
-    { id: 'tech', label: 'Tech' },
-    { id: 'paldeck', label: 'Paldeck' },
-    { id: 'items', label: 'Items' },
-    { id: 'shop', label: 'Merchant' },
-    { id: 'daily', label: 'Daily' },
-    { id: 'achievements', label: 'Achievements' },
-    { id: 'prestige', label: 'Ascension' },
-    { id: 'settings', label: 'Settings' },
+  type Tab = 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings';
+  type Group = { id: string; label: string; tabs: { id: Tab; label: string }[] };
+  const GROUPS: Group[] = [
+    { id: 'pals', label: 'Pals', tabs: [
+      { id: 'party', label: 'Party' }, { id: 'box', label: 'Box' }, { id: 'compare', label: 'Compare' },
+      { id: 'paldeck', label: 'Paldeck' }, { id: 'breed', label: 'Breeding' },
+    ] },
+    { id: 'base', label: 'Base', tabs: [
+      { id: 'base', label: 'Base' }, { id: 'craft', label: 'Craft' }, { id: 'items', label: 'Items' },
+      { id: 'shop', label: 'Merchant' }, { id: 'expedition', label: 'Expeditions' },
+    ] },
+    { id: 'progress', label: 'Progress', tabs: [
+      { id: 'tech', label: 'Tech' }, { id: 'daily', label: 'Daily' }, { id: 'achievements', label: 'Achievements' },
+      { id: 'prestige', label: 'Ascension' }, { id: 'settings', label: 'Settings' },
+    ] },
   ];
-  let tab = $state<Tab>('party');
+  const groupOf = (t: Tab) => GROUPS.find((g) => g.tabs.some((x) => x.id === t))!;
+
+  const UI_KEY = 'catcha.ui.tab';
+  const stored = (() => { try { return localStorage.getItem(UI_KEY) as Tab | null; } catch { return null; } })();
+  let tab = $state<Tab>(stored && GROUPS.some((g) => g.tabs.some((x) => x.id === stored)) ? stored : 'party');
+  const group = $derived(groupOf(tab));
+  // last tab visited in each group, so switching groups lands where you were
+  const lastInGroup = $state<Record<string, Tab>>({});
+
+  function select(t: Tab) {
+    tab = t;
+    lastInGroup[groupOf(t).id] = t;
+    try { localStorage.setItem(UI_KEY, t); } catch { /* ignore */ }
+  }
+  function selectGroup(g: Group) {
+    select(lastInGroup[g.id] ?? g.tabs[0].id);
+  }
 
   onMount(() => game.start());
 </script>
@@ -52,9 +66,14 @@
       <RouteView />
     </section>
     <section class="right">
+      <nav class="groups">
+        {#each GROUPS as g (g.id)}
+          <button class:active={group.id === g.id} onclick={() => selectGroup(g)}>{g.label}</button>
+        {/each}
+      </nav>
       <nav class="tabs">
-        {#each TABS as t}
-          <button class:active={tab === t.id} onclick={() => (tab = t.id)}>{t.label}</button>
+        {#each group.tabs as t (t.id)}
+          <button class:active={tab === t.id} onclick={() => select(t.id)}>{t.label}</button>
         {/each}
       </nav>
       <div class="panel tab-body">
@@ -82,6 +101,9 @@
   .app { max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
   main { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr); gap: 1rem; }
   @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+  .groups { display: flex; gap: 0.25rem; margin-bottom: 0.4rem; }
+  .groups button { flex: 1; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8rem; }
+  .groups button.active { background: var(--accent); color: #1a1a1a; border-color: transparent; }
   .tabs { display: flex; gap: 0.25rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
   .tabs button { border-radius: 6px 6px 0 0; }
   .tabs button.active { background: var(--panel); border-color: var(--accent); color: var(--accent); }
