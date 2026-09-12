@@ -1,10 +1,16 @@
 // Catcha service worker: installability + offline play.
 // index.html is network-first (so deploys show up on reload); hashed assets and images are cache-first.
-const VERSION = 'catcha-v1';
+// __VERSION__ is replaced at build time, so each deploy produces a new worker and the page can offer a reload.
+const VERSION = 'catcha-__VERSION__';
 const SHELL = ['./', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // No skipWaiting here: the new worker waits until the page asks (user clicked "Reload").
+  event.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)));
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

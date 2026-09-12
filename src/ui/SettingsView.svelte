@@ -38,6 +38,8 @@
     if (window.confirm('Delete your save and start over? This cannot be undone.')) game.reset();
   }
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const version = __APP_VERSION__;
+  const builtAt = __BUILT_AT__;
 </script>
 
 <h2>Settings</h2>
@@ -85,6 +87,11 @@
     <span class="grow"></span>
     <button class="small danger" onclick={doReset}>Reset game</button>
   </div>
+</section>
+
+<section>
+  <h3>About</h3>
+  <p class="muted small">Catcha version <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
 </section>
 
 <style>

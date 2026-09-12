@@ -9,7 +9,9 @@ Design notes: [DESIGN.md](DESIGN.md).
 Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Catcha/**
 
 It installs as a PWA (Chrome/Edge: install icon in the address bar; Android: "Add to Home screen"; iOS Safari:
-Share → Add to Home Screen) and keeps working offline after the first load.
+Share → Add to Home Screen) and keeps working offline after the first load. When a new version is deployed, open tabs show a
+"Reload" banner (checked on every visit, every 30 minutes, and whenever the tab regains focus); Settings
+→ About shows the running version.
 
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.
