@@ -1,17 +1,20 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { ACHIEVEMENTS, categoryLabel, POINT_GOLD_BONUS, type AchievementCategory, type AchievementDef } from '../data/achievements';
-  import { achievementPoints, isUnlocked, progressOf, totalPoints } from '../engine/achievements';
+  import { ACHIEVEMENTS, categoryLabel, POINT_GOLD_BONUS } from '../data/achievements';
+  import { achievementPoints, totalPoints } from '../engine/achievements';
+  import { ACH_CATEGORIES, ACH_SORT_LABEL, ACH_STATUS_LABEL, DEFAULT_ACH_FILTER, filterAchievements, groupByCategory, isAchFiltering, type AchievementFilter } from '../engine/achievementfilter';
 
   const save = $derived(game.save);
   const points = $derived(achievementPoints(save));
   const unlockedCount = $derived(save.achievements.length);
 
-  const groups = $derived.by(() => {
-    const m = new Map<AchievementCategory, AchievementDef[]>();
-    for (const a of ACHIEVEMENTS) m.set(a.category, [...(m.get(a.category) ?? []), a]);
-    return [...m.entries()];
-  });
+  let filter = $state<AchievementFilter>({ ...DEFAULT_ACH_FILTER });
+  let open = $state(false);
+  const shown = $derived(filterAchievements(save, filter));
+  // a sorted list reads better flat; the default keeps the category sections
+  const groups = $derived(filter.sort === 'default' ? groupByCategory(shown) : [[null, shown] as const]);
+  const filtering = $derived(isAchFiltering(filter));
+  const clear = () => { filter = { ...DEFAULT_ACH_FILTER, sort: filter.sort }; };
 
   const fmt = (n: number) => (Number.isInteger(n) ? n.toLocaleString() : n.toFixed(1));
 </script>
@@ -20,15 +23,37 @@
   <h2 class="grow">Achievements <span class="muted">{unlockedCount} / {ACHIEVEMENTS.length}</span></h2>
   <span class="points">🏆 {points} / {totalPoints} pts · +{Math.round(points * POINT_GOLD_BONUS * 100)}% gold</span>
 </div>
+<div class="row">
+  <input type="search" placeholder="Search achievements…" bind:value={filter.query} aria-label="Search achievements" />
+  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+  {#if filtering}<span class="muted small">{shown.length} of {ACHIEVEMENTS.length}</span>{/if}
+</div>
+{#if open}
+  <div class="filters">
+    <select bind:value={filter.category} aria-label="Category">
+      <option value="any">Any category</option>
+      {#each ACH_CATEGORIES as c}<option value={c}>{categoryLabel(c)}</option>{/each}
+    </select>
+    <select bind:value={filter.status} aria-label="Status">
+      {#each Object.entries(ACH_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    </select>
+    <select bind:value={filter.sort} aria-label="Sort">
+      {#each Object.entries(ACH_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+    </select>
+    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+  </div>
+{/if}
 <p class="muted small">Every point is +{POINT_GOLD_BONUS * 100}% gold from defeated Pals, permanently.</p>
 
-{#each groups as [category, list] (category)}
+{#if shown.length === 0}
+  <p class="muted">No achievement matches. <button class="small" onclick={clear}>Clear filters</button></p>
+{/if}
+
+{#each groups as [category, list] (category ?? 'all')}
   <section>
-    <h3>{categoryLabel(category)} <span class="muted">{list.filter((a) => isUnlocked(save, a.id)).length} / {list.length}</span></h3>
+    {#if category}<h3>{categoryLabel(category)} <span class="muted">{list.filter((r) => r.done).length} / {list.length}</span></h3>{/if}
     <div class="grid">
-      {#each list as a (a.id)}
-        {@const done = isUnlocked(save, a.id)}
-        {@const value = progressOf(save, a)}
+      {#each list as { def: a, done, value } (a.id)}
         <div class="ach" class:done>
           <div class="row top">
             <b class="grow">{a.name}</b>
@@ -54,4 +79,8 @@
   .pts { font-size: 0.8rem; color: var(--muted); }
   .bar { height: 5px; }
   .ach.done .bar > span { background: var(--ok); }
+  input[type='search'] { min-width: 10rem; flex: 1; max-width: 18rem; }
+  button.active { border-color: var(--accent); color: var(--accent); }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.5rem 0; padding: 0.5rem; background: var(--panel-2); border-radius: var(--radius); }
+  .filters select { font-size: 0.85rem; }
 </style>
