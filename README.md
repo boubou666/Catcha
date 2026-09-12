@@ -27,7 +27,7 @@ npm run dev
 | `npm run check` | Type-check `.ts` and `.svelte` files   |
 | `npm test`      | Vitest — engine unit tests             |
 | `npm run fetch-art` | Download Pal art into `public/pals/` (see below) |
-| `npm run balance` | Print the headless balance model (kill / boss / tower / raid times per region) |
+| `npm run balance` | Print the headless balance model (per-region times, plus hours per run across ascensions; `-- --runs N`) |
 | `npm run fetch-data` | Regenerate `src/data/pals.ts`, `combos.ts` and drop items from the wiki (`--dry-run` to preview) |
 
 ## Layout

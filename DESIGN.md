@@ -177,7 +177,9 @@ towerHp              = 50k → 1.15M across regions; ~60–65% of the 10-min lim
 
 Balance is checked with `npm run balance`, a headless model that assumes a reasonable party per region
 (top species at route level, stars by region, attack techs by level) and prints kill / Alpha / tower / realm /
-raid times and hours per region. Targets: 4–6 s on-level kills, Alphas 2–4 min, towers 60–65%, raids 75–95%.
+raid times and hours per region. Targets: 4–6 s on-level kills, Alphas 2–4 min, towers 60–65%, raids 75–95%. The same script simulates
+ascensions (relics per full clear, greedy spending, Ark Pals carried at Lv 70 ★4): a full clear takes ~38 h
+fresh, ~20 h after one ascension, and floors at ~9 h once the tree is maxed around the ninth run.
 
 ## 9. Architecture
 

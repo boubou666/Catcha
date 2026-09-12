@@ -20,7 +20,8 @@ export interface PrestigeUpgradeDef {
 
 export const BASE_ARK = 1;            // Pals you can always carry through
 
-const linear = (base: number) => (level: number) => base * level;
+// base × level × (1 + 0.3·(level−1)): 2 → 2, 5, 10, 15, 22 — the full tree is ~440 relics, about nine full clears.
+const linear = (base: number) => (level: number) => Math.round(base * level * (1 + 0.3 * (level - 1)));
 
 export const PRESTIGE_UPGRADES: PrestigeUpgradeDef[] = [
   { id: 'power', name: 'Ancient Power', desc: '+10% party attack per level.', maxLevel: 5, cost: linear(2), effect: { kind: 'mult', stat: 'attack', perLevel: 0.1 } },
