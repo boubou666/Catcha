@@ -5,7 +5,7 @@ import { newStats } from './achievements';
 import { newTutorial, TUTORIAL } from './tutorial';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 18;
+export const SAVE_VERSION = 19;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -128,6 +128,14 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 17) {
     s.stats = { ...newStats(), ...(s.stats ?? {}) };   // new counters start at zero
     s.version = 18;
+  }
+  if (s.version === 18) {
+    // the wiki drop 'low_grade_medical_supplies' was a duplicate of the Medicine consumable
+    const inv = s.inventory ?? {};
+    const dupe = inv.low_grade_medical_supplies ?? 0;
+    if (dupe > 0) inv.low_grade_medical = (inv.low_grade_medical ?? 0) + dupe;
+    delete inv.low_grade_medical_supplies;
+    s.version = 19;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

@@ -23,6 +23,7 @@ const WORK = {
 const ITEM_ALIAS = {
   'Paldium Fragment': 'paldium', 'Pal Sphere': 'sphere_pal', 'Mega Sphere': 'sphere_mega', 'Giga Sphere': 'sphere_giga',
   'Hyper Sphere': 'sphere_hyper', 'Ultra Sphere': 'sphere_ultra', 'Legendary Sphere': 'sphere_legendary',
+  'Low Grade Medical Supplies': 'low_grade_medical',   // the SAN consumable made by Medicine Pals
 };
 const FOOD_WORDS = /meat|mutton|poultry|pork|venison|egg|berries|mushroom|honey|milk|raw |cotton candy|tomato|lettuce|wheat|seeds|cake|jam/i;
 

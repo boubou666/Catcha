@@ -59,7 +59,6 @@ export const ITEMS: ItemDef[] = [
   F('tomato_seeds', 'Tomato Seeds'),
   F('wheat_seeds', 'Wheat Seeds'),
   // ---- generated drop items (scripts/fetch-pal-data.mjs) ----
-  { id: 'low_grade_medical_supplies', name: 'Low Grade Medical Supplies', category: 'material' },
   { id: 'gumoss_leaf', name: 'Gumoss Leaf', category: 'material' },
   { id: 'high_grade_technical_manual', name: 'High Grade Technical Manual', category: 'material' },
   { id: 'killamari_tentacle', name: 'Killamari Tentacle', category: 'material' },

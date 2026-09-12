@@ -175,6 +175,11 @@ element; filter by status (caught / seen / never seen), region (met on its route
 work, rarity, subspecies only; sort by number, name, copies or rarity. Pals you haven't seen only ever
 match by number and region, and sort last, so the filters don't reveal what a "???" entry is.
 
+Items (Base → Items) lists what you hold with where each item comes from (Pals that drop or farm it, base
+jobs, the merchant, recipes) and what consumes it (recipes, structures); search matches all of that, and
+filters cover category, "used in crafting or building", "show items I don't have" and sort by name / count /
+category (`src/engine/itemsfilter.ts`).
+
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
 breeding rank, status — with the best value per row highlighted.

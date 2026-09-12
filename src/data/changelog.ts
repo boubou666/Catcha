@@ -21,6 +21,8 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Base: the Workers list and the Assign picker get the same search and filters, plus a Work suitability sort that follows the job you filter on.',
       'Breeding: parents are picked from a searchable, filterable list; with one parent chosen, every candidate shows the offspring it would give and the search matches that too.',
       'Compare: Pals are added from a searchable, filterable list instead of a dropdown.',
+      'Items: each item now shows where it comes from and what uses it; search and filter by category, usage, missing items, and sort.',
+      'Fix: Low Grade Medical Supplies dropped by Pals were a separate item from the Medicine consumable — merged, so drops now treat workers.',
     ],
   },
   {
