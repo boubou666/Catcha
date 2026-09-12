@@ -29,6 +29,7 @@ import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
 import { buy, sell } from '../engine/shop';
+import { classifyLog, type LogEntry } from '../engine/logfilter';
 import { advanceTutorial, currentStep, finishTutorial } from '../engine/tutorial';
 import { condense } from '../engine/condense';
 import { instanceByUid } from '../engine/party';
@@ -36,7 +37,7 @@ import { instanceByUid } from '../engine/party';
 const AUTOSAVE_MS = 30_000;
 const TICK_MS = 100;
 const MAX_TICK_MS = 5_000; // anything longer is a suspend/sleep gap and goes through applyOffline
-const LOG_LINES = 12;
+const LOG_LINES = 200;
 
 export type ToastKind = 'info' | 'success' | 'gold' | 'warn';
 
@@ -47,7 +48,7 @@ export type GameEvent =
 export class Game {
   save = $state<SaveState>(newState());
   wild = $state<Wild | null>(null);
-  log = $state<string[]>([]);
+  log = $state<LogEntry[]>([]);
 
   /** Transient notifications shown by the Toasts component. */
   toasts = $state<{ id: number; text: string; kind: ToastKind }[]>([]);
@@ -461,8 +462,8 @@ export class Game {
     this.push('New game.');
   }
 
-  private push(line: string) {
-    this.log = [line, ...this.log].slice(0, LOG_LINES);
+  private push(text: string) {
+    this.log = [{ at: Date.now(), kind: classifyLog(text), text }, ...this.log].slice(0, LOG_LINES);
   }
 }
 

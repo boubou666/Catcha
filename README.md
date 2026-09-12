@@ -212,7 +212,9 @@ progress / locked) and element filters; results group by region and travel on cl
 (`src/engine/routefilter.ts`). Without a filter the panel shows the current region as before. The Bosses
 panel does the same over Alphas, towers, Sealed Realms and raids across reachable regions (name, kind,
 region, element, level; beaten / available / locked; element), starting the fight on click
-(`src/engine/bossfilter.ts`).
+(`src/engine/bossfilter.ts`). The Log keeps the last 200 entries of the session with a time and a category
+inferred from the message (`classifyLog` in `src/engine/logfilter.ts`); it shows the recent dozen, expands
+on demand, and has a search plus a category select.
 
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
