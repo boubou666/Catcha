@@ -37,6 +37,8 @@ export const SPECIAL_COMBOS: Record<string, number> = {
   '6+86': 1086,    // Broncherry + Fuack    → Broncherry Aqua
   '101+102': 1102, // Suzaku + Jormuntide   → Suzaku Aqua
   '99+104': 1104,  // Lyleen + Menasting    → Lyleen Noct
+  '13+47': 1047,   // Robinquill + Gumoss   → Robinquill Terra
+  '65+67': 1065,   // Surfent + Digtoise    → Surfent Terra
 };
 
 export function comboKey(a: number, b: number): string {

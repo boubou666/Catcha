@@ -79,6 +79,10 @@ export const TECHS: TechDef[] = [
   M('capture_3', 'Capture Technique III', 50, 7, 'catch', 1.25, '+25% catch rate.', ['capture_2']),
   M('labor_5', 'Efficient Labor V', 50, 7, 'base', 1.35, '+35% base output.', ['labor_4']),
   M('training_6', 'Pal Training VI', 50, 7, 'attack', 1.35, '+35% party attack.', ['training_5']),
+  // level 60
+  M('capture_4', 'Capture Technique IV', 60, 8, 'catch', 1.3, '+30% catch rate.', ['capture_3']),
+  M('labor_6', 'Efficient Labor VI', 60, 8, 'base', 1.4, '+40% base output.', ['labor_5']),
+  M('training_7', 'Pal Training VII', 60, 8, 'attack', 1.4, '+40% party attack.', ['training_6']),
 ];
 
 const BY_ID = new Map(TECHS.map((t) => [t.id, t]));

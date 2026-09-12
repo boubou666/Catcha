@@ -55,7 +55,7 @@ Regions, in order, each = a set of routes + Alphas + one tower:
 | 4 | Mount Obsidian         | Marcus & Faleris        | 35–45 | ✓ |
 | 5 | Astral Mountains       | Victor & Shadowbeak     | 45–55 | ✓ |
 | 6 | Sakurajima             | Saya & Selyne           | 55–62 | ✓ |
-| 7 | Feybreak               | Bjorn & Bastigor        | 60+ |
+| 7 | Feybreak               | Bjorn & Bastigor        | 62–70 | ✓ |
 
 Gating: routes unlock by reaching the previous route's kill quota or beating an Alpha. Tower unlocks after all Alphas in the region. Next region unlocks after the tower.
 

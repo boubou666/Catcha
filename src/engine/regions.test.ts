@@ -145,3 +145,23 @@ describe('region 6', () => {
     expect(palById(towerById('saya').palId).name).toBe('Selyne');
   });
 });
+
+describe('region 7', () => {
+  it('opens after the Saya tower and ends at Bjorn & Bastigor', () => {
+    const save = newState();
+    expect(isUnlocked(save, routeById('shore').unlock)).toBe(false);
+    save.progress.towers.push('saya');
+    expect(isUnlocked(save, routeById('shore').unlock)).toBe(true);
+    save.progress.alphas.push('omascul', 'azurmane', 'bellanoir');
+    save.progress.routeKills.peak = 800;
+    expect(isUnlocked(save, towerById('bjorn').unlock)).toBe(true);
+    expect(palById(towerById('bjorn').palId).name).toBe('Bastigor');
+  });
+  it('the seven towers chain in order', () => {
+    const order = ['rayne', 'lily', 'axel', 'marcus', 'victor', 'saya', 'bjorn'];
+    expect(REGIONS.map((r) => r.tower.id)).toEqual(order);
+    for (let i = 1; i < REGIONS.length; i++) {
+      expect(REGIONS[i].routes[0].unlock).toEqual({ kind: 'tower', id: order[i - 1] });
+    }
+  });
+});

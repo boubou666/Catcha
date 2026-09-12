@@ -180,7 +180,36 @@ const sakurajima: RegionDef = {
   },
 };
 
-export const REGIONS: RegionDef[] = [windswept, marsh, dunes, obsidian, astral, sakurajima];
+// ---------------------------------------------------------------------------
+// Region 7 — Feybreak (Lv 62–70) · Bjorn & Bastigor
+
+const R7 = 'feybreak';
+
+const feybreak: RegionDef = {
+  id: R7, name: 'Feybreak',
+  routes: ([
+    ['shore',     'Feybreak Shore',       63, 'Water',   [[139, 30], [140, 25], [138, 10], [1065, 15], [1082, 20]],           { kind: 'tower', id: 'saya' }, 680],
+    ['wetlands',  'Feybreak Wetlands',    64, 'Ground',  [[1047, 20], [1048, 20], [1092, 15], [137, 30], [1095, 15]],          { kind: 'routeCleared', id: 'shore' }, 700],
+    ['ghostwood', 'Ghostwood',            65, 'Dark',    [[127, 25], [134, 20], [132, 10], [141, 20], [133, 25]],              { kind: 'routeCleared', id: 'wetlands' }, 720],
+    ['starfall',  'Starfall Plateau',     66, 'Neutral', [[128, 15], [129, 15], [131, 15], [135, 15], [1097, 15], [137, 25]],  { kind: 'alpha', id: 'omascul' }, 740],
+    ['embers',    'Feybreak Embers',      67, 'Fire',    [[130, 30], [1138, 10], [1140, 25], [1141, 20], [1096, 5], [131, 10]], { kind: 'routeCleared', id: 'starfall' }, 760],
+    ['terra',     'Terra Ruins',          68, 'Ground',  [[1099, 15], [1092, 20], [1105, 10], [142, 2], [129, 25], [132, 28]], { kind: 'alpha', id: 'azurmane' }, 780],
+    ['peak',      "Bastigor's Peak",      70, 'Ice',     [[138, 20], [1082, 20], [128, 20], [130, 15], [142, 3], [1096, 7], [135, 15]], { kind: 'alpha', id: 'bellanoir' }, 800],
+  ] as RouteArgs[]).map((a) => route(R7, a)),
+  alphas: [
+    { id: 'omascul',   regionId: R7, palId: 132, level: 65, hpMult: 40, unlock: { kind: 'routeCleared', id: 'ghostwood' }, reward: { gold: 800000, effigies: 10 } },
+    { id: 'azurmane',  regionId: R7, palId: 135, level: 67, hpMult: 44, unlock: { kind: 'routeCleared', id: 'embers' },    reward: { gold: 1200000, effigies: 10 } },
+    { id: 'bellanoir', regionId: R7, palId: 142, level: 69, hpMult: 50, unlock: { kind: 'routeCleared', id: 'terra' },     reward: { gold: 2000000, effigies: 12 } },
+  ],
+  tower: {
+    id: 'bjorn', regionId: R7,
+    name: 'Feybreak Tower', boss: 'Bjorn & Bastigor', palId: 136, level: 70,
+    hp: 600_000, timeLimitSec: 600,
+    unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'bellanoir' }, { kind: 'routeCleared', id: 'peak' }] },
+  },
+};
+
+export const REGIONS: RegionDef[] = [windswept, marsh, dunes, obsidian, astral, sakurajima, feybreak];
 
 const ROUTES = new Map(REGIONS.flatMap((r) => r.routes).map((r) => [r.id, r]));
 const ALPHAS = new Map(REGIONS.flatMap((r) => r.alphas).map((a) => [a.id, a]));
