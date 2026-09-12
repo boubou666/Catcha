@@ -8,7 +8,7 @@
 // priority; Ark Pals come through at the previous run's end (Lv 70, ★4, best species) and replace party
 // slots; Quick Feet shrinks quotas; Scholar speeds levelling.
 
-import { REGIONS } from '../src/data/regions.ts';
+import { ALPHA_TIME_LIMIT_SEC, REGIONS } from '../src/data/regions.ts';
 import { DUNGEONS } from '../src/data/dungeons.ts';
 import { RAIDS } from '../src/data/raids.ts';
 import { PALS, palById } from '../src/data/pals.ts';
@@ -60,7 +60,7 @@ function partyDps(save, region, level, stars, carried) {
 function playThrough(save, carried, verbose) {
   const expMult = 1.2 * prestigeMult(save, 'exp'); // Field Study + Scholar
   let total = 0;
-  if (verbose) console.log(pad('region', 24), pad('lvl', 4), pad('dps', 7), pad('wild', 7), pad('alpha', 14), pad('tower', 14), pad('realm', 12), pad('kills/lv', 9), pad('region h', 9));
+  if (verbose) console.log(pad('region', 24), pad('lvl', 4), pad('dps', 7), pad('wild', 7), pad('alpha (% of limit)', 22), pad('tower', 14), pad('realm', 12), pad('kills/lv', 9), pad('region h', 9));
   const perRegion = [];
   REGIONS.forEach((region, i) => {
     const top = region.routes[region.routes.length - 1].level;
@@ -82,7 +82,7 @@ function playThrough(save, carried, verbose) {
     perRegion.push(seconds / 3600);
     if (verbose) console.log(
       pad(region.name, 24), pad(top, 4), pad(dps.toFixed(0), 7), pad(fmt(wildS), 7),
-      pad(alphaTimes.map(fmt).join('/'), 14), pad(`${fmt(towerS)} (${Math.round((towerS / region.tower.timeLimitSec) * 100)}%)`, 14),
+      pad(alphaTimes.map((t) => `${fmt(t)}(${Math.round((t / ALPHA_TIME_LIMIT_SEC) * 100)}%)`).join('/'), 22), pad(`${fmt(towerS)} (${Math.round((towerS / region.tower.timeLimitSec) * 100)}%)`, 14),
       pad(`${fmt(realmS)} (${Math.round((realmS / dungeon.timeLimitSec) * 100)}%)`, 12),
       pad(killsPerLevel.toFixed(0), 9), pad(`${(seconds / 3600).toFixed(1)} (Σ${(total / 3600).toFixed(1)})`, 9),
     );

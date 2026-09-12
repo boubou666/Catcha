@@ -227,3 +227,5 @@ export const alphaById = (id: string) => must(ALPHAS, id, 'alpha');
 export const towerById = (id: string) => must(TOWERS, id, 'tower');
 export const regionById = (id: string) => must(REGION_BY_ID, id, 'region');
 export const STARTING_ROUTE = 'plateau';
+/** Alpha fights are timed like towers; the model puts an on-curve party at 45 s – 3.7 min, so 5 min leaves room. */
+export const ALPHA_TIME_LIMIT_SEC = 300;

@@ -1,6 +1,6 @@
 import type { DailyReset, RouteDef, SaveState, SpherePolicy, SphereTier } from '../data/types';
 import { palById } from '../data/pals';
-import { alphaById, regionById, REGIONS, routeById, towerById } from '../data/regions';
+import { ALPHA_TIME_LIMIT_SEC, alphaById, regionById, REGIONS, routeById, towerById } from '../data/regions';
 import { SPHERES } from '../data/spheres';
 import { clearSave, exportSave, importSave, loadState, newState, persist } from '../engine/save';
 import { applyDefeat, partyDps, spawnBoss, spawnWild, type Wild } from '../engine/combat';
@@ -344,8 +344,8 @@ export class Game {
   startAlpha(id: string) {
     const a = alphaById(id);
     if (!isUnlocked(this.save, a.unlock)) return;
-    this.wild = spawnBoss(a.palId, a.level, wildHp(a.level) * a.hpMult, 'alpha', id);
-    this.push(`Alpha ${palById(a.palId).name} appears!`);
+    this.wild = spawnBoss(a.palId, a.level, wildHp(a.level) * a.hpMult, 'alpha', id, Date.now() + ALPHA_TIME_LIMIT_SEC * 1000);
+    this.push(`Alpha ${palById(a.palId).name} appears — ${ALPHA_TIME_LIMIT_SEC / 60} minutes on the clock.`);
   }
 
   startTower(id: string) {

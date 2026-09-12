@@ -77,7 +77,8 @@ src/
   ui/       Svelte components, one per screen
 ```
 
-Balance knobs live in `src/engine/formulas.ts` and `src/data/spheres.ts`.
+Balance knobs live in `src/engine/formulas.ts` and `src/data/spheres.ts`. Alpha fights have a 5-minute clock
+(`ALPHA_TIME_LIMIT_SEC` in `src/data/regions.ts`); towers, realms and raids carry their own limits.
 
 ## Data
 

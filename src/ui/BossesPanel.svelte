@@ -1,6 +1,7 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
+  import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { describeRequirement, isUnlocked } from '../engine/progress';
   import { dungeonsOf } from '../data/dungeons';
   import { bossName, dungeonClears, dungeonUnlocked } from '../engine/dungeon';
@@ -82,7 +83,7 @@
       {@const unlocked = isUnlocked(game.save, a.unlock)}
       {@const done = game.save.progress.alphas.includes(a.id)}
       <button disabled={!unlocked || game.inBossFight} onclick={() => game.startAlpha(a.id)}
-        title={unlocked ? '' : describeRequirement(a.unlock)}>
+        title={unlocked ? `${ALPHA_TIME_LIMIT_SEC / 60} minutes to win. ${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time.` : describeRequirement(a.unlock)}>
         Alpha {palById(a.palId).name} Lv {a.level}{done ? ' ✓' : ''}
       </button>
     {/each}

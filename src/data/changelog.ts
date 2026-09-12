@@ -18,6 +18,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'A compact two-line header on phones: the search folds behind a 🔍 button and the numbers become chips.',
       'A one-line arena bar on phones with a tall ⚔ Attack button.',
       'Tighter tab rows on phones.',
+      'Alpha fights are now timed: 5 minutes to win, like the towers’ 10.',
       'The page no longer scrolls as a whole — the columns scroll on their own, so the header and arena stay put.',
     ],
   },
