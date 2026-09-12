@@ -6,14 +6,14 @@ export type Sfx =
 
 const PREF_KEY = 'catcha.sound';
 
-export interface SoundPref { enabled: boolean; volume: number }
+export interface SoundPref { enabled: boolean; volume: number; haptics: boolean }
 
 export function loadPref(): SoundPref {
   try {
     const raw = localStorage.getItem(PREF_KEY);
-    if (raw) { const p = JSON.parse(raw); return { enabled: !!p.enabled, volume: Math.min(1, Math.max(0, Number(p.volume) || 0.5)) }; }
+    if (raw) { const p = JSON.parse(raw); return { enabled: !!p.enabled, volume: Math.min(1, Math.max(0, Number(p.volume) || 0.5)), haptics: p.haptics !== false }; }
   } catch { /* ignore */ }
-  return { enabled: true, volume: 0.5 };
+  return { enabled: true, volume: 0.5, haptics: true };
 }
 
 export function savePref(p: SoundPref): void {
@@ -113,4 +113,39 @@ export function play(name: Sfx): void {
     if (!a || a.ctx.state !== 'running') return;
     SOUNDS[name](a, a.ctx.currentTime);
   } catch { /* audio is best-effort */ }
+}
+
+// ---- haptics -------------------------------------------------------------------------------
+// navigator.vibrate: Android browsers yes, iOS Safari no (silently unsupported). Only on touch devices.
+
+const PATTERNS: Partial<Record<Sfx, number | number[]>> = {
+  click: 8,
+  defeat: 20,
+  caught: [20, 40, 30],
+  catchFailed: 60,
+  levelUp: [30, 30, 30, 30, 70],
+  bossWin: [50, 40, 50, 40, 120],
+  towerWin: [60, 40, 60, 40, 60, 40, 200],
+  hatched: [20, 30, 40],
+  achievement: [40, 50, 90],
+  questClaimed: [20, 20, 20],
+  luckySpawn: [15, 30, 15, 30, 15, 30, 60],
+  summon: 250,
+  realmClear: [40, 40, 90],
+  ascend: [80, 60, 80, 60, 80, 60, 300],
+};
+
+let coarse: boolean | null = null;
+export function hapticsAvailable(): boolean {
+  if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return false;
+  if (coarse === null) coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  return coarse;
+}
+
+/** Vibrate for an event if the device can and the preference allows. */
+export function buzz(name: Sfx): void {
+  if (!pref.haptics || !hapticsAvailable() || document.hidden) return;
+  const pattern = PATTERNS[name];
+  if (!pattern) return;
+  try { navigator.vibrate(pattern); } catch { /* best-effort */ }
 }

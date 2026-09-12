@@ -23,7 +23,7 @@
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
-  import { play } from './ui/sfx';
+  import { play, buzz } from './ui/sfx';
   import Toasts from './ui/Toasts.svelte';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings';
@@ -75,7 +75,7 @@
 
   onMount(() => {
     const stop = game.start();
-    const off = game.on((e) => play(e));
+    const off = game.on((e) => { play(e); buzz(e); });
     return () => { stop(); off(); };
   });
 </script>

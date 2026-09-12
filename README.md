@@ -16,7 +16,8 @@ returns, Lucky spawns, new daily quests and ascension; click one to dismiss.
 
 Sound effects are synthesized with the Web Audio API (no audio files): clicks and click-kills, catches, level-ups,
 boss and tower wins, hatches, achievements, quests, Lucky spawns, raid summons, ascension. Toggle and volume
-under Settings, stored per device.
+under Settings, stored per device. On touch devices with `navigator.vibrate` (Android browsers; not iOS
+Safari) the same events also give short haptic buzzes — toggle in Settings.
 
 Works on phones: below 800 px the arena becomes a sticky bar under the header and the routes, bosses and
 log move into a World tab group; touch targets are enlarged.

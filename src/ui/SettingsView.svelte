@@ -3,13 +3,15 @@
   import { dayKey, msUntilRollover } from '../engine/daily';
   import { formatDuration } from './format';
   import type { DailyReset } from '../data/types';
-  import { getPref, play, setPref } from './sfx';
+  import { buzz, getPref, hapticsAvailable, play, setPref } from './sfx';
 
   let sound = $state(getPref());
-  function setSound(next: { enabled?: boolean; volume?: number }) {
+  function setSound(next: { enabled?: boolean; volume?: number; haptics?: boolean }) {
     sound = setPref(next);
-    if (sound.enabled) play('caught');
+    if (next.haptics) buzz('caught');
+    else if (sound.enabled && next.haptics === undefined) play('caught');
   }
+  const canBuzz = hapticsAvailable();
 
   const save = $derived(game.save);
   const mode = $derived(save.settings.dailyReset ?? 'utc');
@@ -60,6 +62,10 @@
     <label class="row"><input type="checkbox" checked={sound.enabled} onchange={(e) => setSound({ enabled: e.currentTarget.checked })} /> Sound effects</label>
     <label class="row grow"><span class="muted small">Volume</span>
       <input type="range" min="0" max="1" step="0.05" value={sound.volume} disabled={!sound.enabled} oninput={(e) => setSound({ volume: Number(e.currentTarget.value) })} /></label>
+  </div>
+  <div class="row sound">
+    <label class="row"><input type="checkbox" checked={sound.haptics} disabled={!canBuzz} onchange={(e) => setSound({ haptics: e.currentTarget.checked })} /> Vibration</label>
+    <span class="muted small">{canBuzz ? 'Short buzzes for clicks, catches, level-ups and wins.' : 'Not available on this device (touch screen + browser support needed; iOS Safari has none).'}</span>
   </div>
   <p class="muted small">Synthesized in the browser — no audio files. Stored on this device.</p>
 </section>
