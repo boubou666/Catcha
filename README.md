@@ -192,6 +192,10 @@ readiness (everyone / some / nobody available) and sort by newest, name or most 
 save (`save.loadouts`, v21) and kept through Ascension (`src/engine/loadouts.ts`). The Base tab uses it twice: over the
 Workers list (status pinned to the base) and as the "Assign from the Box" picker; both default to the
 "Work suitability" sort, which ranks by the job chosen in the work filter, or overall suitability if none.
+The Structures list has a search (name, description, next-cost items) and a status select (buildable now /
+researched / needs research / built / maxed); the Production table a job search and "active only"; the
+Incubator a search (species, passives, Lucky), a Lucky toggle and a sort (hatching soonest / laid last /
+species). With those, every list in the game has a search and filters.
 Breeding picks parents from the same kind of list instead of dropdowns: two parent slots, a searchable list
 of idle Pals with a "Parent A / Parent B" button, and — once one parent is picked — the offspring each
 partner would give shown on its card and matched by the search too (`partnerCandidates`), so you can type

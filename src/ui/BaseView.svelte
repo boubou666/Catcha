@@ -2,13 +2,12 @@
   import { game } from '../state/game.svelte';
   import { itemName } from '../data/items';
   import { JOBS, STRUCTURES, FOOD_ITEM } from '../data/base';
-  import { baseWorkers, computeRates, isHungry, MEDICINE_ITEM, nextCost, sanStatus, structureLevel, workLevels } from '../engine/base';
-  import { canAfford, countOf } from '../engine/inventory';
+  import { baseWorkers, computeRates, DEFAULT_STRUCTURE_FILTER, filterStructures, isHungry, isStructureFiltering, MEDICINE_ITEM, sanStatus, STRUCTURE_STATUS_LABEL, workLevels, DEFAULT_PRODUCTION_FILTER, filterJobs, type ProductionFilter, type StructureFilter } from '../engine/base';
+  import { countOf } from '../engine/inventory';
   import PalCard from './PalCard.svelte';
   import CostLine from './CostLine.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
   import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
-  import { structureUnlocked } from '../engine/tech';
   import { structureTech } from '../data/tech';
 
   const save = $derived(game.save);
@@ -35,6 +34,13 @@
   const pickFiltering = $derived(isFiltering(pickFilter, PICK_DEFAULTS));
   const clearPick = () => { pickFilter = { ...PICK_DEFAULTS, sort: pickFilter.sort }; };
   const full = $derived(workers.length >= save.base.slots);
+
+  let prodFilter = $state<ProductionFilter>({ ...DEFAULT_PRODUCTION_FILTER });
+  const jobs = $derived(filterJobs(levels, prodFilter));
+  let structFilter = $state<StructureFilter>({ ...DEFAULT_STRUCTURE_FILTER });
+  const structures = $derived(filterStructures(save, structFilter));
+  const structFiltering = $derived(isStructureFiltering(structFilter));
+  const clearStructs = () => { structFilter = { ...DEFAULT_STRUCTURE_FILTER }; };
   const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2));
 </script>
 
@@ -76,10 +82,15 @@
 </section>
 
 <section>
-  <h3>Production</h3>
+  <div class="row">
+    <h3 class="grow">Production <span class="muted">{prodFilter.query.trim() || prodFilter.activeOnly ? `${jobs.length} of ${JOBS.length}` : ''}</span></h3>
+    <input type="search" placeholder="Search jobs…" bind:value={prodFilter.query} aria-label="Search jobs" />
+    <label class="chk"><input type="checkbox" bind:checked={prodFilter.activeOnly} /> Active only</label>
+  </div>
+  {#if jobs.length === 0}<p class="muted small">No job matches.</p>{/if}
   <table>
     <tbody>
-      {#each JOBS as job}
+      {#each jobs as job (job.type)}
         {@const lvl = levels[job.type]}
         <tr class:idle={lvl === 0}>
           <td class="icon">{job.icon}</td>
@@ -101,12 +112,18 @@
 </section>
 
 <section>
-  <h3>Structures</h3>
+  <div class="row">
+    <h3 class="grow">Structures <span class="muted">{structFiltering ? `${structures.length} of ${STRUCTURES.length}` : ''}</span></h3>
+    <input type="search" placeholder="Search structures…" bind:value={structFilter.query} aria-label="Search structures" />
+    <select bind:value={structFilter.status} aria-label="Structure status">
+      {#each Object.entries(STRUCTURE_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    </select>
+    {#if structFiltering}<button class="small" onclick={clearStructs}>Clear</button>{/if}
+  </div>
+  {#if structures.length === 0}<p class="muted">No structure matches. <button class="small" onclick={clearStructs}>Clear</button></p>{/if}
   <div class="list">
-    {#each STRUCTURES as s (s.id)}
-      {@const level = structureLevel(save, s.id)}
-      {@const cost = nextCost(save, s.id)}
-      {@const locked = !structureUnlocked(save, s.id)}
+    {#each structures as { def: s, level, cost, status } (s.id)}
+      {@const locked = status === 'research'}
       <div class="structure row" class:locked>
         <div class="grow">
           <b>{s.name}</b>
@@ -116,7 +133,7 @@
           {#if locked}<div class="muted small">🔒 Research <b>{structureTech(s.id)?.name}</b> (Tech tab)</div>{/if}
         </div>
         {#if cost}
-          <button class="small" disabled={!canAfford(save, cost)} onclick={() => game.build(s.id)}>
+          <button class="small" class:primary={status === 'buildable'} disabled={status !== 'buildable'} onclick={() => game.build(s.id)}>
             {level > 0 ? 'Upgrade' : 'Build'}
           </button>
         {/if}
@@ -163,4 +180,8 @@
   .chip { background: var(--panel-2); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.85rem; }
   .structure { padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
   .structure.locked { opacity: 0.6; }
+  input[type='search'] { min-width: 8rem; max-width: 12rem; }
+  select { font-size: 0.85rem; }
+  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
+  .chk input { min-height: 0; width: auto; }
 </style>

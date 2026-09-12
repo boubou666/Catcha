@@ -6,6 +6,7 @@
   import { countOf } from '../engine/inventory';
   import {
     BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, breedable, breedingParents, childOf, luckyEggChance, pairBlocker,
+    DEFAULT_EGG_FILTER, EGG_SORT_LABEL, filterEggs, isEggFiltering, type EggFilter,
   } from '../engine/breeding';
   import { formatDuration } from './format';
   import PalIcon from './PalIcon.svelte';
@@ -34,6 +35,10 @@
   const pick = (uid: string) => { if (!aUid) aUid = uid; else if (!bUid) bUid = uid; else bUid = uid; };
   const childWith = (uid: string) => { const a = save.box.find((p) => p.uid === picked); const b = save.box.find((p) => p.uid === uid); return a && b ? childOf(a.palId, b.palId) : null; };
   const inst = (uid: string) => save.box.find((p) => p.uid === uid);
+
+  let eggFilter = $state<EggFilter>({ ...DEFAULT_EGG_FILTER });
+  const eggs = $derived(filterEggs(save, eggFilter));
+  const eggFiltering = $derived(isEggFiltering(eggFilter));
   const preview = $derived.by(() => {
     const a = save.box.find((p) => p.uid === aUid);
     const b = save.box.find((p) => p.uid === bUid);
@@ -141,12 +146,23 @@
   </div>
 {/if}
 
-<h3 class="eggs-title">Incubator <span class="muted">{save.base.eggs.length}</span></h3>
+<div class="row eggs-head">
+  <h3 class="eggs-title grow">Incubator <span class="muted">{eggFiltering ? `${eggs.length} of ${save.base.eggs.length}` : save.base.eggs.length}</span></h3>
+  {#if save.base.eggs.length > 1}
+    <input type="search" placeholder="Search eggs…" bind:value={eggFilter.query} aria-label="Search eggs" />
+    <label class="chk"><input type="checkbox" bind:checked={eggFilter.luckyOnly} /> ✨ Lucky</label>
+    <select bind:value={eggFilter.sort} aria-label="Egg sort">
+      {#each Object.entries(EGG_SORT_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    </select>
+  {/if}
+</div>
 {#if save.base.eggs.length === 0}
   <p class="muted small">No eggs. Hatched Pals arrive in your box at level 1.</p>
+{:else if eggs.length === 0}
+  <p class="muted small">No egg matches.</p>
 {:else}
   <div class="eggs">
-    {#each save.base.eggs as egg, i (i)}
+    {#each eggs as { egg, index: i } (i)}
       {@const total = INCUBATION_SEC[palById(egg.palId).rarity]}
       <div class="egg row">
         <PalIcon palId={egg.palId} size={32} />
@@ -174,7 +190,12 @@
   .child { min-height: 2rem; }
   .small { font-size: 0.8rem; }
   .warn { color: var(--accent); }
-  .eggs-title { margin-top: 1.5rem; }
+  .eggs-head { margin-top: 1.5rem; }
+  .eggs-title { margin: 0; }
+  .eggs-head input[type='search'] { min-width: 7rem; max-width: 11rem; font-size: 0.85rem; }
+  .eggs-head select { font-size: 0.85rem; }
+  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; }
+  .chk input { min-height: 0; width: auto; }
   .eggs { display: flex; flex-direction: column; gap: 0.4rem; }
   .egg { padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
   .egg-bar { width: 120px; }

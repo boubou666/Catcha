@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
 import { addToBox, addToParty, makeInstance, release } from './party';
 import {
-  assignWorker, build, cancelCraft, cancelCraftAll, computeRates, enqueue, filterQueue, isHungry, nextCost, queueSummary,
+  assignWorker, build, cancelCraft, cancelCraftAll, computeRates, DEFAULT_PRODUCTION_FILTER, DEFAULT_STRUCTURE_FILTER, enqueue, filterJobs, filterQueue, filterStructures, isHungry, isStructureFiltering, nextCost, queueSummary, structureStatus,
   tickBase, unassignWorker, workLevels,
 } from './base';
-import { RATES, RECIPES, STRUCTURES } from '../data/base';
+import { JOBS, RATES, RECIPES, STRUCTURES } from '../data/base';
 import { PALS, palById } from '../data/pals';
 import { itemById } from '../data/items';
 import { TECHS } from '../data/tech';
@@ -233,5 +233,38 @@ describe('crafting queue tools', () => {
     expect(cancelCraftAll(save)).toBe(1);
     expect(save.base.queue).toEqual([]);
     expect(save.inventory.wood).toBe(200);
+  });
+});
+
+describe('structures and production filters', () => {
+  it('classifies structures and filters by status and text', () => {
+    const save = newState();
+    expect(structureStatus(save, 'workbench')).toBe('research');
+    save.tech.push('s_workbench');
+    expect(structureStatus(save, 'workbench')).toBe('missing');
+    save.inventory.wood = 10;
+    expect(structureStatus(save, 'workbench')).toBe('buildable');
+    expect(filterStructures(save, { query: '', status: 'buildable' }).map((r) => r.def.id)).toEqual(['workbench']);
+    expect(filterStructures(save, { query: '', status: 'locked' }).length).toBe(STRUCTURES.length - 1);
+    expect(filterStructures(save, { query: 'wood', status: 'any' }).every((r) => 'wood' in (r.cost ?? {}) || /wood/i.test(r.def.desc + r.def.name))).toBe(true);
+    expect(filterStructures(save, { query: 'san', status: 'any' }).map((r) => r.def.id)).toContain('hot_spring');
+    build(save, 'workbench');
+    expect(structureStatus(save, 'workbench')).toBe('maxed');
+    expect(filterStructures(save, { query: '', status: 'built' }).map((r) => r.def.id)).toEqual(['workbench']);
+    expect(filterStructures(save, { query: '', status: 'maxed' }).map((r) => r.def.id)).toEqual(['workbench']);
+    expect(filterStructures(save, { query: 'zzz', status: 'any' })).toEqual([]);
+    expect(isStructureFiltering(DEFAULT_STRUCTURE_FILTER)).toBe(false);
+  });
+
+  it('filters the production table by text and activity', () => {
+    const save = newState();
+    addToBox(save, makeInstance(1, 5));                        // Lamball: Handiwork/Transporting/Farming
+    save.party = [];
+    assignWorker(save, save.box[0].uid);
+    const levels = workLevels(save);
+    expect(filterJobs(levels, DEFAULT_PRODUCTION_FILTER)).toEqual(JOBS);
+    expect(filterJobs(levels, { query: '', activeOnly: true }).map((j) => j.type)).toEqual(['Handiwork', 'Farming', 'Transporting']);
+    expect(filterJobs(levels, { query: 'ore', activeOnly: false }).map((j) => j.type)).toEqual(['Mining', 'Kindling']);
+    expect(filterJobs(levels, { query: 'zzz', activeOnly: false })).toEqual([]);
   });
 });

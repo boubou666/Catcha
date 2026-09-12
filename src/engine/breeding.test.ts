@@ -6,7 +6,7 @@ import { condenseCandidates } from './condense';
 import { applyOffline } from './offline';
 import {
   BREED_SEC, BREEDING_FARM, CAKE, INCUBATION_SEC, LUCKY_PER_LUCKY_PARENT, SPECIAL_COMBOS, breedable, childOf, clearPair, comboKey, luckyEggChance,
-  pairBlocker, setPair, tickBreeding,
+  pairBlocker, setPair, tickBreeding, DEFAULT_EGG_FILTER, filterEggs, isEggFiltering, type EggFilter,
 } from './breeding';
 import { PALS, palById } from '../data/pals';
 import { LUCKY_CHANCE } from './formulas';
@@ -197,5 +197,28 @@ describe('Lucky breeding', () => {
     const child = save.box[2];
     expect(child.lucky).toBe(true);
     expect(child.passives).toEqual(['lucky', 'brave']);
+  });
+});
+
+describe('incubator filter', () => {
+  it('matches species, passives and Lucky, and sorts by time, order or species', () => {
+    const save = newState();
+    save.base.eggs = [
+      { palId: 11, remaining: 300, passives: ['brave'], lucky: false },
+      { palId: 1, remaining: 100, passives: [], lucky: true },
+      { palId: 3, remaining: 200, passives: ['artisan'], lucky: false },
+    ];
+    const f = (over: Partial<EggFilter>): EggFilter => ({ ...DEFAULT_EGG_FILTER, ...over });
+    const ids = (over: Partial<EggFilter>) => filterEggs(save, f(over)).map((r) => r.index);
+    expect(ids({})).toEqual([1, 2, 0]);                         // soonest first
+    expect(ids({ sort: 'newest' })).toEqual([2, 1, 0]);
+    expect(ids({ sort: 'species' })).toEqual([2, 1, 0]);        // Chikipi, Lamball, Penking
+    expect(ids({ luckyOnly: true })).toEqual([1]);
+    expect(ids({ query: 'artisan' })).toEqual([2]);
+    expect(ids({ query: 'penking' })).toEqual([0]);
+    expect(ids({ query: 'lucky' })).toEqual([1]);
+    expect(ids({ query: 'zzz' })).toEqual([]);
+    expect(isEggFiltering(DEFAULT_EGG_FILTER)).toBe(false);
+    expect(isEggFiltering(f({ sort: 'newest' }))).toBe(false);
   });
 });

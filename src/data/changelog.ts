@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'Base structures, the production table and the incubator get search and filters too — every list in the game now has them.',
       'Craft queue: search jobs, group by recipe, cancel a whole recipe or the whole queue with refunds.',
       'Box bulk actions: select Pals (or everything the filter shows) and send them to the party or base, compare them, or release them — Lucky, starred and busy Pals are never released.',
       'Party loadouts: save up to 12 named teams and swap the whole party in one click; members at the base or breeding are pulled in, away or released ones are skipped. Search, readiness filter and sort.',

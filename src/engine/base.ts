@@ -1,7 +1,7 @@
 import type { BaseState, PalInstance, SaveState, WorkType } from '../data/types';
 import { palById } from '../data/pals';
 import { itemName } from '../data/items';
-import { BASE_SLOTS, FOOD_ITEM, JOBS, QUEUE_CAP, RATES, recipeById, structureById, STRUCTURES } from '../data/base';
+import { BASE_SLOTS, FOOD_ITEM, JOBS, QUEUE_CAP, RATES, recipeById, structureById, STRUCTURES, type StructureDef } from '../data/base';
 import { addItem, canAfford, spend, countOf, type Cost } from './inventory';
 import { detachFromBreeding, instanceByUid, isAway } from './party';
 import { isUnlocked } from './progress';
@@ -307,4 +307,57 @@ export function cancelCraftAll(save: SaveState, recipeId?: string): number {
     n += 1;
   }
   return n;
+}
+
+// ---- structures list -----------------------------------------------------------------------
+
+export type StructureStatus = 'buildable' | 'missing' | 'research' | 'maxed';
+export type StructureStatusFilter = 'any' | 'buildable' | 'available' | 'locked' | 'built' | 'maxed';
+export interface StructureFilter { query: string; status: StructureStatusFilter }
+export const DEFAULT_STRUCTURE_FILTER: StructureFilter = { query: '', status: 'any' };
+export const STRUCTURE_STATUS_LABEL: Record<StructureStatusFilter, string> = {
+  any: 'Any status', buildable: 'Buildable now', available: 'Researched', locked: 'Needs research', built: 'Built', maxed: 'Maxed',
+};
+
+export interface StructureRow { def: StructureDef; level: number; cost: Cost | null; status: StructureStatus }
+
+/** Where a structure stands: research first, then max level, then whether the next level is affordable. */
+export function structureStatus(save: SaveState, id: string): StructureStatus {
+  if (!structureUnlocked(save, id)) return 'research';
+  const cost = nextCost(save, id);
+  if (cost === null) return 'maxed';
+  return canAfford(save, cost) ? 'buildable' : 'missing';
+}
+
+export function isStructureFiltering(f: StructureFilter): boolean {
+  return f.query.trim() !== '' || f.status !== 'any';
+}
+
+/** Structures in data order, matching every search word against name, description or next-cost item names. */
+export function filterStructures(save: SaveState, f: StructureFilter): StructureRow[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return STRUCTURES
+    .map((def) => ({ def, level: structureLevel(save, def.id), cost: nextCost(save, def.id), status: structureStatus(save, def.id) }))
+    .filter((r) => {
+      switch (f.status) {
+        case 'buildable': if (r.status !== 'buildable') return false; break;
+        case 'available': if (r.status === 'research') return false; break;
+        case 'locked': if (r.status !== 'research') return false; break;
+        case 'built': if (r.level === 0) return false; break;
+        case 'maxed': if (r.status !== 'maxed') return false; break;
+      }
+      const hay = [r.def.name, r.def.desc, ...Object.keys(r.cost ?? {}).map((id) => (id === 'gold' ? 'gold' : itemName(id)))].join(' ').toLowerCase();
+      return words.every((w) => hay.includes(w));
+    });
+}
+
+// ---- production table ---------------------------------------------------------------------
+
+export interface ProductionFilter { query: string; activeOnly: boolean }
+export const DEFAULT_PRODUCTION_FILTER: ProductionFilter = { query: '', activeOnly: false };
+
+/** Jobs whose name or effect text matches every search word; optionally only jobs with any level at the base. */
+export function filterJobs(levels: Record<WorkType, number>, f: ProductionFilter): typeof JOBS {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return JOBS.filter((j) => (!f.activeOnly || levels[j.type] > 0) && words.every((w) => `${j.type} ${j.effect}`.toLowerCase().includes(w)));
 }

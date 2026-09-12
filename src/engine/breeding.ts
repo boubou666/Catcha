@@ -1,10 +1,11 @@
-import type { PalDef, PalInstance, Rarity, SaveState } from '../data/types';
+import type { Egg, PalDef, PalInstance, Rarity, SaveState } from '../data/types';
 import { PALS, palById } from '../data/pals';
 import { SPECIAL_COMBOS } from '../data/combos';
 export { SPECIAL_COMBOS };
 import { countOf } from './inventory';
 import { addToBox, instanceByUid, isAway, makeInstance } from './party';
 import { inheritPassives, type Rng } from './passives';
+import { passiveById } from '../data/passives';
 import { LUCKY_CHANCE } from './formulas';
 
 /** Odds an egg from these parents is Lucky. */
@@ -130,4 +131,30 @@ export function tickBreeding(save: SaveState, dtSec: number, rand: Rng = Math.ra
   }
   if (hatched.length) base.eggs = base.eggs.filter((e) => e.remaining > 0);
   return hatched;
+}
+
+// ---- incubator ----------------------------------------------------------------------
+
+export interface EggFilter { query: string; luckyOnly: boolean; sort: 'soonest' | 'newest' | 'species' }
+export const DEFAULT_EGG_FILTER: EggFilter = { query: '', luckyOnly: false, sort: 'soonest' };
+export const EGG_SORT_LABEL: Record<EggFilter['sort'], string> = { soonest: 'Hatching soonest', newest: 'Laid last', species: 'Species' };
+
+export function isEggFiltering(f: EggFilter): boolean {
+  return f.query.trim() !== '' || f.luckyOnly;
+}
+
+/** Eggs (with their original index, for keys) matching species / passive names and the Lucky toggle, sorted. */
+export function filterEggs(save: SaveState, f: EggFilter): { egg: Egg; index: number }[] {
+  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
+  const rows = save.base.eggs.map((egg, index) => ({ egg, index })).filter(({ egg }) => {
+    if (f.luckyOnly && !egg.lucky) return false;
+    const hay = [palById(egg.palId).name, egg.lucky ? 'lucky' : '', ...egg.passives.map((id) => passiveById(id).name)].join(' ').toLowerCase();
+    return words.every((w) => hay.includes(w));
+  });
+  switch (f.sort) {
+    case 'soonest': rows.sort((a, b) => a.egg.remaining - b.egg.remaining || a.index - b.index); break;
+    case 'newest': rows.sort((a, b) => b.index - a.index); break;
+    case 'species': rows.sort((a, b) => palById(a.egg.palId).name.localeCompare(palById(b.egg.palId).name) || a.egg.remaining - b.egg.remaining); break;
+  }
+  return rows;
 }
