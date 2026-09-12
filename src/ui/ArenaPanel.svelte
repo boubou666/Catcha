@@ -6,6 +6,8 @@
   import { dungeonById } from '../data/dungeons';
   import PalIcon from './PalIcon.svelte';
   import SpawnList from './SpawnList.svelte';
+  import { catchPreview } from '../engine/catch';
+  import { catchText } from './catchText';
   import { ui } from '../state/ui.svelte';
 
   /** compact: the sticky mobile bar (smaller art, one-line stats) */
@@ -25,6 +27,9 @@
     return () => clearInterval(id);
   });
   const secondsLeft = $derived(wild?.deadlineAt ? Math.max(0, Math.ceil((wild.deadlineAt - now) / 1000)) : null);
+  const catchable = $derived(!!wild && (wild.kind === 'wild' || wild.kind === 'alpha' || wild.kind === 'dungeon' || wild.kind === 'dungeonBoss'));
+  const preview = $derived(wild && catchable ? catchPreview(game.save, wild.palId, wild.lucky, wild.kind === 'alpha') : null);
+  const catchLine = $derived(preview ? catchText(preview) : '');
   const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toFixed(n < 10 ? 1 : 0));
   const showHere = $derived(ui.spawnListOpen);
 </script>
@@ -48,6 +53,7 @@
         <div class="muted tiny">
           {fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)}{#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
           · DPS <b>{game.dps.toFixed(1)}</b>
+          {#if preview}· 🎯 {preview.throws ? `${Math.round(preview.chance * 100)}%` : 'no throw'}{/if}
           {#if wild.kind === 'wild'} · {Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}
           {:else} · <button class="tiny flee" onclick={() => game.flee()}>{run ? 'Leave' : wild.kind === 'raid' ? 'Give up' : 'Retreat'}</button>{/if}
         </div>
@@ -72,6 +78,7 @@
         <div class="muted small">{fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)} HP
           {#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
         </div>
+        {#if preview}<div class="small catch" class:no={!preview.throws}>🎯 Catch: {catchLine}</div>{/if}
       </div>
     </div>
 
@@ -101,6 +108,8 @@
   .tag.realm { background: var(--accent-2); }
   .tag.raid { background: #7b2cbf; }
   .bar.hp { margin: 0.35rem 0; }
+  .catch { color: var(--accent-2); margin-top: 0.15rem; }
+  .catch.no { color: var(--muted); }
   .bar.hp > span { background: var(--danger); }
   .attack { width: 100%; padding: 0.9rem; font-size: 1.2rem; font-weight: 900; border-radius: var(--radius); box-shadow: var(--shadow); margin: 0.75rem 0 0.5rem; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .small { font-size: 0.85rem; }

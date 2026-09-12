@@ -57,3 +57,17 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
   }
   return { outcome: 'failed', tier, chance };
 }
+
+export type CatchPreview =
+  | { throws: true; tier: SphereTier; chance: number; dupe: boolean }
+  | { throws: false; reason: 'policy' | 'no-spheres'; dupe: boolean };
+
+/** What a defeat of this species would do right now: which sphere, what odds — or why nothing is thrown. */
+export function catchPreview(save: SaveState, palId: number, lucky = false, alpha = false): CatchPreview {
+  const dupe = (save.paldeck[palId]?.caught ?? 0) > 0;
+  const preferred = dupe ? save.settings.sphereForDupe : save.settings.sphereForNew;
+  if (preferred === 'none') return { throws: false, reason: 'policy', dupe };
+  const tier = chooseSphere(save, palId);
+  if (!tier) return { throws: false, reason: 'no-spheres', dupe };
+  return { throws: true, tier, chance: catchChance(palById(palId).rarity, tier, save.player.effigies, lucky, techMult(save, 'catch') * prestigeMult(save, 'catch'), alpha), dupe };
+}

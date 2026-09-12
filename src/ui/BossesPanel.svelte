@@ -2,6 +2,8 @@
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
+  import { catchPreview } from '../engine/catch';
+  import { catchText } from './catchText';
   import { describeRequirement, isUnlocked } from '../engine/progress';
   import { dungeonsOf } from '../data/dungeons';
   import { bossName, dungeonClears, dungeonUnlocked } from '../engine/dungeon';
@@ -82,9 +84,10 @@
     {#each game.region.alphas as a}
       {@const unlocked = isUnlocked(game.save, a.unlock)}
       {@const done = game.save.progress.alphas.includes(a.id)}
+      {@const pv = catchPreview(game.save, a.palId, false, true)}
       <button disabled={!unlocked || game.inBossFight} onclick={() => game.startAlpha(a.id)}
-        title={unlocked ? `${ALPHA_TIME_LIMIT_SEC / 60} minutes to win. ${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time.` : describeRequirement(a.unlock)}>
-        Alpha {palById(a.palId).name} Lv {a.level}{done ? ' ✓' : ''}
+        title={unlocked ? `${ALPHA_TIME_LIMIT_SEC / 60} minutes to win. ${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time. Catch: ${catchText(pv)}.` : describeRequirement(a.unlock)}>
+        Alpha {palById(a.palId).name} Lv {a.level}{done ? ' ✓' : ''}{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {pv.throws ? `${Math.round(pv.chance * 100)}%` : '—'}</span>{/if}
       </button>
     {/each}
     <button class:primary={towerUnlocked && !towerDone}
@@ -121,6 +124,8 @@
 
 <style>
   .raid-btn { text-align: left; }
+  .odds { font-size: 0.75rem; color: var(--accent-2); margin-left: 0.25rem; }
+  .odds.no { color: var(--muted); }
   .realm-row { margin-top: 0.5rem; }
   .realm-btn { text-align: left; }
   .head { margin-bottom: 0.4rem; }

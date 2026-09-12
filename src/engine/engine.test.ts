@@ -4,7 +4,7 @@ import { PALS, palById } from '../data/pals';
 import { REGIONS, routeById } from '../data/regions';
 import { itemById } from '../data/items';
 import { newState } from './save';
-import { catchChance, chooseSphere, tryCatch } from './catch';
+import { catchChance, catchPreview, chooseSphere, tryCatch } from './catch';
 import { ALPHA_CATCH_PENALTY } from '../data/spheres';
 import { applyDefeat, partyDps, spawnWild } from './combat';
 import { addToBox, grantExp, makeInstance } from './party';
@@ -143,5 +143,19 @@ describe('catching Alphas', () => {
     expect(tryCatch(save, alpha, () => 0.99).outcome).toBe('failed');
     save.settings.sphereForDupe = 'none';
     expect(tryCatch(save, alpha, () => 0).outcome).toBe('skipped');    // already caught + no dupe sphere: no throw
+  });
+});
+
+describe('catch preview', () => {
+  it('reports the sphere and odds, or why nothing would be thrown', () => {
+    const save = newState();
+    expect(catchPreview(save, 1)).toEqual({ throws: true, tier: 'pal', chance: 0.6, dupe: false });
+    expect(catchPreview(save, 55, false, true).throws && catchPreview(save, 55, false, true)).toMatchObject({ tier: 'pal', dupe: false });
+    save.paldeck[1] = { seen: true, caught: 1 };
+    expect(catchPreview(save, 1)).toEqual({ throws: false, reason: 'policy', dupe: true });
+    save.settings.sphereForDupe = 'pal';
+    expect(catchPreview(save, 1)).toMatchObject({ throws: true, tier: 'pal', dupe: true });
+    save.inventory.sphere_pal = 0;
+    expect(catchPreview(save, 1)).toEqual({ throws: false, reason: 'no-spheres', dupe: true });
   });
 });
