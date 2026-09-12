@@ -162,6 +162,11 @@ must match); Filters adds element, work suitability, status (idle / party / base
 Lucky-only, starred-only, duplicates-only, and sort (stars, level, attack, name, Paldeck number, newest).
 Logic in `src/engine/boxfilter.ts`.
 
+Paldeck search and filters work the same way (`src/engine/paldeckfilter.ts`): search by name, number or
+element; filter by status (caught / seen / never seen), region (met on its routes, Alphas or tower), element,
+work, rarity, subspecies only; sort by number, name, copies or rarity. Pals you haven't seen only ever
+match by number and region, and sort last, so the filters don't reveal what a "???" entry is.
+
 Compare: pick up to four Pals (⚖ in the Box, or the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
 breeding rank, status — with the best value per row highlighted.

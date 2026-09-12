@@ -1,27 +1,65 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { PALS, paldeckNumber, paldeckOrder } from '../data/pals';
+  import { PALS, paldeckNumber } from '../data/pals';
+  import { REGIONS } from '../data/regions';
+  import { ELEMENTS } from '../data/types';
+  import { JOBS } from '../data/base';
+  import { DECK_SORT_LABEL, DECK_STATUS_LABEL, DEFAULT_DECK_FILTER, deckEntries, filterDeck, isDeckFiltering, RARITIES, type DeckFilter } from '../engine/paldeckfilter';
   import PalIcon from './PalIcon.svelte';
   import PalDetail from './PalDetail.svelte';
 
   let selected = $state<number | null>(null);
-  let query = $state('');
+  let filter = $state<DeckFilter>({ ...DEFAULT_DECK_FILTER });
+  let showFilters = $state(false);
 
-  const entries = $derived(
-    [...PALS].sort((a, b) => paldeckOrder(a) - paldeckOrder(b)).map((def) => {
-      const e = game.save.paldeck[def.id];
-      return { def, seen: !!e?.seen, caught: e?.caught ?? 0 };
-    }),
-  );
-  const caughtCount = $derived(entries.filter((e) => e.caught > 0).length);
-  const shown = $derived(entries.filter((e) => !query || (e.seen && e.def.name.toLowerCase().includes(query.toLowerCase()))));
+  const caughtCount = $derived(deckEntries(game.save).filter((e) => e.caught > 0).length);
+  const shown = $derived(filterDeck(game.save, filter));
+  const filtering = $derived(isDeckFiltering(filter));
+  const clear = () => { filter = { ...DEFAULT_DECK_FILTER, sort: filter.sort }; };
+  const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 </script>
 
 <div class="row">
-  <h2 class="grow">Paldeck <span class="muted">{caughtCount} / {PALS.length}</span></h2>
-  <input placeholder="Filter…" bind:value={query} />
+  <h2 class="grow">Paldeck <span class="muted">{caughtCount} / {PALS.length}{filtering ? ` · ${shown.length} shown` : ''}</span></h2>
+  <input type="search" placeholder="Search name, #, element…" bind:value={filter.query} aria-label="Search the Paldeck" />
+  <button class="small" class:active={showFilters || filtering} onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters}>Filters{filtering ? ' •' : ''}</button>
 </div>
-<p class="muted small">Click a Pal for its habitat and breeding recipes.</p>
+
+{#if showFilters}
+  <div class="filters">
+    <select bind:value={filter.status} aria-label="Status">
+      {#each Object.entries(DECK_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    </select>
+    <select bind:value={filter.region} aria-label="Region">
+      <option value="any">Any region</option>
+      {#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
+    </select>
+    <select bind:value={filter.element} aria-label="Element">
+      <option value="any">Any element</option>
+      {#each ELEMENTS as e}<option value={e}>{e}</option>{/each}
+    </select>
+    <select bind:value={filter.work} aria-label="Work suitability">
+      <option value="any">Any work</option>
+      {#each JOBS as j}<option value={j.type}>{j.icon} {j.type}</option>{/each}
+    </select>
+    <select bind:value={filter.rarity} aria-label="Rarity">
+      <option value="any">Any rarity</option>
+      {#each RARITIES as r}<option value={r}>{cap(r)}</option>{/each}
+    </select>
+    <select bind:value={filter.sort} aria-label="Sort">
+      {#each Object.entries(DECK_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+    </select>
+    <label class="chk"><input type="checkbox" bind:checked={filter.subspecies} /> Subspecies only</label>
+    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+  </div>
+  <p class="muted small">Element, work and rarity only apply to Pals you've seen; region means it can be met on that region's routes, Alphas or tower.</p>
+{:else}
+  <p class="muted small">Click a Pal for its habitat and breeding recipes.</p>
+{/if}
+
+{#if shown.length === 0}
+  <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+{/if}
 
 {#if selected !== null}<PalDetail palId={selected} onclose={() => (selected = null)} onselect={(id) => (selected = id)} />{/if}
 
@@ -45,4 +83,11 @@
   .num { font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; }
   .name { font-size: 0.85rem; }
   .small { font-size: 0.75rem; }
+  input[type='search'] { min-width: 10rem; flex: 1; max-width: 16rem; }
+  h2 { white-space: nowrap; }
+  button.active { border-color: var(--accent); color: var(--accent); }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.5rem 0; padding: 0.5rem; background: var(--panel-2); border-radius: var(--radius); }
+  .filters select { font-size: 0.85rem; }
+  .chk { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; padding: 0 0.3rem; cursor: pointer; }
+  .chk input { min-height: 0; width: auto; }
 </style>
