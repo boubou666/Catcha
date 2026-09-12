@@ -14,15 +14,17 @@
   import DailyView from './ui/DailyView.svelte';
   import SettingsView from './ui/SettingsView.svelte';
   import PrestigeView from './ui/PrestigeView.svelte';
+  import CompareView from './ui/CompareView.svelte';
   import PaldeckView from './ui/PaldeckView.svelte';
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
 
-  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'expedition' | 'tech' | 'paldeck' | 'items' | 'shop' | 'achievements' | 'daily' | 'settings' | 'prestige';
+  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'expedition' | 'tech' | 'paldeck' | 'items' | 'shop' | 'achievements' | 'daily' | 'settings' | 'prestige' | 'compare';
   const TABS: { id: Tab; label: string }[] = [
     { id: 'party', label: 'Party' },
     { id: 'box', label: 'Box' },
+    { id: 'compare', label: 'Compare' },
     { id: 'base', label: 'Base' },
     { id: 'craft', label: 'Craft' },
     { id: 'breed', label: 'Breeding' },
@@ -69,6 +71,7 @@
         {:else if tab === 'daily'}<DailyView />
         {:else if tab === 'settings'}<SettingsView />
         {:else if tab === 'prestige'}<PrestigeView />
+        {:else if tab === 'compare'}<CompareView />
         {:else}<AchievementsView />{/if}
       </div>
     </section>

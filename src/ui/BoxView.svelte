@@ -7,6 +7,7 @@
   import { isBreeding } from '../engine/breeding';
   import { isAway } from '../engine/party';
   import PalCard from './PalCard.svelte';
+  import { compare } from '../state/compare.svelte';
 
   let query = $state('');
   const sorted = $derived(
@@ -45,6 +46,7 @@
       {#if game.save.base.workers.includes(inst.uid)}<span class="muted small">at base</span>{/if}
       {#if isBreeding(game.save, inst.uid)}<span class="muted small">breeding</span>{/if}
       {#if isAway(game.save, inst.uid)}<span class="muted small">on expedition</span>{/if}
+      <button class="small" class:cmp-on={compare.has(inst.uid)} disabled={!compare.has(inst.uid) && compare.full} onclick={() => compare.toggle(inst.uid)} title={compare.has(inst.uid) ? 'Remove from comparison' : 'Add to comparison (Compare tab)'}>⚖</button>
       {#if cost !== null}
         <button class="small star" class:ready={!block} disabled={!!block} onclick={() => game.condense(inst.uid)}
           title={block ? BLOCK_TEXT[block] : `Condense ${cost} ${palById(inst.palId).name}s into this one`}>
@@ -65,4 +67,5 @@
   .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 60vh; overflow-y: auto; }
   .small { font-size: 0.8rem; }
   .star.ready { border-color: var(--accent); color: var(--accent); }
+  .cmp-on { border-color: var(--accent-2); color: var(--accent-2); }
 </style>
