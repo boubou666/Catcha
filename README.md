@@ -186,7 +186,10 @@ description, what it unlocks (structure / recipe name) or prerequisite; filter b
 Achievements (`src/engine/achievementfilter.ts`): search name / description / category; filter by category
 and status (unlocked, locked, "almost there" ≥ 50%); sort by closest first, points or name (sorted views are
 flat, the default keeps category sections). Daily quests get the same bar (search text / kind / reward,
-status ready / in progress / claimed, kind) — thin with three quests a day, but consistent.
+status ready / in progress / claimed / missed, kind), and a **History** section: at each reset the day's quests
+are frozen into `save.dailyHistory` (last 90 days, one record per date) with their final progress; the view
+shows a streak (consecutive days with all three claimed, reaching today or yesterday), quests claimed, bonuses
+and gold from quests, then each past day newest first. The filters apply to history too.
 
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,

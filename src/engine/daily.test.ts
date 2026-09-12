@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
-import { bonusReady, claimBonus, claimQuest, dayKey, generateDaily, msUntilRollover, progressTier, questDone, questProgress, rollDaily, DAILY_COUNT, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterQuests, isQuestFiltering, questStatus, QUEST_KIND_LABEL, type QuestFilter } from './daily';
+import { bonusReady, claimBonus, claimQuest, dayKey, generateDaily, msUntilRollover, progressTier, questDone, questProgress, rollDaily, DAILY_COUNT, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterQuests, isQuestFiltering, questStatus, QUEST_KIND_LABEL, archiveDaily, filterHistory, historySummary, questStreak, type QuestFilter } from './daily';
+import { ascend } from './ascend';
 import { applyDefeat } from './combat';
 import { routeById } from '../data/regions';
 import { itemById } from '../data/items';
@@ -145,5 +146,86 @@ describe('quest filter', () => {
     expect(filterQuests(s, f({ status: 'claimed' }), name)).toEqual([q]);
     expect(filterQuests(s, f({ status: 'progress' }), name)).not.toContain(q);
     expect(questStatus(s, q)).toBe('claimed');
+  });
+});
+
+describe('quest history', () => {
+  const day = (n: number) => Date.UTC(2026, 8, n, 12);     // noon UTC on Sep n
+  const name = (id: string) => routeById(id).name;
+
+  it('archives the previous day with final progress when the day rolls over', () => {
+    const s = newState();
+    rollDaily(s, day(10));
+    const q = s.daily!.quests[0];
+    q.claimed = true;
+    s.daily!.bonusClaimed = false;
+    expect(rollDaily(s, day(10))).toBe(false);             // same day: nothing archived
+    expect(s.dailyHistory).toEqual([]);
+    expect(rollDaily(s, day(11))).toBe(true);
+    expect(s.dailyHistory).toHaveLength(1);
+    const rec = s.dailyHistory[0];
+    expect(rec.date).toBe('2026-09-10');
+    expect(rec.quests).toHaveLength(DAILY_COUNT);
+    expect(rec.quests[0]).toMatchObject({ kind: q.kind, target: q.target, claimed: true, reward: q.reward });
+    expect(rec.quests.slice(1).every((x) => !x.claimed && x.progress === 0)).toBe(true);
+    expect(s.daily!.date).toBe('2026-09-11');
+  });
+
+  it('keeps one record per date and at most 90 days', () => {
+    const s = newState();
+    for (let n = 0; n < 95; n++) rollDaily(s, day(1) + n * 86_400_000);
+    expect(s.dailyHistory).toHaveLength(90);
+    expect(new Set(s.dailyHistory.map((r) => r.date)).size).toBe(90);
+    expect(s.dailyHistory.at(-1)!.date < s.daily!.date).toBe(true);
+    // a reset-mode change re-rolling the same calendar date replaces rather than duplicates
+    const before = s.dailyHistory.length;
+    archiveDaily(s); archiveDaily(s);
+    expect(s.dailyHistory).toHaveLength(before);            // today's record replaced itself (cap keeps 90)
+  });
+
+  it('computes streaks and totals', () => {
+    const s = newState();
+    const full = (n: number) => { rollDaily(s, day(n)); for (const q of s.daily!.quests) q.claimed = true; s.daily!.bonusClaimed = true; };
+    full(1); full(2); full(3);
+    rollDaily(s, day(4));                                    // today, open
+    expect(questStreak(s)).toBe(3);
+    expect(historySummary(s)).toMatchObject({ days: 4, claimed: 9, total: 12, bonuses: 3 });
+    for (const q of s.daily!.quests) q.claimed = true;       // finish today too
+    expect(questStreak(s)).toBe(4);
+    rollDaily(s, day(6));                                    // skipped the 5th: streak is broken
+    expect(questStreak(s)).toBe(0);
+    full(6); rollDaily(s, day(7));
+    expect(questStreak(s)).toBe(1);
+    expect(historySummary(s).gold).toBeGreaterThan(0);
+  });
+
+  it('filters history by status, kind and text, newest first', () => {
+    const s = newState();
+    rollDaily(s, day(1)); s.daily!.quests[0].claimed = true;
+    rollDaily(s, day(2));
+    rollDaily(s, day(3));
+    const f = (over: Partial<QuestFilter>): QuestFilter => ({ ...DEFAULT_QUEST_FILTER, ...over });
+    const all = filterHistory(s, DEFAULT_QUEST_FILTER, name);
+    expect(all.map((r) => r.date)).toEqual(['2026-09-02', '2026-09-01']);
+    const claimed = filterHistory(s, f({ status: 'claimed' }), name);
+    expect(claimed).toHaveLength(1);
+    expect(claimed[0].quests).toHaveLength(1);
+    const missed = filterHistory(s, f({ status: 'missed' }), name);
+    expect(missed.reduce((n, r) => n + r.quests.length, 0)).toBe(DAILY_COUNT * 2 - 1);
+    expect(filterHistory(s, f({ status: 'ready' }), name)).toEqual([]);   // never applies to the past
+    const kind = s.dailyHistory[0].quests[0].kind;
+    expect(filterHistory(s, f({ kind }), name).every((r) => r.quests.every((q) => q.kind === kind))).toBe(true);
+    expect(filterHistory(s, f({ query: 'zzz' }), name)).toEqual([]);
+  });
+
+  it('is added by migration and survives Ascension', () => {
+    const v19 = { ...newState(), version: 19 } as Record<string, unknown>;
+    delete v19.dailyHistory;
+    const s = migrate(v19)!;
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(s.dailyHistory).toEqual([]);
+    rollDaily(s, day(1)); rollDaily(s, day(2));
+    s.progress.towers.push('rayne');
+    expect(ascend(s, [])!.dailyHistory).toEqual(s.dailyHistory);
   });
 });

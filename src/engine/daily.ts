@@ -1,4 +1,4 @@
-import type { DailyKind, DailyQuest, DailyReset, DailyState, Element, SaveState } from '../data/types';
+import type { DailyKind, DailyQuest, DailyRecord, DailyReset, DailyState, Element, SaveState } from '../data/types';
 import { ELEMENTS } from '../data/types';
 import { REGIONS } from '../data/regions';
 import { DUNGEONS } from '../data/dungeons';
@@ -12,6 +12,7 @@ import { itemName } from '../data/items';
 
 export const DAILY_COUNT = 3;
 export const BONUS_EFFIGIES = 1;
+export const HISTORY_DAYS = 90;
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
@@ -126,12 +127,65 @@ export function generateDaily(save: SaveState, key: string): DailyState {
   return { date: key, quests, bonusClaimed: false };
 }
 
+/** Freeze the current day's quests (with their final progress) into the history. */
+export function archiveDaily(save: SaveState): void {
+  const d = save.daily;
+  if (!d || d.quests.length === 0) return;
+  const record: DailyRecord = {
+    date: d.date,
+    quests: d.quests.map((q) => ({ kind: q.kind, param: q.param, target: q.target, progress: questProgress(save, q), claimed: q.claimed, reward: q.reward })),
+    bonusClaimed: d.bonusClaimed,
+  };
+  save.dailyHistory ??= [];
+  // a reset-mode change can re-roll the same date; keep one record per date
+  save.dailyHistory = [...save.dailyHistory.filter((r) => r.date !== d.date), record].slice(-HISTORY_DAYS);
+}
+
 /** Make sure today's quests exist; regenerate on a new day (unclaimed quests are lost). Returns true if rolled. */
 export function rollDaily(save: SaveState, now = Date.now()): boolean {
   const key = dayKey(now, save.settings.dailyReset ?? 'utc');
   if (save.daily?.date === key) return false;
+  archiveDaily(save);
   save.daily = generateDaily(save, key);
   return true;
+}
+
+/** Consecutive days ending today (or yesterday, if today is still open) on which every quest was claimed. */
+export function questStreak(save: SaveState): number {
+  const days = [...(save.dailyHistory ?? []).map((r) => ({ date: r.date, full: r.quests.length > 0 && r.quests.every((q) => q.claimed) }))];
+  if (save.daily) days.push({ date: save.daily.date, full: save.daily.quests.length > 0 && save.daily.quests.every((q) => q.claimed) });
+  days.sort((a, b) => a.date.localeCompare(b.date));
+  let streak = 0;
+  let i = days.length - 1;
+  const today = save.daily?.date ?? null;
+  if (i >= 0 && days[i].date === today && !days[i].full) i -= 1;   // today isn't over yet
+  // the run must reach today or yesterday, otherwise it's already broken
+  let expect: string | null = today && i >= 0 && days[i].date !== today ? prevDay(today) : null;
+  for (; i >= 0; i -= 1) {
+    if (!days[i].full || (expect !== null && days[i].date !== expect)) break;
+    streak += 1;
+    expect = prevDay(days[i].date);
+  }
+  return streak;
+}
+
+const prevDay = (key: string) => { const d = new Date(key + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); };
+
+export interface HistorySummary { days: number; claimed: number; total: number; bonuses: number; gold: number; streak: number }
+
+/** Totals over the history plus today. */
+export function historySummary(save: SaveState): HistorySummary {
+  const recs = save.dailyHistory ?? [];
+  const today = save.daily;
+  const all = [...recs.flatMap((r) => r.quests), ...(today?.quests ?? [])];
+  return {
+    days: recs.length + (today ? 1 : 0),
+    claimed: all.filter((q) => q.claimed).length,
+    total: all.length,
+    bonuses: recs.filter((r) => r.bonusClaimed).length + (today?.bonusClaimed ? 1 : 0),
+    gold: all.filter((q) => q.claimed).reduce((s, q) => s + q.reward.gold, 0),
+    streak: questStreak(save),
+  };
 }
 
 export function claimQuest(save: SaveState, id: string): DailyQuest | null {
@@ -171,7 +225,7 @@ export function describeQuest(q: DailyQuest, routeName: (id: string) => string):
 
 // ---- filtering ----------------------------------------------------------------------
 
-export type QuestStatus = 'ready' | 'progress' | 'claimed';
+export type QuestStatus = 'ready' | 'progress' | 'claimed' | 'missed';
 export type QuestStatusFilter = 'any' | QuestStatus;
 
 export interface QuestFilter {
@@ -181,7 +235,7 @@ export interface QuestFilter {
 }
 
 export const DEFAULT_QUEST_FILTER: QuestFilter = { query: '', status: 'any', kind: 'any' };
-export const QUEST_STATUS_LABEL: Record<QuestStatusFilter, string> = { any: 'Any status', ready: 'Ready to claim', progress: 'In progress', claimed: 'Claimed' };
+export const QUEST_STATUS_LABEL: Record<QuestStatusFilter, string> = { any: 'Any status', ready: 'Ready to claim', progress: 'In progress', claimed: 'Claimed', missed: 'Missed' };
 export const QUEST_KIND_LABEL: Record<DailyKind, string> = {
   defeat: 'Defeat Pals', catch: 'Catch Pals', gold: 'Earn gold', hatch: 'Hatch eggs', craft: 'Craft items',
   expedition: 'Expedition', realm: 'Sealed Realm', element: 'Element defeats', route: 'Route defeats',
@@ -195,14 +249,28 @@ export function isQuestFiltering(f: QuestFilter): boolean {
   return f.query.trim() !== '' || f.status !== 'any' || f.kind !== 'any';
 }
 
-/** Every word must match the quest text, its kind label, or a reward item name. */
+type QuestLike = Pick<DailyQuest, 'kind' | 'param' | 'target' | 'claimed' | 'reward'>;
+
+function questMatches(q: QuestLike, status: QuestStatus, f: QuestFilter, words: string[], routeName: (id: string) => string): boolean {
+  if (f.kind !== 'any' && q.kind !== f.kind) return false;
+  if (f.status !== 'any' && status !== f.status) return false;
+  if (words.length === 0) return true;
+  const hay = [describeQuest(q as DailyQuest, routeName), QUEST_KIND_LABEL[q.kind], ...Object.keys(q.reward.items).map(itemName), 'gold'].join(' ').toLowerCase();
+  return words.every((w) => hay.includes(w));
+}
+
+const queryWords = (f: QuestFilter) => f.query.toLowerCase().split(/\s+/).filter(Boolean);
+
+/** Today's quests matching the filter. Every search word must match the quest text, its kind label, or a reward item name. */
 export function filterQuests(save: SaveState, f: QuestFilter, routeName: (id: string) => string): DailyQuest[] {
-  const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
-  return (save.daily?.quests ?? []).filter((q) => {
-    if (f.kind !== 'any' && q.kind !== f.kind) return false;
-    if (f.status !== 'any' && questStatus(save, q) !== f.status) return false;
-    if (words.length === 0) return true;
-    const hay = [describeQuest(q, routeName), QUEST_KIND_LABEL[q.kind], ...Object.keys(q.reward.items).map(itemName), 'gold'].join(' ').toLowerCase();
-    return words.every((w) => hay.includes(w));
-  });
+  const words = queryWords(f);
+  return (save.daily?.quests ?? []).filter((q) => questMatches(q, questStatus(save, q), f, words, routeName));
+}
+
+/** Past days, newest first, each reduced to the quests that match; days with no match are dropped. */
+export function filterHistory(save: SaveState, f: QuestFilter, routeName: (id: string) => string): DailyRecord[] {
+  const words = queryWords(f);
+  return [...(save.dailyHistory ?? [])].reverse()
+    .map((r) => ({ ...r, quests: r.quests.filter((q) => questMatches(q, q.claimed ? 'claimed' : 'missed', f, words, routeName)) }))
+    .filter((r) => r.quests.length > 0);
 }

@@ -201,6 +201,7 @@ export interface SaveState {
   };
   achievements: string[];                // unlocked ids
   daily: DailyState | null;              // today's quests; regenerated when the day changes
+  dailyHistory: DailyRecord[];           // past days, oldest first, capped
   prestige: { relics: number; ascensions: number; upgrades: Record<string, number> };
   tutorial: { step: number; done: boolean };
   lastSavedAt: number;
@@ -221,5 +222,12 @@ export interface DailyQuest {
 export interface DailyState {
   date: string;                          // YYYY-MM-DD (UTC)
   quests: DailyQuest[];
+  bonusClaimed: boolean;
+}
+
+/** A past day's quests, frozen at rollover. */
+export interface DailyRecord {
+  date: string;
+  quests: { kind: DailyKind; param?: string; target: number; progress: number; claimed: boolean; reward: DailyQuest['reward'] }[];
   bonusClaimed: boolean;
 }

@@ -2,7 +2,7 @@
   import { game } from '../state/game.svelte';
   import { routeById } from '../data/regions';
   import { itemName } from '../data/items';
-  import { bonusReady, describeQuest, msUntilRollover, progressTier, questDone, questProgress, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterQuests, isQuestFiltering, QUEST_KIND_LABEL, QUEST_STATUS_LABEL, type QuestFilter } from '../engine/daily';
+  import { bonusReady, describeQuest, msUntilRollover, progressTier, questDone, questProgress, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterHistory, filterQuests, historySummary, isQuestFiltering, QUEST_KIND_LABEL, QUEST_STATUS_LABEL, type QuestFilter } from '../engine/daily';
   import { formatDuration } from './format';
 
   const save = $derived(game.save);
@@ -25,6 +25,11 @@
   const shown = $derived(filterQuests(save, filter, routeName));
   const filtering = $derived(isQuestFiltering(filter));
   const clear = () => { filter = { ...DEFAULT_QUEST_FILTER }; };
+  const history = $derived(filterHistory(save, filter, routeName));
+  const summary = $derived(historySummary(save));
+  let showHistory = $state(true);
+  const fmtDate = (key: string) => new Date(key + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  const pct = (n: number, d: number) => Math.round((n / d) * 100);
 </script>
 
 <div class="row">
@@ -79,6 +84,44 @@
   <p class="muted">Quests appear once the game has run for a second.</p>
 {/if}
 
+<section class="history">
+  <div class="row">
+    <h3 class="grow">History <span class="muted">{save.dailyHistory.length} day{save.dailyHistory.length === 1 ? '' : 's'}</span></h3>
+    {#if save.dailyHistory.length}<button class="small" onclick={() => (showHistory = !showHistory)}>{showHistory ? 'Hide' : 'Show'}</button>{/if}
+  </div>
+  <div class="summary row">
+    <span>🔥 Streak <b>{summary.streak}</b> day{summary.streak === 1 ? '' : 's'}</span>
+    <span>Quests claimed <b>{summary.claimed}</b> / {summary.total}{#if summary.total} <span class="muted">({pct(summary.claimed, summary.total)}%)</span>{/if}</span>
+    <span>Bonuses <b>{summary.bonuses}</b> / {summary.days}</span>
+    <span>Gold from quests <b>{fmt(summary.gold)}</b></span>
+  </div>
+  <p class="muted small">A streak counts consecutive days with all three quests claimed. The last 90 days are kept; the search and filters above apply here too (missed = not claimed before reset).</p>
+  {#if save.dailyHistory.length === 0}
+    <p class="muted">Nothing yet — past days appear here after the first reset.</p>
+  {:else if showHistory}
+    {#if history.length === 0}
+      <p class="muted">No past quest matches. <button class="small" onclick={clear}>Clear filters</button></p>
+    {/if}
+    <div class="days">
+      {#each history as day (day.date)}
+        <div class="day" class:full={day.bonusClaimed}>
+          <div class="row">
+            <b class="grow">{fmtDate(day.date)}</b>
+            <span class="muted small">{day.quests.filter((q) => q.claimed).length} / {day.quests.length} claimed{day.bonusClaimed ? ' · bonus ✓' : ''}</span>
+          </div>
+          {#each day.quests as q}
+            <div class="past row" class:claimed={q.claimed}>
+              <span class="mark">{q.claimed ? '✓' : '✗'}</span>
+              <span class="grow">{describeQuest({ ...q, id: '', baseline: 0 }, routeName)}</span>
+              <span class="muted small">{q.claimed ? `+${fmt(q.reward.gold)} gold` : `${fmt(q.progress)} / ${fmt(q.target)}`}</span>
+            </div>
+          {/each}
+        </div>
+      {/each}
+    </div>
+  {/if}
+</section>
+
 <style>
   .small { font-size: 0.8rem; }
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -95,4 +138,14 @@
   .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.5rem 0; padding: 0.5rem; background: var(--panel-2); border-radius: var(--radius); }
   .filters select { font-size: 0.85rem; }
   .list { margin-top: 0.5rem; }
+  .history { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+  .history h3 { margin: 0; }
+  .summary { gap: 1rem; margin: 0.4rem 0; font-size: 0.9rem; }
+  .days { display: flex; flex-direction: column; gap: 0.5rem; max-height: 50vh; overflow-y: auto; }
+  .day { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.25rem; }
+  .day.full { border-color: var(--ok); }
+  .past { font-size: 0.9rem; color: var(--muted); }
+  .past.claimed { color: var(--text); }
+  .mark { width: 1.1rem; text-align: center; color: var(--danger); }
+  .past.claimed .mark { color: var(--ok); }
 </style>
