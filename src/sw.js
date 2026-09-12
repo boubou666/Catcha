@@ -24,8 +24,10 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
 
   if (req.mode === 'navigate') {
+    // Revalidate the shell: GitHub Pages serves index.html with a 10-minute max-age, and a stale shell
+    // would point at old bundles even after a new worker took over.
     event.respondWith(
-      fetch(req).then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put('./', copy)); return res; })
+      fetch(new Request(req, { cache: 'no-cache' })).then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put('./', copy)); return res; })
         .catch(() => caches.match('./')),
     );
     return;
