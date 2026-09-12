@@ -73,3 +73,14 @@ select, input {
   transition: width 80ms linear;
 }
 .bar.exp > span { background: var(--accent-2); }
+
+/* touch devices: comfortable targets, no double-tap zoom on buttons */
+@media (pointer: coarse) {
+  button { min-height: 40px; touch-action: manipulation; }
+  button.small, button.tiny { min-height: 34px; }
+  select, input { min-height: 40px; }
+}
+@media (max-width: 800px) {
+  h1 { font-size: 1.2rem; }
+  .panel { padding: 0.75rem; }
+}

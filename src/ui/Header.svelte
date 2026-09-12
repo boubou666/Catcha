@@ -47,6 +47,7 @@
 
 <style>
   header { gap: 1.5rem; }
+  @media (max-width: 800px) { header { gap: 0.6rem 1rem; } .stat { min-width: 0; flex: 1 1 40%; } }
   h1 { font-size: 1.4rem; color: var(--accent); }
   .stat { min-width: 150px; }
   .label { font-weight: 600; }

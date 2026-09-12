@@ -11,6 +11,9 @@ Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Cat
 Saves live in the browser's localStorage, so the hosted copy starts fresh; use **Export** on one copy and
 **Import** on the other (Settings tab) to move a save.
 
+Works on phones: below 800 px the arena becomes a sticky bar under the header and the routes, bosses and
+log move into a World tab group; touch targets are enlarged.
+
 ## Run
 
 ```bash
