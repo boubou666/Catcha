@@ -10,12 +10,14 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "fetch-art": "node scripts/fetch-pal-art.mjs",
-    "fetch-data": "node scripts/fetch-pal-data.mjs"
+    "fetch-data": "node scripts/fetch-pal-data.mjs",
+    "balance": "tsx scripts/balance.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "svelte": "^5.57.0",
     "svelte-check": "^4.7.6",
+    "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"

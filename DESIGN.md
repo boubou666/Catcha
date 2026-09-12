@@ -166,14 +166,18 @@ All `*Def` types are static content in `src/data/*.ts`. Only `SaveState` is muta
 ## 8. Formulas (starting values — expect to retune)
 
 ```
-wildHp(level)        = 12 × level² + 30
+wildHp(level)        = (25 + 10 × level^1.5) × 1.012^level   — exponential term keeps on-level kills ~5 s as techs/stars stack
 palAttack(inst)      = def.baseAttack × (1 + 0.06 × level) × (1 + 0.1 × stars) × passiveMult
 partyDps             = Σ palAttack × elementMult(pal, route.dominant)
 clickDamage          = 5 × weaponTier × (1 + 0.03 × playerLevel)
 expToLevel(n)        = 25 × n^1.8
 alphaHp              = wildHp(level) × hpMult (20–60)
-towerHp              = 30 000 → 500 000 across regions, must be beaten inside timeLimitSec
+towerHp              = 50k → 1.15M across regions; ~60–65% of the 10-min limit for an on-level party (scripts/balance.mjs)
 ```
+
+Balance is checked with `npm run balance`, a headless model that assumes a reasonable party per region
+(top species at route level, stars by region, attack techs by level) and prints kill / Alpha / tower / realm /
+raid times and hours per region. Targets: 4–6 s on-level kills, Alphas 2–4 min, towers 60–65%, raids 75–95%.
 
 ## 9. Architecture
 

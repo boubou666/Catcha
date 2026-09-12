@@ -18,13 +18,13 @@ export const SLAB_FRAGMENT = 'slab_fragment';
 const d = (itemId: string, chance: number, min: number, max: number): Drop => ({ itemId, chance, min, max });
 
 export const RAIDS: RaidDef[] = [
-  { id: 'bellanoir', name: 'Bellanoir', palId: 142, level: 50, hp: 500_000, timeLimitSec: 600, slabItemId: 'slab_bellanoir',
+  { id: 'bellanoir', name: 'Bellanoir', palId: 142, level: 50, hp: 650_000, timeLimitSec: 600, slabItemId: 'slab_bellanoir',
     unlock: { kind: 'tower', id: 'marcus' },
     reward: { gold: 100_000, items: [d('diamond', 1, 2, 4), d('ingot', 1, 20, 40), d('high_quality_pal_oil', 1, 10, 20), d('sphere_legendary', 0.3, 1, 1)], egg: true } },
-  { id: 'xenolord', name: 'Xenolord', palId: 125, level: 62, hp: 1_500_000, timeLimitSec: 600, slabItemId: 'slab_xenolord',
+  { id: 'xenolord', name: 'Xenolord', palId: 125, level: 62, hp: 1_750_000, timeLimitSec: 600, slabItemId: 'slab_xenolord',
     unlock: { kind: 'tower', id: 'saya' },
     reward: { gold: 400_000, items: [d('diamond', 1, 4, 8), d('ingot', 1, 40, 80), d('high_quality_pal_oil', 1, 20, 40), d('sphere_legendary', 0.6, 1, 2)], egg: true } },
-  { id: 'libero', name: 'Bellanoir Libero', palId: 1142, level: 72, hp: 3_000_000, timeLimitSec: 600, slabItemId: 'slab_libero',
+  { id: 'libero', name: 'Bellanoir Libero', palId: 1142, level: 72, hp: 2_800_000, timeLimitSec: 600, slabItemId: 'slab_libero',
     unlock: { kind: 'raid', id: 'bellanoir' },
     reward: { gold: 1_000_000, items: [d('diamond', 1, 8, 15), d('ingot', 1, 80, 150), d('sphere_legendary', 1, 2, 3)], egg: true } },
 ];

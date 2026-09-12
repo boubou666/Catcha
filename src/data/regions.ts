@@ -30,7 +30,7 @@ const windswept: RegionDef = {
   tower: {
     id: 'rayne', regionId: R1,
     name: 'Rayne Syndicate Tower', boss: 'Zoe & Grizzbolt', palId: 103, level: 15,
-    hp: 30_000, timeLimitSec: 600,
+    hp: 50_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'penking' }, { kind: 'routeCleared', id: 'icewind' }] },
   },
 };
@@ -59,7 +59,7 @@ const marsh: RegionDef = {
   tower: {
     id: 'lily', regionId: R2,
     name: 'Free Pal Alliance Tower', boss: 'Lily & Lyleen', palId: 104, level: 25,
-    hp: 60_000, timeLimitSec: 600,
+    hp: 100_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'kingpaca' }, { kind: 'routeCleared', id: 'alliance' }] },
   },
 };
@@ -88,7 +88,7 @@ const dunes: RegionDef = {
   tower: {
     id: 'axel', regionId: R3,
     name: 'Brothers of the Eternal Pyre Tower', boss: 'Axel & Orserk', palId: 106, level: 35,
-    hp: 100_000, timeLimitSec: 600,
+    hp: 190_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'anubis' }, { kind: 'routeCleared', id: 'brothers' }] },
   },
 };
@@ -117,7 +117,7 @@ const obsidian: RegionDef = {
   tower: {
     id: 'marcus', regionId: R4,
     name: 'PIDF Tower', boss: 'Marcus & Faleris', palId: 105, level: 45,
-    hp: 180_000, timeLimitSec: 600,
+    hp: 330_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'blazamut' }, { kind: 'routeCleared', id: 'pidf' }] },
   },
 };
@@ -146,7 +146,7 @@ const astral: RegionDef = {
   tower: {
     id: 'victor', regionId: R5,
     name: 'PAL Genetic Research Unit Tower', boss: 'Victor & Shadowbeak', palId: 107, level: 55,
-    hp: 280_000, timeLimitSec: 600,
+    hp: 620_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'frostallion' }, { kind: 'routeCleared', id: 'genetics' }] },
   },
 };
@@ -175,7 +175,7 @@ const sakurajima: RegionDef = {
   tower: {
     id: 'saya', regionId: R6,
     name: 'Moonflower Tower', boss: 'Saya & Selyne', palId: 126, level: 62,
-    hp: 400_000, timeLimitSec: 600,
+    hp: 850_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'xenolord' }, { kind: 'routeCleared', id: 'moonflower' }] },
   },
 };
@@ -204,7 +204,7 @@ const feybreak: RegionDef = {
   tower: {
     id: 'bjorn', regionId: R7,
     name: 'Feybreak Tower', boss: 'Bjorn & Bastigor', palId: 136, level: 70,
-    hp: 600_000, timeLimitSec: 600,
+    hp: 1_150_000, timeLimitSec: 600,
     unlock: { kind: 'all', of: [{ kind: 'alpha', id: 'bellanoir' }, { kind: 'routeCleared', id: 'peak' }] },
   },
 };

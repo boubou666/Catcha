@@ -32,7 +32,7 @@ describe('summoning', () => {
     const boss = summon(save, 'bellanoir', 0)!;
     expect(boss.kind).toBe('raid');
     expect(boss.palId).toBe(142);
-    expect(boss.maxHp).toBe(500_000);
+    expect(boss.maxHp).toBe(raidById('bellanoir').hp);
     expect(boss.deadlineAt).toBe(600_000);
     expect(save.inventory.slab_bellanoir).toBe(0);
     expect(summon(save, 'bellanoir')).toBeNull();

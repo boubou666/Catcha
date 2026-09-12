@@ -8,7 +8,9 @@ export const PARTY_SIZE = 5;
 export const LUCKY_CHANCE = 1 / 300;
 export const LUCKY_HP_MULT = 3;
 
-export const wildHp = (level: number) => 25 + 10 * Math.pow(level, 1.5);
+// Polynomial for the early curve, with a 1.2%/level exponential so late-game DPS growth (attack techs
+// ×3.9 by Lv 60, stars, passives) doesn't turn kills trivial. Tuned by scripts/balance.mjs.
+export const wildHp = (level: number) => (25 + 10 * Math.pow(level, 1.5)) * Math.pow(1.012, level);
 
 export function instanceAttack(inst: PalInstance): number {
   const def = palById(inst.palId);
