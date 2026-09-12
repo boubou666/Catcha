@@ -13,6 +13,7 @@ export interface OfflineReport {
   crafted: number;                        // queue entries completed
   hatched: number[];                      // Paldeck ids that hatched
   returned: ExpeditionReport[];           // expeditions that came back
+  sick: number;                           // workers at 0 SAN when you got back
   weaponTier?: number;                    // set if a weapon finished
 }
 
@@ -51,6 +52,7 @@ export function applyOffline(save: SaveState, elapsedMs: number): OfflineReport 
     crafted: queued - save.base.queue.length,
     hatched,
     returned,
+    sick: save.box.filter((p) => save.base.workers.includes(p.uid) && p.san <= 0).length,
   };
   if (save.player.weaponTier > weapon) report.weaponTier = save.player.weaponTier;
 

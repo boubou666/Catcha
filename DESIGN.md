@@ -80,7 +80,7 @@ Player assigns box Pals to the base (slot cap grows with tech). Each Pal contrib
 | Cooling     | fridge = food doesn't spoil (removes food decay) |
 | Farming     | Pal-specific drops (Chikipi eggs, Mozzarina milk, Beegarde honey, Vixy spheres!) |
 | Transporting| +% overall base output                           |
-| Medicine    | SAN recovery (workers below SAN threshold stop)  |
+| Medicine    | Medical Supplies → auto-treat workers below 50 SAN; sick (0 SAN) workers stop — implemented |
 
 Rate = Σ over workers of `workLevel × baseRate × structureMult`. Food consumption per worker per minute; no food → output halts (light punishment, not death).
 

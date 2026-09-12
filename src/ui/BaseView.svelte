@@ -3,7 +3,7 @@
   import { palById } from '../data/pals';
   import { itemName } from '../data/items';
   import { JOBS, STRUCTURES, FOOD_ITEM } from '../data/base';
-  import { baseWorkers, computeRates, isHungry, nextCost, structureLevel, workLevels } from '../engine/base';
+  import { baseWorkers, computeRates, isHungry, MEDICINE_ITEM, nextCost, sanStatus, structureLevel, workLevels } from '../engine/base';
   import { canAfford, countOf } from '../engine/inventory';
   import PalCard from './PalCard.svelte';
   import CostLine from './CostLine.svelte';
@@ -16,6 +16,9 @@
   const rates = $derived(computeRates(save));
   const hungry = $derived(isHungry(save));
   const berries = $derived(countOf(save, FOOD_ITEM));
+  const medical = $derived(countOf(save, MEDICINE_ITEM));
+  const sick = $derived(workers.filter((w) => sanStatus(w.san ?? 100) === 'sick').length);
+  const stressed = $derived(workers.filter((w) => sanStatus(w.san ?? 100) !== 'fine').length);
 
   let query = $state('');
   const candidates = $derived(
@@ -36,6 +39,11 @@
   <span>🍇 {itemName(FOOD_ITEM)}: <b>{berries}</b>
     {#if workers.length > 0}<span class="muted">(−{fmt(rates.foodPerMin)}/min)</span>{/if}</span>
   <span>Output: <b>×{rates.mult.toFixed(2)}</b></span>
+  {#if workers.length > 0}
+    <span>💊 {itemName(MEDICINE_ITEM)}: <b>{medical}</b> <span class="muted">(+{fmt(rates.medicalPerMin)}/min · SAN −{fmt(rates.sanDrainPerMin)}/min each)</span></span>
+  {/if}
+  {#if sick > 0}<span class="warn">{sick} worker{sick === 1 ? ' is' : 's are'} sick and not working — rest them or stock Medical Supplies.</span>
+  {:else if stressed > 0}<span class="warn">{stressed} worker{stressed === 1 ? '' : 's'} below 50 SAN.</span>{/if}
   {#if hungry}<span class="warn">Workers are hungry — output halved. Stock Red Berries or build a Berry Plantation.</span>{/if}
 </div>
 
@@ -46,7 +54,7 @@
   {/if}
   <div class="list">
     {#each workers as inst (inst.uid)}
-      <PalCard {inst} showWork>
+      <PalCard {inst} showWork showSan>
         <button class="small" onclick={() => game.unassignWorker(inst.uid)}>Dismiss</button>
       </PalCard>
     {/each}

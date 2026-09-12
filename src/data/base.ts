@@ -21,7 +21,7 @@ export const JOBS: JobDef[] = [
   { type: 'Transporting', icon: '📦', effect: '+3% to all base output per level (max +60%).' },
   { type: 'Electricity',  icon: '⚡', effect: '+5% to all base output per level (max +50%).' },
   { type: 'Cooling',      icon: '❄️', effect: '−10% food consumption per level (max −50%).' },
-  { type: 'Medicine',     icon: '💊', effect: 'No effect yet (SAN system comes later).' },
+  { type: 'Medicine',     icon: '💊', effect: 'Makes Medical Supplies (Medicine Workbench); they auto-treat stressed workers.' },
 ];
 
 export const JOB_ICON: Record<WorkType, string> = Object.fromEntries(JOBS.map((j) => [j.type, j.icon])) as Record<WorkType, string>;
@@ -44,6 +44,15 @@ export const RATES = {
   electricBonus: 0.05, electricCap: 0.5,
   coolingSaving: 0.1, coolingCap: 0.5,
   starBonus: 0.1,           // work output per condensing star
+  // SAN (sanity). Workers drain, everyone else recovers. Output falls off in bands; 0 = sick, stops working.
+  sanDrain: 0.5,            // per worker per minute while working (100 → 0 in ~3.3 h)
+  sanHungryMult: 2,
+  sanRest: 2,               // per minute while not working
+  sanBands: [[50, 1], [20, 0.75], [1, 0.4], [0, 0]] as [number, number][],   // [minSan, outputMult]
+  hotSpringReduction: [0.4, 0.7],   // drain reduction by Hot Spring level
+  medicinePerLevel: 0.05,   // Medical Supplies per Medicine level per minute (Medicine Workbench)
+  medicineThreshold: 50,    // treat workers below this
+  medicineHeal: 30,
 };
 
 export const FOOD_ITEM = 'red_berries';
@@ -81,6 +90,10 @@ export const STRUCTURES: StructureDef[] = [
     costs: [{ wood: 50, stone: 30, paldium: 10 }, { wood: 200, stone: 100, ingot: 5 }, { wood: 500, stone: 300, ingot: 20 }] },
   { id: 'altar', name: 'Summoning Altar', desc: 'Summon raid bosses with slabs crafted from fragments.',
     costs: [{ stone: 200, ingot: 30, paldium: 50, diamond: 1 }] },
+  { id: 'medicine_bench', name: 'Medieval Medicine Workbench', desc: 'Medicine Pals make Low Grade Medical Supplies, used automatically on workers whose SAN drops below 50.',
+    costs: [{ wood: 30, stone: 10, paldium: 5 }] },
+  { id: 'hot_spring', name: 'Hot Spring', desc: 'Workers lose SAN 40% / 70% slower.',
+    costs: [{ wood: 30, stone: 20, paldium: 10 }, { wood: 150, stone: 100, paldium: 30, ingot: 5 }] },
   { id: 'palbox', name: 'Palbox Expansion', desc: '+1 worker slot per level.',
     costs: [
       { gold: 150, paldium: 5 }, { gold: 300, paldium: 10 }, { gold: 600, paldium: 15 },

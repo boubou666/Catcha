@@ -37,11 +37,36 @@ export function unassignWorker(save: SaveState, uid: string): void {
   save.base.workers = save.base.workers.filter((u) => u !== uid);
 }
 
-/** Sum of each job's work level across workers, with the condensing-star bonus. */
+export const MEDICINE_ITEM = 'low_grade_medical';
+
+/** Output multiplier for a worker's sanity. */
+export function sanMult(san: number): number {
+  for (const [min, mult] of RATES.sanBands) if (san >= min) return mult;
+  return 0;
+}
+
+export type SanStatus = 'fine' | 'stressed' | 'depressed' | 'sick';
+export function sanStatus(san: number): SanStatus {
+  return san >= 50 ? 'fine' : san >= 20 ? 'stressed' : san >= 1 ? 'depressed' : 'sick';
+}
+
+/** Per-worker output multiplier: stars, work passives, sanity. */
+export function workerMult(inst: PalInstance): number {
+  return (1 + RATES.starBonus * inst.stars) * passiveMult(inst, 'work') * sanMult(inst.san ?? 100);
+}
+
+/** SAN lost per minute by a worker right now. */
+export function sanDrainPerMin(save: SaveState): number {
+  const spring = structureLevel(save, 'hot_spring');
+  const reduction = spring > 0 ? RATES.hotSpringReduction[Math.min(spring, RATES.hotSpringReduction.length) - 1] : 0;
+  return RATES.sanDrain * (isHungry(save) ? RATES.sanHungryMult : 1) * (1 - reduction);
+}
+
+/** Sum of each job's work level across workers, with stars, passives and sanity applied. */
 export function workLevels(save: SaveState): Record<WorkType, number> {
   const out = Object.fromEntries(JOBS.map((j) => [j.type, 0])) as Record<WorkType, number>;
   for (const inst of baseWorkers(save)) {
-    const mult = (1 + RATES.starBonus * inst.stars) * passiveMult(inst, 'work');
+    const mult = workerMult(inst);
     for (const [job, lvl] of Object.entries(palById(inst.palId).work)) {
       out[job as WorkType] += (lvl ?? 0) * mult;
     }
@@ -94,6 +119,8 @@ export interface BaseRates {
   smeltPerMin: number;             // ingots/min if ore is available
   handiworkPerSec: number;         // crafting work units per second
   foodPerMin: number;              // consumption
+  medicalPerMin: number;           // Medical Supplies from Medicine Pals
+  sanDrainPerMin: number;          // per worker
   mult: number;
 }
 
@@ -118,7 +145,7 @@ export function computeRates(save: SaveState): BaseRates {
   if (lvl('ranch') > 0) {
     for (const inst of baseWorkers(save)) {
       const farm = palById(inst.palId).farmDrop;
-      if (farm) add(farm.itemId, farm.perMinute * (1 + RATES.starBonus * inst.stars) * passiveMult(inst, 'work') * mult);
+      if (farm) add(farm.itemId, farm.perMinute * workerMult(inst) * mult);
     }
   }
 
@@ -127,6 +154,8 @@ export function computeRates(save: SaveState): BaseRates {
     smeltPerMin: lvl('furnace') > 0 ? w.Kindling * RATES.smelt * mult : 0,
     handiworkPerSec: lvl('workbench') > 0 ? w.Handiwork * RATES.handiwork * mult : 0,
     foodPerMin: foodPerMinute(save, w),
+    medicalPerMin: lvl('medicine_bench') > 0 ? w.Medicine * RATES.medicinePerLevel * mult : 0,
+    sanDrainPerMin: sanDrainPerMin(save),
     mult,
   };
 }
@@ -178,10 +207,29 @@ function produce(save: SaveState, itemId: string, amount: number): void {
   }
 }
 
+/** Sanity: workers drain (rates already reflect this tick's bands), everyone else rests, medicine treats the worst off. */
+function tickSan(save: SaveState, dtMin: number, drainPerMin: number, medicalPerMin: number): void {
+  const workers = new Set(save.base.workers);
+  for (const inst of save.box) {
+    inst.san ??= 100;
+    inst.san = workers.has(inst.uid)
+      ? Math.max(0, inst.san - drainPerMin * dtMin)
+      : Math.min(100, inst.san + RATES.sanRest * dtMin);
+  }
+  if (medicalPerMin > 0) produce(save, MEDICINE_ITEM, medicalPerMin * dtMin);
+  const needy = baseWorkers(save).filter((w) => w.san < RATES.medicineThreshold).sort((a, b) => a.san - b.san);
+  for (const w of needy) {
+    if (countOf(save, MEDICINE_ITEM) < 1) break;
+    save.inventory[MEDICINE_ITEM] -= 1;
+    w.san = Math.min(100, w.san + RATES.medicineHeal);
+  }
+}
+
 export function tickBase(save: SaveState, dtSec: number): void {
-  if (save.base.workers.length === 0 || dtSec <= 0) return;
-  const rates = computeRates(save);
+  if (dtSec <= 0) return;
   const dtMin = dtSec / 60;
+  if (save.base.workers.length === 0) { tickSan(save, dtMin, 0, 0); return; }
+  const rates = computeRates(save);
   const acc = save.base.acc;
 
   // Food is eaten before anything else so this tick's hunger state is already priced into `rates`.
@@ -202,6 +250,8 @@ export function tickBase(save: SaveState, dtSec: number): void {
       acc.smelt -= 1;
     }
   }
+
+  tickSan(save, dtMin, rates.sanDrainPerMin, rates.medicalPerMin);
 
   let units = rates.handiworkPerSec * dtSec;
   while (units > 0 && save.base.queue.length > 0) {

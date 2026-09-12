@@ -109,6 +109,7 @@ export interface PalInstance {
   stars: 0 | 1 | 2 | 3 | 4;
   lucky: boolean;
   passives: string[];
+  san: number;                           // 0–100 sanity; drains while working, recovers while resting
 }
 
 export type SpherePolicy = SphereTier | 'none';

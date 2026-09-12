@@ -9,7 +9,11 @@
   import { JOB_ICON } from '../data/base';
   import type { WorkType } from '../data/types';
 
-  let { inst, showWork = false, children }: { inst: PalInstance; showWork?: boolean; children?: Snippet } = $props();
+  import { sanStatus } from '../engine/base';
+
+  let { inst, showWork = false, showSan = false, children }: { inst: PalInstance; showWork?: boolean; showSan?: boolean; children?: Snippet } = $props();
+  const san = $derived(inst.san ?? 100);
+  const status = $derived(sanStatus(san));
   const def = $derived(palById(inst.palId));
   const expPct = $derived((inst.exp / expToLevel(inst.level + 1)) * 100);
   const work = $derived(Object.entries(def.work) as [WorkType, number][]);
@@ -31,6 +35,12 @@
     </div>
     {#if inst.passives.length > 0}<div class="passives"><PassiveChips ids={inst.passives} /></div>{/if}
     <div class="bar exp"><span style:width="{expPct}%"></span></div>
+    {#if showSan}
+      <div class="san row" title="SAN {Math.round(san)} / 100 — output {status === 'fine' ? 'normal' : status === 'stressed' ? '75%' : status === 'depressed' ? '40%' : 'stopped'}">
+        <div class="bar san-bar grow"><span class={status} style:width="{san}%"></span></div>
+        <span class="small status {status}">{status === 'fine' ? 'SAN' : status}</span>
+      </div>
+    {/if}
   </div>
   {#if children}<div class="row">{@render children()}</div>{/if}
 </div>
@@ -42,4 +52,13 @@
   .bar { height: 4px; margin-top: 0.25rem; }
   .job { margin-right: 0.25rem; white-space: nowrap; }
   .passives { margin-top: 0.2rem; }
+  .san { margin-top: 0.25rem; gap: 0.4rem; }
+  .san-bar { height: 4px; }
+  .san-bar > span.fine { background: var(--ok); }
+  .san-bar > span.stressed { background: var(--accent); }
+  .san-bar > span.depressed { background: var(--danger); }
+  .san-bar > span.sick { background: var(--danger); }
+  .status { color: var(--muted); min-width: 4.5rem; text-align: right; text-transform: capitalize; }
+  .status.stressed { color: var(--accent); }
+  .status.depressed, .status.sick { color: var(--danger); }
 </style>

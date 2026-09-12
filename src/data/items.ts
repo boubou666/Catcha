@@ -31,7 +31,7 @@ export const ITEMS: ItemDef[] = [
   M('penking_plume', 'Penking Plume'),
   M('ruby', 'Ruby'),
   M('gold_coin', 'Gold Coin'),
-  M('low_grade_medical', 'Low Grade Medical Supplies'),
+  M('low_grade_medical', 'Low Grade Medical Supplies'),   // also the SAN treatment consumable
   M('horn', 'Horn'),
   M('beautiful_flower', 'Beautiful Flower'),
   M('suspicious_juice', 'Suspicious Juice'),

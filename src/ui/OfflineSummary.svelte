@@ -40,6 +40,9 @@
           {#if report.returned.length > 0}
             <tr><td>Expeditions back</td><td class="n">{report.returned.map((r) => `${expeditionById(r.defId).name} (${r.success ? 'success' : 'failed'})`).join(', ')}</td></tr>
           {/if}
+          {#if report.sick > 0}
+            <tr><td>Workers sick</td><td class="n loss">{report.sick} — resting or Medical Supplies needed</td></tr>
+          {/if}
           {#if report.crafted > 0}
             <tr><td>Crafts finished</td><td class="n gain">{report.crafted}</td></tr>
           {/if}

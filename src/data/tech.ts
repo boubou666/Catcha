@@ -48,12 +48,14 @@ export const TECHS: TechDef[] = [
   S('palbox', 'Palbox Expansion', 5, 1, 'Buy extra worker slots for the base.'),
   M('training_1', 'Pal Training I', 5, 2, 'attack', 1.1, '+10% party attack.'),
   // level 6
+  S('medicine_bench', 'Medicine Workbench', 6, 2, 'Medicine Pals keep the base sane.'),
   R('sphere_mega', 'Mega Sphere', 6, 2, 'A better sphere: ×1.5 catch rate.', ['r_sphere_pal', 's_furnace']),
   M('labor_1', 'Efficient Labor I', 6, 2, 'base', 1.15, '+15% base output.'),
   // level 7
   M('capture', 'Capture Technique', 7, 2, 'catch', 1.15, '+15% catch rate with every sphere.'),
   M('haggling', 'Haggling', 7, 2, 'gold', 1.2, '+20% gold from defeated Pals.'),
   // level 8
+  S('hot_spring', 'Hot Spring', 8, 2, 'Workers lose SAN much slower.'),
   S('breeding_farm', 'Breeding Farm', 8, 3, 'Pair Pals to produce eggs.', ['s_ranch']),
   R('cake', 'Cake', 8, 2, 'Bake Cake for the Breeding Farm.', ['s_breeding_farm']),
   // level 9

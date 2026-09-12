@@ -65,8 +65,14 @@ switcher appears above the routes.
 Base building is in: assign box Pals as workers (party and base are exclusive), each work
 suitability produces something — Lumbering/Mining raw materials, Planting+Watering+Gathering
 berries, Kindling smelts, Handiwork crafts spheres and weapons, Farming yields Pal produce,
-Transporting/Electricity multiply, Cooling cuts food use. Structures gate and multiply jobs;
-workers eat Red Berries and slow down when hungry. Knobs: `src/data/base.ts` (RATES).
+Transporting/Electricity multiply, Cooling cuts food use, Medicine makes Medical Supplies. Structures
+gate and multiply jobs; workers eat Red Berries and slow down when hungry.
+
+Sanity: every Pal has SAN 0–100. Working drains it (0.5/min, doubled when hungry; Hot Spring cuts
+40%/70%), resting recovers it (2/min). Below 50 a worker is stressed (75% output), below 20 depressed
+(40%), at 0 sick (stops). Medical Supplies — made by Medicine Pals at the Medicine Workbench, or found
+as drops — are used automatically on the worst-off worker under 50 (+30). Runs offline; the
+welcome-back summary says if anyone came back sick. Knobs: `src/data/base.ts` (RATES).
 
 Offline progress: on load (and after a laptop-sleep gap) the base is simulated in 60 s chunks for the
 time away, capped at 24 h, and a summary shows the deltas. Combat never runs offline.

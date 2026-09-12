@@ -8,7 +8,7 @@ export function newUid(): string {
 }
 
 export function makeInstance(palId: number, level: number, lucky = false, passives: string[] = []): PalInstance {
-  return { uid: newUid(), palId, level, exp: 0, stars: 0, lucky, passives };
+  return { uid: newUid(), palId, level, exp: 0, stars: 0, lucky, passives, san: 100 };
 }
 
 export function addToBox(save: SaveState, inst: PalInstance): void {

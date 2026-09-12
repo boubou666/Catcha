@@ -44,10 +44,12 @@ describe('offline progress', () => {
   it('caps at 24 hours', () => {
     const save = withWorkers(4);
     save.inventory.red_berries = 100_000;
+    const perMin = computeRates(save).items.wood; // sampled before: the worker's SAN falls over a day
     const r = applyOffline(save, 3 * OFFLINE_CAP_MS)!;
     expect(r.capped).toBe(true);
     expect(r.elapsedMs).toBe(OFFLINE_CAP_MS);
-    expect(r.items.wood).toBeLessThan(computeRates(save).items.wood * 60 * 24 + 1);
+    expect(r.items.wood).toBeLessThan(perMin * 60 * 24 + 1);
+    expect(r.sick).toBe(1); // no medicine, no rest: sick by the time you're back
   });
 
   it('prices in hunger once the berries run out', () => {
