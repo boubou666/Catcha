@@ -6,6 +6,8 @@
   import { canAfford } from '../engine/inventory';
   import { describeRequirement, isUnlocked } from '../engine/progress';
   import CostLine from './CostLine.svelte';
+  import { recipeUnlocked } from '../engine/tech';
+  import { recipeTech } from '../data/tech';
 
   const save = $derived(game.save);
   const hasBench = $derived(structureLevel(save, 'workbench') > 0);
@@ -32,7 +34,8 @@
 
 <div class="list">
   {#each RECIPES as r (r.id)}
-    {@const unlocked = isUnlocked(save, r.unlock)}
+    {@const researched = recipeUnlocked(save, r.id)}
+    {@const unlocked = isUnlocked(save, r.unlock) && researched}
     {@const usable = canCraft(save, r.id)}
     {@const owned = r.output.kind === 'weapon' && save.player.weaponTier >= r.output.tier}
     <div class="recipe row" class:locked={!unlocked}>
@@ -40,7 +43,9 @@
         <b>{r.name}</b> <span class="muted small">{r.work} work · {eta(r.work)} each</span>
         {#if owned}<span class="muted small">· owned</span>{/if}
         <div class="muted small">{outputLabel(r.id)}</div>
-        {#if unlocked}<CostLine cost={r.inputs} />{:else}<div class="muted small">🔒 {describeRequirement(r.unlock)}</div>{/if}
+        {#if unlocked}<CostLine cost={r.inputs} />
+        {:else if !researched}<div class="muted small">🔒 Research <b>{recipeTech(r.id)?.name}</b> (Tech tab)</div>
+        {:else}<div class="muted small">🔒 {describeRequirement(r.unlock)}</div>{/if}
       </div>
       {#if unlocked && !owned}
         <button class="small" disabled={!usable || !canAfford(save, r.inputs)} onclick={() => game.craft(r.id, 1)}>×1</button>

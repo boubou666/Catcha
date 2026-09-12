@@ -63,4 +63,8 @@ idle Pals. One Cake → one egg every 5 min; eggs incubate by rarity (2–40 min
 level 1. Same species breeds true, otherwise the child is the species with breeding power closest to the
 parents' average (`SPECIAL_COMBOS` in `engine/breeding.ts` for fixed pairs). Works offline.
 
-Next: tech tree, passives, more regions — see DESIGN.md §10.
+Tech tree: 2 tech points per level. Structures and recipes must be researched (level-gated, some with
+prerequisites) before they can be built or crafted; passive techs multiply click damage, party attack,
+base output, catch rate, exp and gold. Tree lives in `src/data/tech.ts`.
+
+Next: passives, more regions, dungeons — see DESIGN.md §10.

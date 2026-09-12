@@ -4,6 +4,7 @@ import { BASE_SLOTS, FOOD_ITEM, JOBS, QUEUE_CAP, RATES, recipeById, structureByI
 import { addItem, canAfford, spend, countOf, type Cost } from './inventory';
 import { detachFromBreeding, instanceByUid } from './party';
 import { isUnlocked } from './progress';
+import { recipeUnlocked, structureUnlocked, techMult } from './tech';
 
 export function newBase(): BaseState {
   return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [] };
@@ -55,6 +56,7 @@ export function structureLevel(save: SaveState, id: string): number {
 
 /** Cost of the next level, or null when maxed. */
 export function nextCost(save: SaveState, id: string): Cost | null {
+  if (!structureUnlocked(save, id)) return null;
   const def = structureById(id);
   const level = structureLevel(save, id);
   return level < def.costs.length ? def.costs[level] : null;
@@ -77,7 +79,7 @@ export function isHungry(save: SaveState): boolean {
 export function globalMult(save: SaveState, levels = workLevels(save)): number {
   const transport = Math.min(RATES.transportCap, levels.Transporting * RATES.transportBonus);
   const electric = Math.min(RATES.electricCap, levels.Electricity * RATES.electricBonus);
-  return (1 + transport) * (1 + electric) * (isHungry(save) ? RATES.hungryMult : 1);
+  return (1 + transport) * (1 + electric) * (isHungry(save) ? RATES.hungryMult : 1) * techMult(save, 'base');
 }
 
 export function foodPerMinute(save: SaveState, levels = workLevels(save)): number {
@@ -131,7 +133,7 @@ export function computeRates(save: SaveState): BaseRates {
 
 export function canCraft(save: SaveState, recipeId: string): boolean {
   const r = recipeById(recipeId);
-  return structureLevel(save, 'workbench') > 0 && isUnlocked(save, r.unlock);
+  return structureLevel(save, 'workbench') > 0 && isUnlocked(save, r.unlock) && recipeUnlocked(save, recipeId);
 }
 
 /** Pay for and queue n units. Returns how many were queued. */

@@ -1,14 +1,15 @@
 import type { SaveState } from '../data/types';
 import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
+import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
   return {
     version: SAVE_VERSION,
-    player: { level: 1, exp: 0, gold: 0, techPoints: 0, effigies: 0, weaponTier: 1 },
+    player: { level: 1, exp: 0, gold: 0, techPoints: STARTING_TECH_POINTS, effigies: 0, weaponTier: 1 },
     paldeck: {},
     party: [],
     box: [],
@@ -34,6 +35,16 @@ export function migrate(raw: unknown): SaveState | null {
     s.base.breeding = null;
     s.base.eggs = [];
     s.version = 3;
+  }
+  if (s.version === 3 && s.player && s.base) {
+    // Tech tree arrived: back-pay the extra point per level and grant the techs for what's already built.
+    s.player.techPoints += STARTING_TECH_POINTS + (s.player.level - 1) * (TECH_POINTS_PER_LEVEL - 1);
+    s.tech ??= [];
+    for (const id of Object.keys(s.base.structures)) {
+      const t = structureTech(id);
+      if (t && !s.tech.includes(t.id)) s.tech.push(t.id);
+    }
+    s.version = 4;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

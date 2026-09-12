@@ -1,5 +1,6 @@
 import type { PalInstance, SaveState } from '../data/types';
 import { expToLevel, PARTY_SIZE } from './formulas';
+import { TECH_POINTS_PER_LEVEL } from '../data/tech';
 
 let uidCounter = 0;
 export function newUid(): string {
@@ -41,7 +42,7 @@ export function grantExp(save: SaveState, amount: number): PalInstance[] {
   while (save.player.exp >= expToLevel(save.player.level + 1)) {
     save.player.exp -= expToLevel(save.player.level + 1);
     save.player.level += 1;
-    save.player.techPoints += 1;
+    save.player.techPoints += TECH_POINTS_PER_LEVEL;
   }
   const levelled: PalInstance[] = [];
   for (const inst of partyInstances(save)) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { newState, migrate } from './save';
+import { newState, migrate, SAVE_VERSION } from './save';
 import { addToBox, addToParty, makeInstance, release } from './party';
 import { assignWorker } from './base';
 import { condenseCandidates } from './condense';
@@ -129,7 +129,7 @@ describe('migration', () => {
     delete base.breeding; delete base.eggs;
     v2.base = base;
     const s = migrate(v2)!;
-    expect(s.version).toBe(3);
+    expect(s.version).toBe(SAVE_VERSION);
     expect(s.base.breeding).toBeNull();
     expect(s.base.eggs).toEqual([]);
   });

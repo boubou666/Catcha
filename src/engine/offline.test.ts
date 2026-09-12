@@ -3,11 +3,13 @@ import { newState } from './save';
 import { addToBox, makeInstance } from './party';
 import { assignWorker, computeRates, enqueue } from './base';
 import { applyOffline, OFFLINE_CAP_MS, OFFLINE_MIN_MS } from './offline';
+import { TECHS } from '../data/tech';
 
 const HOUR = 60 * 60 * 1000;
 
 function withWorkers(...palIds: number[]) {
   const save = newState();
+  save.tech = TECHS.filter((t) => t.effect.kind !== 'mult').map((t) => t.id);
   for (const id of palIds) {
     const inst = makeInstance(id, 1);
     addToBox(save, inst);

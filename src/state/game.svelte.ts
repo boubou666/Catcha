@@ -11,6 +11,8 @@ import { clickDamage, wildHp } from '../engine/formulas';
 import { assignWorker, build, cancelCraft, enqueue, unassignWorker } from '../engine/base';
 import { tickWorld } from '../engine/tick';
 import { clearPair, setPair } from '../engine/breeding';
+import { research, techMult } from '../engine/tech';
+import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
 import { condense } from '../engine/condense';
@@ -45,7 +47,7 @@ export class Game {
   get route(): RouteDef { return routeById(this.save.progress.route); }
   get region() { return regionById(this.route.regionId); }
   get dps(): number { return this.wild ? partyDps(this.save, this.wild) : 0; }
-  get clickDmg(): number { return clickDamage(this.save.player.level, this.save.player.weaponTier); }
+  get clickDmg(): number { return clickDamage(this.save.player.level, this.save.player.weaponTier) * techMult(this.save, 'click'); }
   get inBossFight(): boolean { return this.wild?.kind !== 'wild'; }
 
   // ---- loop --------------------------------------------------------------
@@ -203,6 +205,10 @@ export class Game {
   }
 
   clearPair() { clearPair(this.save); }
+
+  research(techId: string) {
+    if (research(this.save, techId)) this.push(`Researched ${techById(techId).name}.`);
+  }
 
   condense(uid: string) {
     const fed = condense(this.save, uid);

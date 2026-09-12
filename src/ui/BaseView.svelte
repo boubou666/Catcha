@@ -7,6 +7,8 @@
   import { canAfford, countOf } from '../engine/inventory';
   import PalCard from './PalCard.svelte';
   import CostLine from './CostLine.svelte';
+  import { structureUnlocked } from '../engine/tech';
+  import { structureTech } from '../data/tech';
 
   const save = $derived(game.save);
   const workers = $derived(baseWorkers(save));
@@ -82,12 +84,14 @@
     {#each STRUCTURES as s (s.id)}
       {@const level = structureLevel(save, s.id)}
       {@const cost = nextCost(save, s.id)}
-      <div class="structure row">
+      {@const locked = !structureUnlocked(save, s.id)}
+      <div class="structure row" class:locked>
         <div class="grow">
           <b>{s.name}</b>
           {#if level > 0}<span class="muted">Lv {level}{cost ? '' : ' (max)'}</span>{/if}
           <div class="muted small">{s.desc}</div>
           {#if cost}<CostLine {cost} />{/if}
+          {#if locked}<div class="muted small">🔒 Research <b>{structureTech(s.id)?.name}</b> (Tech tab)</div>{/if}
         </div>
         {#if cost}
           <button class="small" disabled={!canAfford(save, cost)} onclick={() => game.build(s.id)}>
@@ -128,4 +132,5 @@
   .rates { margin-top: 0.5rem; }
   .chip { background: var(--panel-2); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.85rem; }
   .structure { padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; }
+  .structure.locked { opacity: 0.6; }
 </style>

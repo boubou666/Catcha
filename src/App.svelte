@@ -8,18 +8,20 @@
   import BaseView from './ui/BaseView.svelte';
   import CraftView from './ui/CraftView.svelte';
   import BreedingView from './ui/BreedingView.svelte';
+  import TechView from './ui/TechView.svelte';
   import PaldeckView from './ui/PaldeckView.svelte';
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
 
-  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'paldeck' | 'items' | 'shop';
+  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'tech' | 'paldeck' | 'items' | 'shop';
   const TABS: { id: Tab; label: string }[] = [
     { id: 'party', label: 'Party' },
     { id: 'box', label: 'Box' },
     { id: 'base', label: 'Base' },
     { id: 'craft', label: 'Craft' },
     { id: 'breed', label: 'Breeding' },
+    { id: 'tech', label: 'Tech' },
     { id: 'paldeck', label: 'Paldeck' },
     { id: 'items', label: 'Items' },
     { id: 'shop', label: 'Merchant' },
@@ -49,6 +51,7 @@
         {:else if tab === 'base'}<BaseView />
         {:else if tab === 'craft'}<CraftView />
         {:else if tab === 'breed'}<BreedingView />
+        {:else if tab === 'tech'}<TechView />
         {:else if tab === 'paldeck'}<PaldeckView />
         {:else if tab === 'items'}<ItemsView />
         {:else}<ShopView />{/if}

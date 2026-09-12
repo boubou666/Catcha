@@ -3,6 +3,7 @@ import { palById } from '../data/pals';
 import { elementMult } from '../data/elements';
 import { partyInstances, grantExp } from './party';
 import { addItem } from './inventory';
+import { techMult } from './tech';
 import { expReward, goldReward, instanceAttack, LUCKY_CHANCE, LUCKY_HP_MULT, wildHp } from './formulas';
 
 export type Rng = () => number;
@@ -48,7 +49,7 @@ export function partyDps(save: SaveState, wild: Wild): number {
   for (const inst of partyInstances(save)) {
     dps += instanceAttack(inst) * elementMult(palById(inst.palId).elements, target);
   }
-  return dps;
+  return dps * techMult(save, 'attack');
 }
 
 export interface DefeatSummary {
@@ -63,8 +64,8 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
   const bossMult = wild.kind === 'wild' ? 1 : wild.kind === 'alpha' ? 10 : 25;
   const luckyMult = wild.lucky ? 5 : 1;
 
-  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult);
-  const exp = Math.round(expReward(wild.level) * bossMult * luckyMult);
+  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold'));
+  const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp'));
   save.player.gold += gold;
   grantExp(save, exp);
 

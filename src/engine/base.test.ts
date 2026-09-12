@@ -8,10 +8,18 @@ import {
 import { RATES, RECIPES, STRUCTURES } from '../data/base';
 import { PALS } from '../data/pals';
 import { itemById } from '../data/items';
+import { TECHS } from '../data/tech';
+
+/** newState with every unlock tech researched (no multipliers) — these tests are about the base, not the gates. */
+function allTech() {
+  const save = newState();
+  save.tech = TECHS.filter((t) => t.effect.kind !== 'mult').map((t) => t.id);
+  return save;
+}
 
 /** A save with `n` Lamballs (Handiwork 1, Transporting 1, Farming 1) already on base duty. */
 function staffed(n: number, palId = 1) {
-  const save = newState();
+  const save = allTech();
   for (let i = 0; i < n; i++) {
     const inst = makeInstance(palId, 1);
     addToBox(save, inst);
@@ -116,7 +124,7 @@ describe('production', () => {
 
 describe('structures', () => {
   it('charges the next level and stops at max', () => {
-    const save = newState();
+    const save = allTech();
     save.inventory.wood = 10;
     expect(build(save, 'workbench')).toBe(true);
     expect(save.inventory.wood).toBe(0);
@@ -124,7 +132,7 @@ describe('structures', () => {
     expect(build(save, 'workbench')).toBe(false);
   });
   it('palbox adds a slot and takes gold', () => {
-    const save = newState();
+    const save = allTech();
     save.player.gold = 150; save.inventory.paldium = 5;
     expect(build(save, 'palbox')).toBe(true);
     expect(save.base.slots).toBe(4);
