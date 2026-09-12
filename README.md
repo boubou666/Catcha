@@ -97,6 +97,10 @@ The interface is styled after Palworld's own menus: a sunny Palpagos backdrop, d
 cyan edge-light and chamfered corners, bold rounded type (Nunito from Google Fonts, system fallback offline),
 yellow-orange for the actions that matter. Everything is driven by the tokens at the top of `src/app.css`
 (colours, chamfer size, glow); components only use those tokens. Icons come from `scripts/make-icons.mjs`.
+Settings → Appearance switches between the dark HUD (default), a light HUD (cream glass, ink text) and
+"follow the system"; the choice is per device (`catcha.theme`) and stamps `data-theme` on the root plus the
+browser theme colour (`src/state/theme.svelte.ts`). The window itself never scrolls: the app fills the
+viewport and the two columns (or, on phones, the area under the arena) scroll on their own.
 
 ## Status
 

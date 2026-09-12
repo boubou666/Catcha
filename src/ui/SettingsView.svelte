@@ -9,6 +9,12 @@
   import { filterSettings, SETTINGS_SECTIONS, type SettingsSection } from '../engine/settingsfilter';
   import TutorialSteps from './TutorialSteps.svelte';
   import KeyBindings from './KeyBindings.svelte';
+  import { theme, type ThemeChoice } from '../state/theme.svelte';
+  const THEMES: { value: ThemeChoice; label: string; desc: string }[] = [
+    { value: 'dark', label: 'Dark HUD', desc: 'Navy glass panels over the Palpagos sky — the default.' },
+    { value: 'light', label: 'Light HUD', desc: 'Cream glass with ink text; easier in bright daylight.' },
+    { value: 'system', label: 'Follow the system', desc: 'Light or dark as your device prefers.' },
+  ];
   import { ui } from '../state/ui.svelte';
 
   let sound = $state(getPref());
@@ -83,6 +89,20 @@
       <input type="radio" name="reset" checked={mode === 'local'} onchange={() => pick('local')} />
       <span><b>Local midnight</b> <span class="muted small">({tz})</span><br /><span class="muted small">Your own midnight. Next reset in {formatDuration(msUntilRollover(now, 'local'))}.</span></span>
     </label>
+  </div>
+</section>
+{/if}
+
+{#if show('appearance')}
+<section>
+  <h3>Appearance</h3>
+  <div class="options">
+    {#each THEMES as t (t.value)}
+      <label class="opt" class:on={theme.choice === t.value}>
+        <input type="radio" name="theme" checked={theme.choice === t.value} onchange={() => theme.set(t.value)} />
+        <span><b>{t.label}</b>{#if t.value === 'system'} <span class="muted small">(now {theme.effective})</span>{/if}<br /><span class="muted small">{t.desc}</span></span>
+      </label>
+    {/each}
   </div>
 </section>
 {/if}

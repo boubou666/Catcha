@@ -14,6 +14,8 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       'New interface styled after Palworld’s menus: a sunny Palpagos backdrop, dark glass HUD panels with cyan edge-light and chamfered corners, bold rounded type (Nunito), yellow-orange for the actions that matter.',
       'Fresh app icons to match.',
+      'Settings → Appearance: dark HUD, light HUD, or follow the system.',
+      'The page no longer scrolls as a whole — the columns scroll on their own, so the header and arena stay put.',
     ],
   },
   {

@@ -1,4 +1,4 @@
-export type SettingsSection = 'daily' | 'sound' | 'catching' | 'keyboard' | 'save' | 'about';
+export type SettingsSection = 'daily' | 'appearance' | 'sound' | 'catching' | 'keyboard' | 'save' | 'about';
 
 export interface SettingsSectionDef {
   id: SettingsSection;
@@ -8,6 +8,7 @@ export interface SettingsSectionDef {
 
 export const SETTINGS_SECTIONS: SettingsSectionDef[] = [
   { id: 'daily', title: 'Daily quest reset', keywords: ['daily', 'quest', 'reset', 'midnight', 'utc', 'local', 'time', 'timezone', 'clock', 'day', 'rollover'] },
+  { id: 'appearance', title: 'Appearance', keywords: ['appearance', 'theme', 'dark', 'light', 'mode', 'colour', 'color', 'look', 'night', 'day', 'system'] },
   { id: 'sound', title: 'Sound', keywords: ['sound', 'audio', 'sfx', 'effects', 'volume', 'mute', 'music', 'vibration', 'haptic', 'buzz', 'vibrate'] },
   { id: 'catching', title: 'Catching', keywords: ['catch', 'catching', 'sphere', 'policy', 'throw', 'merchant', 'auto'] },
   { id: 'keyboard', title: 'Keyboard', keywords: ['keyboard', 'shortcuts', 'hotkeys', 'keys', 'rebind', 'binding', 'bindings', 'controls', 'remap'] },

@@ -35,6 +35,7 @@
   import ShortcutsHelp from './ui/ShortcutsHelp.svelte';
   import { isFieldTarget, resolveShortcut } from './engine/shortcuts';
   import { keys } from './state/keys.svelte';
+  import { theme } from './state/theme.svelte';
   import { isUnlocked } from './engine/progress';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings' | 'stats';
@@ -126,7 +127,8 @@
     const stop = game.start();
     const off = game.on((e) => { play(e); buzz(e); });
     whatsNew.init();
-    return () => { stop(); off(); };
+    const stopTheme = theme.start();
+    return () => { stop(); off(); stopTheme(); };
   });
 </script>
 
@@ -185,24 +187,33 @@
 </div>
 
 <style>
-  .app { max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
-  main { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr); gap: 1rem; }
+  /* full-height shell: header, then two independently scrolling columns; the window itself never scrolls */
+  .app { max-width: 1200px; height: 100vh; height: 100dvh; margin: 0 auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr); gap: 1rem; }
   main.mobile { grid-template-columns: 1fr; }
-  main > section { min-width: 0; }
+  main > section { min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px; margin: -4px; }   /* padding keeps the panels' glow from being clipped */
+  .right { display: flex; flex-direction: column; }
+  .right .tab-body { flex: 1; min-height: 0; overflow-y: auto; }
+  .right > :global(*) { flex-shrink: 0; }
+  .right > .tab-body { flex-shrink: 1; }
   .groups button { min-width: 0; padding-left: 0.4rem; padding-right: 0.4rem; }
   .spawns-mobile { margin-top: 0.75rem; }
   .sticky-arena { position: sticky; top: 0; z-index: 5; padding-bottom: 0.35rem; }
   @media (max-width: 800px) {
     .app { padding: 0.5rem; gap: 0.5rem; }
     .tab-body { min-height: 0; padding: 0.75rem; }
+    /* one column on phones: the sticky arena stays put while the rest scrolls */
+    main.mobile > section { overflow: visible; }
+    main.mobile { overflow-y: auto; min-height: 0; display: block; }
+    .right .tab-body { overflow: visible; flex: none; }
   }
   .groups { display: flex; gap: 0.35rem; margin-bottom: 0.5rem; }
   .groups button { flex: 1; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; }
-  .groups button.active { background: linear-gradient(180deg, #7fe3ff, var(--accent-2)); color: var(--on-accent); border-color: #d9f6ff; }
+  .groups button.active { background: linear-gradient(180deg, #7fe3ff, #35d0ff); color: var(--on-accent); border-color: #d9f6ff; }
   .tabs { display: flex; gap: 0.3rem; margin-bottom: -2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 0 0.5rem; position: relative; z-index: 1; }
   .tabs::-webkit-scrollbar { display: none; }
   .tabs button { flex: 0 0 auto; border-radius: var(--radius-sm) var(--radius-sm) 0 0; border-bottom: none; box-shadow: none; background: var(--panel-2); padding: 0.3rem 0.65rem 0.45rem; font-size: 0.9rem; }
-  .tabs button.active { background: rgba(53, 208, 255, 0.18); color: #fff; border-color: var(--accent-2); font-weight: 900; }
+  .tabs button.active { background: var(--tab-active); color: var(--text); border-color: var(--accent-2); font-weight: 900; }
   .tab-body { border-top-left-radius: 0; }
-  .tab-body { min-height: 400px; }
+  .tab-body { min-height: 200px; }
 </style>

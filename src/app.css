@@ -24,6 +24,13 @@
   --shadow: var(--glow);
   --shadow-sm: 0 4px 14px rgba(5, 15, 30, 0.35);
   --shadow-float: 0 0 0 1px rgba(53, 208, 255, 0.35), 0 18px 48px rgba(5, 15, 30, 0.6);
+  --button-bg: rgba(var(--navy), 0.9);
+  --button-hover: rgba(53, 208, 255, 0.22);
+  --field-bg: rgba(0, 0, 0, 0.28);
+  --option-bg: #10203a;
+  --title: #fff;
+  --title-glow: 0 0 14px rgba(53, 208, 255, 0.9), 0 2px 0 rgba(0, 0, 0, 0.35);
+  --tab-active: rgba(53, 208, 255, 0.18);
   --chamfer: 14px;
   --radius: 6px;
   --radius-sm: 4px;
@@ -35,9 +42,37 @@
   background: var(--bg);
 }
 
+/* Light HUD: the same shapes over cream glass with ink text. Picked in Settings → Appearance (or follows the system). */
+:root[data-theme='light'] {
+  --panel: rgba(255, 250, 240, 0.9);
+  --panel-2: rgba(31, 42, 68, 0.06);
+  --panel-3: rgba(31, 42, 68, 0.12);
+  --border: rgba(26, 155, 199, 0.7);
+  --border-soft: rgba(31, 42, 68, 0.18);
+  --text: #1f2a44;
+  --muted: #5d6b83;
+  --accent-2: #1a9bc7;
+  --danger: #d63b3b;
+  --ok: #1f9d5a;
+  --overlay: rgba(31, 42, 68, 0.5);
+  --glow: 0 0 0 1px rgba(26, 155, 199, 0.25), 0 12px 32px rgba(31, 42, 68, 0.25);
+  --shadow: var(--glow);
+  --shadow-sm: 0 4px 14px rgba(31, 42, 68, 0.2);
+  --shadow-float: 0 0 0 1px rgba(26, 155, 199, 0.35), 0 18px 48px rgba(31, 42, 68, 0.35);
+  --button-bg: rgba(255, 255, 255, 0.85);
+  --button-hover: rgba(26, 155, 199, 0.18);
+  --field-bg: rgba(255, 255, 255, 0.7);
+  --option-bg: #fffaf0;
+  --title: #1f2a44;
+  --title-glow: 0 2px 0 rgba(255, 255, 255, 0.8);
+  --tab-active: rgba(26, 155, 199, 0.16);
+  color-scheme: light;
+}
+
 * { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
 body {
-  margin: 0; min-height: 100vh;
+  margin: 0;
   background:
     radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.55), transparent 45%),
     radial-gradient(ellipse at 50% 115%, var(--grass) 0%, rgba(124, 201, 107, 0.6) 25%, transparent 55%),
@@ -60,13 +95,13 @@ button {
   --c: 7px;
   font: inherit; font-weight: 800;
   color: var(--text);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)), rgba(var(--navy), 0.9);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)), var(--button-bg);
   border: 1px solid var(--border);
   padding: 0.4rem 0.9rem;
   cursor: pointer;
   transition: background-color 120ms ease, border-color 120ms ease, transform 60ms ease;
 }
-button:hover:not(:disabled) { border-color: var(--accent-2); background: linear-gradient(180deg, rgba(53, 208, 255, 0.28), rgba(53, 208, 255, 0.1)), rgba(var(--navy), 0.9); }
+button:hover:not(:disabled) { border-color: var(--accent-2); background: linear-gradient(180deg, var(--button-hover), transparent), var(--button-bg); }
 button:active:not(:disabled) { transform: translateY(1px); }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 button.primary { background: linear-gradient(180deg, #ffd166, var(--accent) 55%, #f39c12); color: var(--on-accent); border-color: #fff1c2; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35); }
@@ -80,11 +115,11 @@ select, input {
   --c: 6px;
   font: inherit; font-weight: 600;
   color: var(--text);
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--field-bg);
   border: 1px solid var(--border-soft);
   padding: 0.3rem 0.6rem;
 }
-select option { background: #10203a; color: var(--text); }
+select option { background: var(--option-bg); color: var(--text); }
 input::placeholder { color: var(--muted); font-weight: 500; }
 select:focus, input:focus, button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 0; border-color: var(--accent-2); }
 input[type='checkbox'], input[type='radio'] { accent-color: var(--accent-2); }
@@ -129,6 +164,12 @@ a { color: var(--accent-2); }
 .bar.exp > span { background: linear-gradient(180deg, #8ae4ff, var(--accent-2)); }
 
 table { font-variant-numeric: tabular-nums; }
+
+/* slim, theme-coloured scrollbars for the columns that do scroll */
+* { scrollbar-width: thin; scrollbar-color: rgba(53, 208, 255, 0.45) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(53, 208, 255, 0.45); border-radius: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
 
 /* touch devices: comfortable targets, no double-tap zoom on buttons */
 @media (pointer: coarse) {
