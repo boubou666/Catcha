@@ -8,7 +8,9 @@ import { tryCatch } from '../engine/catch';
 import { isUnlocked } from '../engine/progress';
 import { addToParty, release, removeFromParty } from '../engine/party';
 import { clickDamage, wildHp } from '../engine/formulas';
-import { assignWorker, build, cancelCraft, enqueue, tickBase, unassignWorker } from '../engine/base';
+import { assignWorker, build, cancelCraft, enqueue, unassignWorker } from '../engine/base';
+import { tickWorld } from '../engine/tick';
+import { clearPair, setPair } from '../engine/breeding';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
 import { condense } from '../engine/condense';
@@ -94,7 +96,7 @@ export class Game {
         this.hit((this.dps * dtMs) / 1000);
       }
     }
-    tickBase(this.save, dtMs / 1000);
+    for (const palId of tickWorld(this.save, dtMs / 1000).hatched) this.push(`An egg hatched: ${palById(palId).name}!`);
     this.sinceSave += dtMs;
     if (this.sinceSave >= AUTOSAVE_MS) this.persist();
   }
@@ -192,6 +194,15 @@ export class Game {
   }
 
   cancelCraft(index: number) { cancelCraft(this.save, index); }
+
+  setPair(aUid: string, bUid: string) {
+    if (setPair(this.save, aUid, bUid)) {
+      const a = instanceByUid(this.save, aUid)!; const b = instanceByUid(this.save, bUid)!;
+      this.push(`${palById(a.palId).name} and ${palById(b.palId).name} moved to the Breeding Farm.`);
+    }
+  }
+
+  clearPair() { clearPair(this.save); }
 
   condense(uid: string) {
     const fed = condense(this.save, uid);

@@ -116,12 +116,25 @@ export interface CraftJob {
   remaining: number;                     // Handiwork units left on this unit
 }
 
+export interface BreedingPair {
+  a: string;                             // parent uids; locked out of the party and base while paired
+  b: string;
+  progress: number | null;               // 0..1 toward the next egg, null = waiting for a Cake
+}
+
+export interface Egg {
+  palId: number;
+  remaining: number;                     // incubation seconds left
+}
+
 export interface BaseState {
   slots: number;                         // worker capacity
   workers: string[];                     // PalInstance uids (never also in the party)
   structures: Record<string, number>;    // structureId -> level (absent = not built)
   queue: CraftJob[];                     // head is being worked on
   acc: Record<string, number>;           // fractional production carry, keyed by item / 'food' / 'smelt'
+  breeding: BreedingPair | null;
+  eggs: Egg[];                           // all incubate in parallel
 }
 
 export interface SaveState {

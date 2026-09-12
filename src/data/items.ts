@@ -34,6 +34,7 @@ export const ITEMS: ItemDef[] = [
   M('low_grade_medical', 'Low Grade Medical Supplies'),
   // food
   F('red_berries', 'Red Berries'),
+  F('cake', 'Cake'),
   F('berry_seeds', 'Berry Seeds'),
   F('egg', 'Egg'),
   F('milk', 'Milk'),

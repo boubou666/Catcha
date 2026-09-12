@@ -19,6 +19,12 @@ export function addToBox(save: SaveState, inst: PalInstance): void {
   if (save.party.length < PARTY_SIZE) save.party.push(inst.uid);
 }
 
+/** A Pal that takes another job or leaves the box breaks up its breeding pair. */
+export function detachFromBreeding(save: SaveState, uid: string): void {
+  const b = save.base.breeding;
+  if (b && (b.a === uid || b.b === uid)) save.base.breeding = null;
+}
+
 export function instanceByUid(save: SaveState, uid: string): PalInstance | undefined {
   return save.box.find((p) => p.uid === uid);
 }
@@ -55,6 +61,7 @@ export function grantExp(save: SaveState, amount: number): PalInstance[] {
 export function addToParty(save: SaveState, uid: string): boolean {
   if (save.party.length >= PARTY_SIZE || save.party.includes(uid) || !instanceByUid(save, uid)) return false;
   save.base.workers = save.base.workers.filter((u) => u !== uid);
+  detachFromBreeding(save, uid);
   save.party.push(uid);
   return true;
 }
@@ -66,5 +73,6 @@ export function removeFromParty(save: SaveState, uid: string): void {
 export function release(save: SaveState, uid: string): void {
   removeFromParty(save, uid);
   save.base.workers = save.base.workers.filter((u) => u !== uid);
+  detachFromBreeding(save, uid);
   save.box = save.box.filter((p) => p.uid !== uid);
 }

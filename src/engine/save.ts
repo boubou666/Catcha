@@ -2,7 +2,7 @@ import type { SaveState } from '../data/types';
 import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -29,6 +29,11 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 1) {
     s.base = newBase();
     s.version = 2;
+  }
+  if (s.version === 2 && s.base) {
+    s.base.breeding = null;
+    s.base.eggs = [];
+    s.version = 3;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

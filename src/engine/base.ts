@@ -2,11 +2,11 @@ import type { BaseState, PalInstance, SaveState, WorkType } from '../data/types'
 import { palById } from '../data/pals';
 import { BASE_SLOTS, FOOD_ITEM, JOBS, QUEUE_CAP, RATES, recipeById, structureById, STRUCTURES } from '../data/base';
 import { addItem, canAfford, spend, countOf, type Cost } from './inventory';
-import { instanceByUid } from './party';
+import { detachFromBreeding, instanceByUid } from './party';
 import { isUnlocked } from './progress';
 
 export function newBase(): BaseState {
-  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {} };
+  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [] };
 }
 
 // ---- workers ---------------------------------------------------------------
@@ -26,6 +26,7 @@ export function assignWorker(save: SaveState, uid: string): boolean {
   if (isWorker(save, uid) || !instanceByUid(save, uid)) return false;
   if (save.base.workers.length >= save.base.slots) return false;
   save.party = save.party.filter((u) => u !== uid);
+  detachFromBreeding(save, uid);
   save.base.workers.push(uid);
   return true;
 }

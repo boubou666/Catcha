@@ -20,7 +20,8 @@ export function condenseCandidates(save: SaveState, target: PalInstance): PalIns
     .filter((p) =>
       p.palId === target.palId && p.uid !== target.uid
       && p.stars === 0 && !p.lucky
-      && !save.party.includes(p.uid) && !save.base.workers.includes(p.uid))
+      && !save.party.includes(p.uid) && !save.base.workers.includes(p.uid)
+      && p.uid !== save.base.breeding?.a && p.uid !== save.base.breeding?.b)
     .sort((a, b) => a.level - b.level || a.exp - b.exp);
 }
 

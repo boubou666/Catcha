@@ -1,6 +1,7 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
   import { itemName } from '../data/items';
+  import { palById } from '../data/pals';
   import { OFFLINE_CAP_MS } from '../engine/offline';
   import { formatDuration, signed } from './format';
 
@@ -32,6 +33,9 @@
           {#each rows as [id, delta] (id)}
             <tr><td>{itemName(id)}</td><td class="n" class:gain={delta > 0} class:loss={delta < 0}>{signed(delta)}</td></tr>
           {/each}
+          {#if report.hatched.length > 0}
+            <tr><td>Eggs hatched</td><td class="n gain">{report.hatched.map((id) => palById(id).name).join(', ')}</td></tr>
+          {/if}
           {#if report.crafted > 0}
             <tr><td>Crafts finished</td><td class="n gain">{report.crafted}</td></tr>
           {/if}

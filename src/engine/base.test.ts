@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { newState, migrate } from './save';
+import { newState, migrate, SAVE_VERSION } from './save';
 import { addToBox, addToParty, makeInstance, release } from './party';
 import {
   assignWorker, build, cancelCraft, computeRates, enqueue, isHungry, nextCost,
@@ -180,7 +180,7 @@ describe('migration', () => {
     const v1 = { ...newState(), version: 1 } as Record<string, unknown>;
     delete v1.base;
     const s = migrate(v1);
-    expect(s?.version).toBe(2);
+    expect(s?.version).toBe(SAVE_VERSION);
     expect(s?.base.slots).toBe(3);
   });
 });

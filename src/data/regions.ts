@@ -15,7 +15,7 @@ const routes: RouteDef[] = [
   route('plateau',  'Plateau of Beginnings',      1,  'Neutral', [[1, 40], [2, 30], [3, 20], [4, 10]],                    { kind: 'none' }, 10),
   route('behemoth', 'Grassy Behemoth Hills',      3,  'Grass',   [[4, 20], [8, 20], [5, 15], [14, 15], [16, 15], [13, 15]], { kind: 'routeCleared', id: 'plateau' }, 20),
   route('fort',     'Fort Ruins',                 5,  'Water',   [[10, 25], [6, 20], [7, 20], [12, 20], [17, 15]],         { kind: 'routeCleared', id: 'behemoth' }, 30),
-  route('cove',     'Small Cove',                 7,  'Water',   [[25, 25], [23, 25], [16, 15], [6, 15], [27, 20]],        { kind: 'alpha', id: 'chillet' }, 40),
+  route('cove',     'Small Cove',                 7,  'Water',   [[25, 25], [23, 20], [16, 15], [6, 15], [27, 15], [29, 10]],        { kind: 'alpha', id: 'chillet' }, 40),
   route('bridge',   'Bridge of the Twin Knights', 9,  'Ground',  [[20, 25], [22, 20], [21, 20], [19, 20], [26, 15]],       { kind: 'routeCleared', id: 'cove' }, 50),
   route('church',   'Abandoned Church',           11, 'Dark',    [[24, 15], [15, 25], [18, 20], [28, 20], [30, 20]],       { kind: 'routeCleared', id: 'bridge' }, 60),
   route('icewind',  'Ice Wind Island',            13, 'Ice',     [[10, 35], [11, 15], [29, 25], [55, 10], [9, 15]],        { kind: 'alpha', id: 'penking' }, 75),

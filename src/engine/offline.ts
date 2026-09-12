@@ -1,5 +1,5 @@
 import type { SaveState } from '../data/types';
-import { tickBase } from './base';
+import { tickWorld } from './tick';
 
 export const OFFLINE_CAP_MS = 24 * 60 * 60 * 1000;
 export const OFFLINE_MIN_MS = 10_000;     // shorter gaps aren't worth a report
@@ -11,6 +11,7 @@ export interface OfflineReport {
   gold: number;                           // delta
   items: Record<string, number>;          // delta per item, positive or negative
   crafted: number;                        // queue entries completed
+  hatched: number[];                      // Paldeck ids that hatched
   weaponTier?: number;                    // set if a weapon finished
 }
 
@@ -28,8 +29,9 @@ export function applyOffline(save: SaveState, elapsedMs: number): OfflineReport 
   const queued = save.base.queue.length;
   const weapon = save.player.weaponTier;
 
+  const hatched: number[] = [];
   for (let left = simulated / 1000; left > 0; left -= OFFLINE_STEP_SEC) {
-    tickBase(save, Math.min(OFFLINE_STEP_SEC, left));
+    hatched.push(...tickWorld(save, Math.min(OFFLINE_STEP_SEC, left)).hatched);
   }
 
   const items: Record<string, number> = {};
@@ -43,9 +45,10 @@ export function applyOffline(save: SaveState, elapsedMs: number): OfflineReport 
     gold: save.player.gold - gold,
     items,
     crafted: queued - save.base.queue.length,
+    hatched,
   };
   if (save.player.weaponTier > weapon) report.weaponTier = save.player.weaponTier;
 
-  const empty = report.gold === 0 && report.crafted === 0 && Object.keys(items).length === 0 && !report.weaponTier;
+  const empty = report.gold === 0 && report.crafted === 0 && Object.keys(items).length === 0 && !report.weaponTier && hatched.length === 0;
   return empty ? null : report;
 }

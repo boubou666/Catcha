@@ -58,4 +58,9 @@ Condensing: build the Pal Essence Condenser, then feed 4 / 16 / 32 / 64 idle dup
 from the Box for ★1–★4 (+10% attack and work per star). Lucky, starred, party and base Pals are never
 consumed.
 
-Next: breeding, tech tree — see DESIGN.md §10.
+Breeding: build the Breeding Farm, bake Cake at the Workbench (8 Red Berries, 8 Eggs, 5 Milk), pair two
+idle Pals. One Cake → one egg every 5 min; eggs incubate by rarity (2–40 min) and hatch into the box at
+level 1. Same species breeds true, otherwise the child is the species with breeding power closest to the
+parents' average (`SPECIAL_COMBOS` in `engine/breeding.ts` for fixed pairs). Works offline.
+
+Next: tech tree, passives, more regions — see DESIGN.md §10.

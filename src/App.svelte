@@ -7,17 +7,19 @@
   import BoxView from './ui/BoxView.svelte';
   import BaseView from './ui/BaseView.svelte';
   import CraftView from './ui/CraftView.svelte';
+  import BreedingView from './ui/BreedingView.svelte';
   import PaldeckView from './ui/PaldeckView.svelte';
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
 
-  type Tab = 'party' | 'box' | 'base' | 'craft' | 'paldeck' | 'items' | 'shop';
+  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'paldeck' | 'items' | 'shop';
   const TABS: { id: Tab; label: string }[] = [
     { id: 'party', label: 'Party' },
     { id: 'box', label: 'Box' },
     { id: 'base', label: 'Base' },
     { id: 'craft', label: 'Craft' },
+    { id: 'breed', label: 'Breeding' },
     { id: 'paldeck', label: 'Paldeck' },
     { id: 'items', label: 'Items' },
     { id: 'shop', label: 'Merchant' },
@@ -46,6 +48,7 @@
         {:else if tab === 'box'}<BoxView />
         {:else if tab === 'base'}<BaseView />
         {:else if tab === 'craft'}<CraftView />
+        {:else if tab === 'breed'}<BreedingView />
         {:else if tab === 'paldeck'}<PaldeckView />
         {:else if tab === 'items'}<ItemsView />
         {:else}<ShopView />{/if}
