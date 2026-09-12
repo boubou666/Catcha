@@ -95,8 +95,8 @@ shows, since the images are never committed or deployed.
 
 The interface is styled after Palworld's own menus: a sunny Palpagos backdrop, dark navy glass panels with a
 cyan edge-light and chamfered corners, bold rounded type (Nunito from Google Fonts, system fallback offline),
-yellow-orange for the actions that matter. Everything is driven by the tokens at the top of 
-(colours, chamfer size, glow); components only use those tokens. Icons come from .
+yellow-orange for the actions that matter. Everything is driven by the tokens at the top of `src/app.css`
+(colours, chamfer size, glow); components only use those tokens. Icons come from `scripts/make-icons.mjs`.
 
 ## Status
 
