@@ -5,18 +5,21 @@
   import { compareRows, MAX_COMPARE } from '../engine/compare';
   import PalIcon from './PalIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
+  import PalCard from './PalCard.svelte';
+  import BoxFilterBar from './BoxFilterBar.svelte';
+  import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
 
   const save = $derived(game.save);
   // drop anything that left the box (released / ascended)
   const insts = $derived(compare.uids.map((u) => save.box.find((p) => p.uid === u)).filter((p): p is NonNullable<typeof p> => !!p));
   const rows = $derived(compareRows(save, insts));
-  const others = $derived([...save.box].filter((p) => !compare.has(p.uid)).sort((a, b) => b.level - a.level || a.palId - b.palId));
-
-  let pick = $state('');
-  function add() {
-    if (pick) { compare.toggle(pick); pick = ''; }
-  }
-  const label = (p: (typeof save.box)[number]) => `${palById(p.palId).name} Lv ${p.level}${p.stars ? ' ' + '★'.repeat(p.stars) : ''}${p.lucky ? ' ✨' : ''}`;
+  // Picker: the whole Box minus the selection, strongest first. Duplicates-only is handy for picking which copy to keep.
+  const PICK_DEFAULTS: BoxFilter = { ...DEFAULT_FILTER, sort: 'attack' };
+  let filter = $state<BoxFilter>({ ...PICK_DEFAULTS });
+  const candidates = $derived(filterBox(save, filter).filter((p) => !compare.has(p.uid)));
+  const others = $derived(save.box.length - insts.length);
+  const filtering = $derived(isFiltering(filter, PICK_DEFAULTS));
+  const clear = () => { filter = { ...PICK_DEFAULTS, sort: filter.sort }; };
 </script>
 
 <div class="row">
@@ -25,16 +28,8 @@
 </div>
 <p class="muted small">Pick up to {MAX_COMPARE} Pals here or with the ⚖ button in the Box. Best value per row is highlighted; work rows are effective output after stars, passives and sanity.</p>
 
-<div class="row">
-  <select bind:value={pick} disabled={compare.full}>
-    <option value="">{compare.full ? 'Selection full' : 'Add a Pal…'}</option>
-    {#each others as p (p.uid)}<option value={p.uid}>{label(p)}</option>{/each}
-  </select>
-  <button class="small" disabled={!pick || compare.full} onclick={add}>Add</button>
-</div>
-
 {#if insts.length === 0}
-  <p class="muted">Nothing selected yet.</p>
+  <p class="muted">Nothing selected yet — add Pals from the list below.</p>
 {:else}
   <div class="scroll">
     <table>
@@ -65,6 +60,29 @@
   </div>
 {/if}
 
+{#if others > 0}
+  <div class="picker">
+    <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search Pals to compare">
+      {#snippet heading()}
+        <h3 class="grow">Add to comparison <span class="muted">{filtering ? `${candidates.length} of ${others}` : candidates.length}</span></h3>
+      {/snippet}
+    </BoxFilterBar>
+    {#if compare.full}<p class="muted small">Selection is full — remove one above to add another.</p>{/if}
+    {#if candidates.length === 0}
+      <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+    {/if}
+    <div class="list">
+      {#each candidates as p (p.uid)}
+        {@const status = statusOf(save, p.uid)}
+        <PalCard inst={p} showWork>
+          {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
+          <button class="small" disabled={compare.full} onclick={() => compare.toggle(p.uid)}>⚖ Add</button>
+        </PalCard>
+      {/each}
+    </div>
+  </div>
+{/if}
+
 <style>
   .small { font-size: 0.8rem; }
   .scroll { overflow-x: auto; margin-top: 0.75rem; }
@@ -74,5 +92,7 @@
   td.label { text-align: left; color: var(--muted); white-space: nowrap; }
   td.best { color: var(--ok); font-weight: 600; }
   .tiny { font-size: 0.7rem; padding: 0 0.35rem; margin-top: 0.25rem; }
-  select { max-width: 60%; }
+  .picker { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+  .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 45vh; overflow-y: auto; }
+  h3 { margin: 0; }
 </style>
