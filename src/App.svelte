@@ -23,6 +23,7 @@
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
+  import { play } from './ui/sfx';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings';
   type Group = { id: string; label: string; tabs: { id: Tab; label: string }[] };
@@ -71,7 +72,11 @@
     select(lastInGroup[g.id] ?? g.tabs[0].id);
   }
 
-  onMount(() => game.start());
+  onMount(() => {
+    const stop = game.start();
+    const off = game.on((e) => play(e));
+    return () => { stop(); off(); };
+  });
 </script>
 
 <OfflineSummary />

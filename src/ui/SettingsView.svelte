@@ -3,6 +3,13 @@
   import { dayKey, msUntilRollover } from '../engine/daily';
   import { formatDuration } from './format';
   import type { DailyReset } from '../data/types';
+  import { getPref, play, setPref } from './sfx';
+
+  let sound = $state(getPref());
+  function setSound(next: { enabled?: boolean; volume?: number }) {
+    sound = setPref(next);
+    if (sound.enabled) play('caught');
+  }
 
   const save = $derived(game.save);
   const mode = $derived(save.settings.dailyReset ?? 'utc');
@@ -48,6 +55,16 @@
 </section>
 
 <section>
+  <h3>Sound</h3>
+  <div class="row sound">
+    <label class="row"><input type="checkbox" checked={sound.enabled} onchange={(e) => setSound({ enabled: e.currentTarget.checked })} /> Sound effects</label>
+    <label class="row grow"><span class="muted small">Volume</span>
+      <input type="range" min="0" max="1" step="0.05" value={sound.volume} disabled={!sound.enabled} oninput={(e) => setSound({ volume: Number(e.currentTarget.value) })} /></label>
+  </div>
+  <p class="muted small">Synthesized in the browser — no audio files. Stored on this device.</p>
+</section>
+
+<section>
   <h3>Catching</h3>
   <p class="muted small">Sphere policies live under <b>Merchant → Catch settings</b>.</p>
 </section>
@@ -71,4 +88,6 @@
   .opt { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
   .opt.on { border-color: var(--accent); }
   .opt input { margin-top: 0.2rem; }
+  .sound { gap: 1.5rem; }
+  .sound input[type=range] { flex: 1; min-height: 0; }
 </style>

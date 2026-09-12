@@ -36,10 +36,19 @@ const TICK_MS = 100;
 const MAX_TICK_MS = 5_000; // anything longer is a suspend/sleep gap and goes through applyOffline
 const LOG_LINES = 12;
 
+export type GameEvent =
+  | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
+  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone';
+
 export class Game {
   save = $state<SaveState>(newState());
   wild = $state<Wild | null>(null);
   log = $state<string[]>([]);
+
+  /** Game events for the UI layer (sounds, toasts). Handlers must not throw. */
+  private listeners = new Set<(e: GameEvent) => void>();
+  on(fn: (e: GameEvent) => void): () => void { this.listeners.add(fn); return () => this.listeners.delete(fn); }
+  private emit(e: GameEvent) { for (const fn of this.listeners) { try { fn(e); } catch { /* ignore */ } } }
   offline = $state<OfflineReport | null>(null);   // "while you were away" summary, until dismissed
   run = $state<DungeonRun | null>(null);           // active Sealed Realm run
   private sinceSave = 0;
@@ -122,14 +131,16 @@ export class Game {
       this.unlockAchievements();
       if (rollDaily(this.save)) this.push('A new day — fresh daily quests are up.');
     }
+    const queued = this.save.base.queue.length;
     const world = tickWorld(this.save, dtMs / 1000);
-    for (const palId of world.hatched) this.push(`An egg hatched: ${palById(palId).name}!`);
+    if (this.save.base.queue.length < queued) this.emit('craftDone');
+    for (const palId of world.hatched) { this.push(`An egg hatched: ${palById(palId).name}!`); this.emit('hatched'); }
     for (const r of world.returned) this.push(`${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} — +${r.gold.toLocaleString()} gold${Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}.`);
     this.sinceSave += dtMs;
     if (this.sinceSave >= AUTOSAVE_MS) this.persist();
   }
 
-  click() { this.save.stats.clicks += 1; this.hit(this.clickDmg); }
+  click() { this.save.stats.clicks += 1; this.emit('click'); this.hit(this.clickDmg); }
 
   // ---- prestige ----------------------------------------------------------
 
@@ -146,10 +157,12 @@ export class Game {
     this.spawn();
     this.persist();
     this.push(`Ascension ${next.prestige.ascensions} — +${relics} Ancient Relics. A new run begins.`);
+    this.emit('ascend');
   }
 
   claimQuest(id: string) {
     const q = claimQuest(this.save, id);
+    if (q) this.emit('questClaimed');
     if (q) this.push(`Quest complete: ${describeQuest(q, (r) => routeById(r).name)} — +${q.reward.gold.toLocaleString()} gold, ${Object.entries(q.reward.items).map(([i, n]) => `${n} ${itemName(i)}`).join(', ')}.`);
   }
 
@@ -158,7 +171,7 @@ export class Game {
   }
 
   private unlockAchievements() {
-    for (const a of checkAchievements(this.save)) this.push(`🏆 Achievement: ${a.name} — ${a.desc} (+${a.points} pts)`);
+    for (const a of checkAchievements(this.save)) { this.push(`🏆 Achievement: ${a.name} — ${a.desc} (+${a.points} pts)`); this.emit('achievement'); }
   }
 
   private hit(dmg: number) {
@@ -171,20 +184,24 @@ export class Game {
   private defeat(w: Wild) {
     const def = palById(w.palId);
     const save = this.save;
+    const levelBefore = save.player.level;
     const reward = applyDefeat(save, w);
+    this.emit('defeat');
+    if (save.player.level > levelBefore) this.emit('levelUp');
 
     if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
       if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
       const res = tryCatch(save, w);
       const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
-      if (res.outcome === 'caught') this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`);
-      else if (res.outcome === 'failed') this.push(`${label} broke free (${Math.round(res.chance * 100)}%).`);
+      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`); this.emit('caught'); }
+      else if (res.outcome === 'failed') { this.push(`${label} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
       else if (w.lucky) this.push(`A Lucky ${def.name} got away — no sphere thrown.`);
       if (this.run && w.kind !== 'wild') {
         this.run.gold += reward.gold;
         for (const [id, n] of Object.entries(reward.drops)) this.run.items[id] = (this.run.items[id] ?? 0) + n;
         if (w.kind === 'dungeonBoss') {
           const chest = completeRun(save, dungeonById(this.run.id));
+          this.emit('realmClear');
           this.push(`${dungeonById(this.run.id).name} cleared! Chest: ${describeChest(chest, itemName)}.`);
           this.run = null;
           this.spawn();
@@ -202,6 +219,7 @@ export class Game {
         earnGold(save, alpha.reward.gold);
         save.player.effigies += alpha.reward.effigies ?? 0;
         this.push(`Alpha ${def.name} defeated! +${alpha.reward.gold} gold, +${alpha.reward.effigies ?? 0} effigies.`);
+        this.emit('bossWin');
       } else {
         this.push(`Alpha ${def.name} defeated again. +${reward.gold} gold.`);
       }
@@ -209,15 +227,20 @@ export class Game {
       const tower = towerById(w.refId);
       if (!save.progress.towers.includes(w.refId)) save.progress.towers.push(w.refId);
       this.push(`${tower.boss} defeated — ${tower.name} cleared!`);
+      this.emit('towerWin');
     } else if (w.kind === 'raid' && w.refId) {
       const raid = raidById(w.refId);
       const chest = completeRaid(save, raid);
       this.push(`${raid.name} defeated! ${describeRaidChest(chest, raid.name, itemName)}.`);
+      this.emit('towerWin');
     }
     this.spawn();
   }
 
-  spawn() { this.wild = spawnWild(this.route); }
+  spawn() {
+    this.wild = spawnWild(this.route);
+    if (this.wild.lucky) this.emit('luckySpawn');
+  }
 
   // ---- navigation --------------------------------------------------------
 
@@ -280,6 +303,7 @@ export class Game {
     this.wild = boss;
     const def = raidById(raidId);
     this.push(`${def.name} answers the altar — ${(def.hp / 1000).toLocaleString()}k HP, ${def.timeLimitSec / 60} minutes.`);
+    this.emit('summon');
   }
 
   // ---- dungeons ----------------------------------------------------------
