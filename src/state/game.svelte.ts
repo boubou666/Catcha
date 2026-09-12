@@ -20,6 +20,7 @@ import { expeditionById } from '../data/expeditions';
 import { completeRaid, describeRaidChest, summon, summonBlocker } from '../engine/raid';
 import { raidById } from '../data/raids';
 import { checkAchievements } from '../engine/achievements';
+import { claimBonus, claimQuest, rollDaily, describeQuest, BONUS_EFFIGIES } from '../engine/daily';
 import { earnGold } from '../engine/inventory';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
@@ -50,6 +51,7 @@ export class Game {
     } else {
       this.push('Welcome to the Palpagos Islands. Attack a Pal to begin.');
     }
+    rollDaily(this.save);
     this.spawn();
   }
 
@@ -112,7 +114,11 @@ export class Game {
     }
     this.save.stats.playSeconds += dtMs / 1000;
     this.sinceCheck += dtMs;
-    if (this.sinceCheck >= 1000) { this.sinceCheck = 0; this.unlockAchievements(); }
+    if (this.sinceCheck >= 1000) {
+      this.sinceCheck = 0;
+      this.unlockAchievements();
+      if (rollDaily(this.save)) this.push('A new day — fresh daily quests are up.');
+    }
     const world = tickWorld(this.save, dtMs / 1000);
     for (const palId of world.hatched) this.push(`An egg hatched: ${palById(palId).name}!`);
     for (const r of world.returned) this.push(`${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} — +${r.gold.toLocaleString()} gold${Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}.`);
@@ -121,6 +127,15 @@ export class Game {
   }
 
   click() { this.save.stats.clicks += 1; this.hit(this.clickDmg); }
+
+  claimQuest(id: string) {
+    const q = claimQuest(this.save, id);
+    if (q) this.push(`Quest complete: ${describeQuest(q, (r) => routeById(r).name)} — +${q.reward.gold.toLocaleString()} gold, ${Object.entries(q.reward.items).map(([i, n]) => `${n} ${itemName(i)}`).join(', ')}.`);
+  }
+
+  claimBonus() {
+    if (claimBonus(this.save)) this.push(`Daily bonus claimed: +${BONUS_EFFIGIES} Effigy.`);
+  }
 
   private unlockAchievements() {
     for (const a of checkAchievements(this.save)) this.push(`🏆 Achievement: ${a.name} — ${a.desc} (+${a.points} pts)`);

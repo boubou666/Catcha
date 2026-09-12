@@ -69,6 +69,7 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
   const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp'));
   earnGold(save, gold);
   save.stats.defeated += 1;
+  for (const e of def.elements) save.stats.defeatedByElement[e] = (save.stats.defeatedByElement[e] ?? 0) + 1;
   grantExp(save, exp);
 
   const drops: Record<string, number> = {};

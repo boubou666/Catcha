@@ -4,7 +4,7 @@ import { newBase } from './base';
 import { newStats } from './achievements';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -21,6 +21,7 @@ export function newState(): SaveState {
     settings: { sphereForNew: 'pal', sphereForDupe: 'none' },
     stats: newStats(),
     achievements: [],
+    daily: null,
     lastSavedAt: Date.now(),
   };
 }
@@ -102,6 +103,11 @@ export function migrate(raw: unknown): SaveState | null {
     s.stats ??= newStats();
     s.achievements ??= [];
     s.version = 13;
+  }
+  if (s.version === 13 && s.stats) {
+    s.stats.defeatedByElement ??= {};
+    s.daily ??= null;
+    s.version = 14;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

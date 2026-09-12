@@ -11,12 +11,13 @@
   import TechView from './ui/TechView.svelte';
   import ExpeditionView from './ui/ExpeditionView.svelte';
   import AchievementsView from './ui/AchievementsView.svelte';
+  import DailyView from './ui/DailyView.svelte';
   import PaldeckView from './ui/PaldeckView.svelte';
   import ItemsView from './ui/ItemsView.svelte';
   import ShopView from './ui/ShopView.svelte';
   import OfflineSummary from './ui/OfflineSummary.svelte';
 
-  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'expedition' | 'tech' | 'paldeck' | 'items' | 'shop' | 'achievements';
+  type Tab = 'party' | 'box' | 'base' | 'craft' | 'breed' | 'expedition' | 'tech' | 'paldeck' | 'items' | 'shop' | 'achievements' | 'daily';
   const TABS: { id: Tab; label: string }[] = [
     { id: 'party', label: 'Party' },
     { id: 'box', label: 'Box' },
@@ -28,6 +29,7 @@
     { id: 'paldeck', label: 'Paldeck' },
     { id: 'items', label: 'Items' },
     { id: 'shop', label: 'Merchant' },
+    { id: 'daily', label: 'Daily' },
     { id: 'achievements', label: 'Achievements' },
   ];
   let tab = $state<Tab>('party');
@@ -60,6 +62,7 @@
         {:else if tab === 'paldeck'}<PaldeckView />
         {:else if tab === 'items'}<ItemsView />
         {:else if tab === 'shop'}<ShopView />
+        {:else if tab === 'daily'}<DailyView />
         {:else}<AchievementsView />{/if}
       </div>
     </section>

@@ -190,7 +190,27 @@ export interface SaveState {
     defeated: number; clicks: number; caught: number; luckyCaught: number;
     hatched: number; luckyHatched: number; crafted: number; expeditions: number;
     goldEarned: number; playSeconds: number;
+    defeatedByElement: Partial<Record<Element, number>>;
   };
   achievements: string[];                // unlocked ids
+  daily: DailyState | null;              // today's quests; regenerated when the UTC day changes
   lastSavedAt: number;
+}
+
+export type DailyKind = 'defeat' | 'catch' | 'gold' | 'hatch' | 'craft' | 'expedition' | 'realm' | 'element' | 'route';
+
+export interface DailyQuest {
+  id: string;
+  kind: DailyKind;
+  param?: string;                        // element or route id
+  target: number;
+  baseline: number;                      // counter value when generated
+  claimed: boolean;
+  reward: { gold: number; items: Record<string, number> };
+}
+
+export interface DailyState {
+  date: string;                          // YYYY-MM-DD (UTC)
+  quests: DailyQuest[];
+  bonusClaimed: boolean;
 }

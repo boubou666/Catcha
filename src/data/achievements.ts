@@ -26,7 +26,8 @@ const CATEGORY_LABEL: Record<AchievementCategory, string> = {
 };
 export const categoryLabel = (c: AchievementCategory) => CATEGORY_LABEL[c];
 
-const stat = (k: keyof SaveState['stats']) => (s: SaveState) => s.stats[k];
+type NumericStat = { [K in keyof SaveState['stats']]: SaveState['stats'][K] extends number ? K : never }[keyof SaveState['stats']];
+const stat = (k: NumericStat) => (s: SaveState) => s.stats[k];
 const paldeckCaught = (s: SaveState) => Object.values(s.paldeck).filter((e) => e.caught > 0).length;
 const maxStars = (s: SaveState) => Math.max(0, ...s.box.map((p) => p.stars));
 const structuresBuilt = (s: SaveState) => Object.keys(s.base.structures).length;

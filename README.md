@@ -120,6 +120,11 @@ Legendary Sphere chance and the boss's egg, which inherits passives from the par
 (same rule as breeding, with your five fighters as the parent pool) and has a 10% / 15% / 25% chance to
 be Lucky. Data in `src/data/raids.ts`.
 
+Daily quests: three per UTC day (defeat / catch / earn gold / craft / element kills / a specific route,
+plus hatch, expedition and Sealed Realm once those are unlocked), scaled to your furthest region and
+seeded by the date, so refreshing never rerolls. Claim for gold, spheres and Paldium; claim all three
+for an Effigy. Engine in `src/engine/daily.ts`.
+
 Achievements: 63 across combat, collection, base, breeding, exploration and economy, worth 179 points;
 every point is a permanent +1% gold from defeated Pals. Lifetime stats (defeats, catches, crafts, gold…)
 are tracked from save v13 onward. Defined in `src/data/achievements.ts`.
