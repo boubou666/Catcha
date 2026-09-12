@@ -1,5 +1,6 @@
 import type { BaseState, PalInstance, SaveState, WorkType } from '../data/types';
 import { palById } from '../data/pals';
+import { itemName } from '../data/items';
 import { BASE_SLOTS, FOOD_ITEM, JOBS, QUEUE_CAP, RATES, recipeById, structureById, STRUCTURES } from '../data/base';
 import { addItem, canAfford, spend, countOf, type Cost } from './inventory';
 import { detachFromBreeding, instanceByUid, isAway } from './party';
@@ -269,3 +270,41 @@ export function tickBase(save: SaveState, dtSec: number): void {
 }
 
 export { canAfford, STRUCTURES };
+
+// ---- crafting queue: summary, search, bulk cancel -------------------------------------------
+
+export interface QueueGroup { recipeId: string; name: string; count: number; remaining: number; first: number }
+
+/** Jobs grouped by recipe in first-appearance order, with the work left across the group. */
+export function queueSummary(save: SaveState): QueueGroup[] {
+  const groups = new Map<string, QueueGroup>();
+  save.base.queue.forEach((job, i) => {
+    const g = groups.get(job.recipeId);
+    if (g) { g.count += 1; g.remaining += job.remaining; }
+    else groups.set(job.recipeId, { recipeId: job.recipeId, name: recipeById(job.recipeId).name, count: 1, remaining: job.remaining, first: i });
+  });
+  return [...groups.values()];
+}
+
+/** Indexes of queue jobs whose recipe name (or output) matches every search word. */
+export function filterQueue(save: SaveState, query: string): number[] {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const out: number[] = [];
+  save.base.queue.forEach((job, i) => {
+    const r = recipeById(job.recipeId);
+    const hay = `${r.name} ${r.output.kind === 'item' ? itemName(r.output.itemId) : r.output.name}`.toLowerCase();
+    if (words.every((w) => hay.includes(w))) out.push(i);
+  });
+  return out;
+}
+
+/** Cancel every queued job of one recipe (or every job), refunding materials. Returns how many were cancelled. */
+export function cancelCraftAll(save: SaveState, recipeId?: string): number {
+  let n = 0;
+  for (let i = save.base.queue.length - 1; i >= 0; i--) {
+    if (recipeId && save.base.queue[i].recipeId !== recipeId) continue;
+    cancelCraft(save, i);
+    n += 1;
+  }
+  return n;
+}

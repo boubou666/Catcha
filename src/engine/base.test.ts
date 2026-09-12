@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
 import { addToBox, addToParty, makeInstance, release } from './party';
 import {
-  assignWorker, build, cancelCraft, computeRates, enqueue, isHungry, nextCost,
+  assignWorker, build, cancelCraft, cancelCraftAll, computeRates, enqueue, filterQueue, isHungry, nextCost, queueSummary,
   tickBase, unassignWorker, workLevels,
 } from './base';
 import { RATES, RECIPES, STRUCTURES } from '../data/base';
@@ -193,5 +193,45 @@ describe('migration', () => {
     const s = migrate(v1);
     expect(s?.version).toBe(SAVE_VERSION);
     expect(s?.base.slots).toBe(3);
+  });
+});
+
+describe('crafting queue tools', () => {
+  function queued() {
+    const save = newState();
+    save.base.structures.workbench = 1;
+    save.tech.push('s_workbench', 'r_sphere_pal', 'r_wooden_club');
+    save.inventory = { paldium: 100, wood: 200, stone: 100 };
+    expect(enqueue(save, 'sphere_pal', 3)).toBe(3);
+    expect(enqueue(save, 'wooden_club', 1)).toBe(1);
+    expect(enqueue(save, 'sphere_pal', 2)).toBe(2);
+    return save;
+  }
+
+  it('summarises the queue by recipe in first-appearance order', () => {
+    const save = queued();
+    const s = queueSummary(save);
+    expect(s.map((g) => [g.name, g.count, g.first])).toEqual([['Pal Sphere', 5, 0], ['Wooden Club', 1, 3]]);
+    expect(s[0].remaining).toBe(5 * 60);
+  });
+
+  it('searches jobs by recipe or output name', () => {
+    const save = queued();
+    expect(filterQueue(save, '')).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(filterQueue(save, 'club')).toEqual([3]);
+    expect(filterQueue(save, 'sphere')).toEqual([0, 1, 2, 4, 5]);
+    expect(filterQueue(save, 'zzz')).toEqual([]);
+  });
+
+  it('cancels every job of one recipe, or all, refunding materials', () => {
+    const save = queued();
+    const wood = save.inventory.wood;
+    expect(cancelCraftAll(save, 'sphere_pal')).toBe(5);
+    expect(save.base.queue.map((j) => j.recipeId)).toEqual(['wooden_club']);
+    expect(save.inventory.wood).toBe(wood + 5 * 3);
+    expect(save.inventory.paldium).toBe(100);
+    expect(cancelCraftAll(save)).toBe(1);
+    expect(save.base.queue).toEqual([]);
+    expect(save.inventory.wood).toBe(200);
   });
 });

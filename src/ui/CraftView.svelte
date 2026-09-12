@@ -3,7 +3,7 @@
   import { RECIPES, recipeById } from '../data/base';
   import { CRAFT_SORT_LABEL, CRAFT_STATUS_LABEL, DEFAULT_CRAFT_FILTER, filterRecipes, isCraftFiltering, KIND_LABEL, type CraftFilter } from '../engine/craftfilter';
   import { itemName } from '../data/items';
-  import { canCraft, computeRates, structureLevel } from '../engine/base';
+  import { canCraft, computeRates, filterQueue, queueSummary, structureLevel } from '../engine/base';
   import { canAfford } from '../engine/inventory';
   import { describeRequirement } from '../engine/progress';
   import CostLine from './CostLine.svelte';
@@ -14,6 +14,14 @@
   const speed = $derived(computeRates(save).handiworkPerSec);
   const queue = $derived(save.base.queue);
   const queuedWork = $derived(queue.reduce((s, j) => s + j.remaining, 0));
+
+  // queue: search by recipe, grouped by recipe once it gets long, bulk cancel per recipe or all
+  let queueQuery = $state('');
+  let grouped = $state<boolean | null>(null);           // null = auto (group when long)
+  const isGrouped = $derived(grouped ?? queue.length > 8);
+  const matchIdx = $derived(new Set(filterQueue(save, queueQuery)));
+  const groups = $derived(queueSummary(save).filter((g) => queueQuery.trim() === '' || queue.some((j, i) => j.recipeId === g.recipeId && matchIdx.has(i))));
+  const queueFiltering = $derived(queueQuery.trim() !== '');
   const eta = (units: number) => (speed > 0 ? `${Math.ceil(units / speed)}s` : '—');
 
   let filter = $state<CraftFilter>({ ...DEFAULT_CRAFT_FILTER });
@@ -89,10 +97,29 @@
 </div>
 
 {#if queue.length > 0}
-  <h3 class="queue-title">Queue <span class="muted">{queue.length}</span></h3>
+  <div class="row queue-head">
+    <h3 class="queue-title grow">Queue <span class="muted">{queueFiltering ? `${matchIdx.size} of ${queue.length}` : queue.length}</span></h3>
+    <input type="search" placeholder="Search queue…" bind:value={queueQuery} aria-label="Search the queue" />
+    <button class="small" class:active={isGrouped} onclick={() => (grouped = !isGrouped)} title="Group jobs by recipe">{isGrouped ? 'Grouped' : 'Group'}</button>
+    <button class="small danger" onclick={() => { if (window.confirm(`Cancel all ${queue.length} queued crafts and refund the materials?`)) game.cancelCraftAll(); }}>Cancel all</button>
+  </div>
+  {#if matchIdx.size === 0}<p class="muted small">No queued craft matches.</p>{/if}
   <div class="list">
+    {#if isGrouped}
+      {#each groups as g (g.recipeId)}
+        <div class="job row">
+          <span class="grow"><b>{g.name}</b> <span class="muted">×{g.count}</span></span>
+          {#if g.first === 0}
+            <div class="bar grow"><span style:width="{(1 - queue[0].remaining / recipeById(g.recipeId).work) * 100}%"></span></div>
+          {/if}
+          <span class="muted small">{eta(g.remaining)}</span>
+          <button class="small danger" title="Cancel every {g.name} and refund" onclick={() => game.cancelCraftAll(g.recipeId)}>✕ all</button>
+        </div>
+      {/each}
+    {:else}
     {#each queue as job, i}
       {@const r = recipeById(job.recipeId)}
+      {#if matchIdx.has(i)}
       <div class="job row">
         <span class="grow">{r.name}</span>
         {#if i === 0}
@@ -101,7 +128,9 @@
         <span class="muted small">{eta(job.remaining)}</span>
         <button class="small danger" title="Cancel and refund" onclick={() => game.cancelCraft(i)}>✕</button>
       </div>
+      {/if}
     {/each}
+    {/if}
   </div>
 {/if}
 
@@ -111,7 +140,9 @@
   .locked { opacity: 0.55; }
   .small { font-size: 0.8rem; }
   .warn { color: var(--accent); }
-  .queue-title { margin-top: 1.25rem; }
+  .queue-title { margin: 0; }
+  .queue-head { margin-top: 1.25rem; margin-bottom: 0.4rem; }
+  .queue-head input[type='search'] { min-width: 7rem; max-width: 11rem; font-size: 0.85rem; }
   .bar { max-width: 160px; }
   .bar > span { background: var(--accent-2); }
   input[type='search'] { min-width: 10rem; flex: 1; max-width: 16rem; }

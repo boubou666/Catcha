@@ -212,7 +212,9 @@ jobs, the merchant, recipes) and what consumes it (recipes, structures); search 
 filters cover category, "used in crafting or building", "show items I don't have" and sort by name / count /
 category (`src/engine/itemsfilter.ts`). Craft has the same treatment (`src/engine/craftfilter.ts`): search by
 recipe, output or ingredient; filter by kind (spheres / materials / food / weapons) and status (craftable now,
-unlocked, locked); hide owned weapons; sort by work needed or name. Tech (`src/engine/techfilter.ts`): search by tech name,
+unlocked, locked); hide owned weapons; sort by work needed or name. The crafting queue (up to 50 jobs) has a search, groups by
+recipe automatically past eight jobs (toggle), and offers "✕ all" per recipe or "Cancel all", refunding
+materials (`queueSummary` / `filterQueue` / `cancelCraftAll` in `src/engine/base.ts`). Tech (`src/engine/techfilter.ts`): search by tech name,
 description, what it unlocks (structure / recipe name) or prerequisite; filter by kind, boosted stat, status
 (researchable now / not researched / researched) and hide levels above yours; the level grouping is kept.
 Achievements (`src/engine/achievementfilter.ts`): search name / description / category; filter by category

@@ -8,7 +8,7 @@ import { tryCatch } from '../engine/catch';
 import { isUnlocked } from '../engine/progress';
 import { addToParty, release, removeFromParty } from '../engine/party';
 import { clickDamage, wildHp } from '../engine/formulas';
-import { assignWorker, build, cancelCraft, enqueue, unassignWorker } from '../engine/base';
+import { assignWorker, build, cancelCraft, cancelCraftAll, enqueue, unassignWorker } from '../engine/base';
 import { tickWorld } from '../engine/tick';
 import { clearPair, setPair } from '../engine/breeding';
 import { research, techMult } from '../engine/tech';
@@ -440,6 +440,10 @@ export class Game {
   }
 
   cancelCraft(index: number) { cancelCraft(this.save, index); }
+  cancelCraftAll(recipeId?: string) {
+    const n = cancelCraftAll(this.save, recipeId);
+    if (n) { this.push(`Cancelled ${n} queued craft${n === 1 ? '' : 's'}${recipeId ? ` of ${recipeById(recipeId).name}` : ''} — materials refunded.`); this.notify(`↩ ${n} craft${n === 1 ? '' : 's'} cancelled, materials refunded`, 'info', 3000); }
+  }
 
   setPair(aUid: string, bUid: string) {
     if (setPair(this.save, aUid, bUid)) {
