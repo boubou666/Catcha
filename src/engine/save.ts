@@ -3,7 +3,7 @@ import { STARTING_ROUTE } from '../data/regions';
 import { newBase } from './base';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -16,7 +16,7 @@ export function newState(): SaveState {
     inventory: { sphere_pal: 20, red_berries: 30 },
     base: newBase(),
     tech: [],
-    progress: { route: STARTING_ROUTE, routeKills: {}, alphas: [], towers: [] },
+    progress: { route: STARTING_ROUTE, routeKills: {}, alphas: [], towers: [], dungeons: {} },
     settings: { sphereForNew: 'pal', sphereForDupe: 'none' },
     lastSavedAt: Date.now(),
   };
@@ -73,6 +73,10 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 6 && s.base) {
     for (const e of s.base.eggs) e.passives ??= [];
     s.version = 7;
+  }
+  if (s.version === 7 && s.progress) {
+    s.progress.dungeons ??= {};
+    s.version = 8;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

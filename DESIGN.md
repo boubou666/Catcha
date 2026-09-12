@@ -17,7 +17,7 @@ A PokéClicker-style incremental game themed on Palworld. Browser-only, no backe
 | Hatchery               | Breeding Farm + Cake + Incubator             | Palworld combi-rank formula |
 | Shiny                  | Lucky Pals                                   | rare sparkle variant |
 | Oak items              | Technology tree (Tech Points)                | weapons = click damage, structures = unlocks — implemented in `data/tech.ts` |
-| Dungeons               | Sealed Realms                                | timed run, boss at end |
+| Dungeons               | Sealed Realms                                | timed run, boss at end — implemented in `data/dungeons.ts` |
 | —                      | Condensing (dupes → stars)                   | gives duplicates value |
 | —                      | Lifmunk Effigies → Capture Power             | catch-rate upgrade collectible |
 | —                      | Expeditions                                  | send box Pals away for timed loot |

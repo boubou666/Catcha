@@ -78,4 +78,9 @@ affecting attack, work and food; Lucky Pals always carry *Lucky*, legendary spec
 inherit a random subset of both parents' passives with a 10% mutation chance per free slot. Pool in
 `src/data/passives.ts`.
 
-Next: dungeons, expeditions, raids, balance pass — see DESIGN.md §10.
+Dungeons: one Sealed Realm per region (unlocked by clearing its last route) — five waves at the region
+cap with 1.5–1.8× HP, then a catchable guardian, inside five minutes. Clearing pays a loot chest scaled
+by region and Effigies on the first clear; leaving or timing out keeps what the waves dropped. Defined
+in `src/data/dungeons.ts`.
+
+Next: expeditions, raids, balance pass — see DESIGN.md §10.

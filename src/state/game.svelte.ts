@@ -12,6 +12,9 @@ import { assignWorker, build, cancelCraft, enqueue, unassignWorker } from '../en
 import { tickWorld } from '../engine/tick';
 import { clearPair, setPair } from '../engine/breeding';
 import { research, techMult } from '../engine/tech';
+import { bossName, completeRun, describeChest, dungeonUnlocked, isBossWave, spawnFor, startRun, type DungeonRun } from '../engine/dungeon';
+import { dungeonById } from '../data/dungeons';
+import { itemName } from '../data/items';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
@@ -28,6 +31,7 @@ export class Game {
   wild = $state<Wild | null>(null);
   log = $state<string[]>([]);
   offline = $state<OfflineReport | null>(null);   // "while you were away" summary, until dismissed
+  run = $state<DungeonRun | null>(null);           // active Sealed Realm run
   private sinceSave = 0;
 
   constructor() {
@@ -92,8 +96,8 @@ export class Game {
     const w = this.wild;
     if (w) {
       if (w.deadlineAt && Date.now() > w.deadlineAt) {
-        this.push(`Time's up — ${palById(w.palId).name} retreats.`);
-        this.spawn();
+        if (this.run) this.endRun('Time ran out');
+        else { this.push(`Time's up — ${palById(w.palId).name} retreats.`); this.spawn(); }
       } else {
         this.hit((this.dps * dtMs) / 1000);
       }
@@ -117,13 +121,28 @@ export class Game {
     const save = this.save;
     const reward = applyDefeat(save, w);
 
-    if (w.kind === 'wild') {
-      save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
+    if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
+      if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
       const res = tryCatch(save, w);
       const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
       if (res.outcome === 'caught') this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`);
       else if (res.outcome === 'failed') this.push(`${label} broke free (${Math.round(res.chance * 100)}%).`);
       else if (w.lucky) this.push(`A Lucky ${def.name} got away — no sphere thrown.`);
+      if (this.run && w.kind !== 'wild') {
+        this.run.gold += reward.gold;
+        for (const [id, n] of Object.entries(reward.drops)) this.run.items[id] = (this.run.items[id] ?? 0) + n;
+        if (w.kind === 'dungeonBoss') {
+          const chest = completeRun(save, dungeonById(this.run.id));
+          this.push(`${dungeonById(this.run.id).name} cleared! Chest: ${describeChest(chest, itemName)}.`);
+          this.run = null;
+          this.spawn();
+        } else {
+          this.run.wave += 1;
+          this.wild = spawnFor(this.run);
+          this.push(isBossWave(this.run) ? `The realm's guardian ${bossName(this.run.id)} appears!` : `Wave ${this.run.wave + 1} / ${dungeonById(this.run.id).waves}`);
+        }
+        return;
+      }
     } else if (w.kind === 'alpha' && w.refId) {
       const alpha = alphaById(w.refId);
       if (!save.progress.alphas.includes(w.refId)) {
@@ -178,7 +197,28 @@ export class Game {
   }
 
   flee() {
+    if (this.run) { this.endRun('Retreated'); return; }
     this.push('Retreated.');
+    this.spawn();
+  }
+
+  // ---- dungeons ----------------------------------------------------------
+
+  canEnter(dungeonId: string): boolean { return !this.run && !this.inBossFight && dungeonUnlocked(this.save, dungeonId); }
+
+  enterDungeon(dungeonId: string) {
+    if (!this.canEnter(dungeonId)) return;
+    this.run = startRun(dungeonId);
+    this.wild = spawnFor(this.run);
+    const def = dungeonById(dungeonId);
+    this.push(`Entered ${def.name} — ${def.waves} waves and ${bossName(dungeonId)} in ${def.timeLimitSec / 60} minutes.`);
+  }
+
+  private endRun(why: string) {
+    const run = this.run!;
+    const earned = run.gold > 0 || Object.keys(run.items).length > 0;
+    this.push(`${why} — left ${dungeonById(run.id).name}${earned ? ` with ${run.gold} gold and ${Object.values(run.items).reduce((a, b) => a + b, 0)} items` : ''}.`);
+    this.run = null;
     this.spawn();
   }
 

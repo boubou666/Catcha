@@ -159,6 +159,7 @@ export interface SaveState {
     routeKills: Record<string, number>;
     alphas: string[];
     towers: string[];
+    dungeons: Record<string, number>;    // dungeonId -> clears
   };
   settings: {
     sphereForNew: SpherePolicy;          // sphere to throw at a Pal not yet in the Paldeck
