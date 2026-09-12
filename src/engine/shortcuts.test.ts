@@ -23,7 +23,10 @@ describe('shortcuts', () => {
     expect(resolveShortcut(k({ key: '1', code: 'Digit1', ctrl: true }))).toBeNull();
     expect(resolveShortcut(k({ key: 'k', code: 'KeyK', meta: true }))).toBeNull();
     expect(resolveShortcut(k({ key: '1', code: 'Digit1', alt: true }))).toBeNull();
-    expect(resolveShortcut(k({ key: '!', code: 'Digit1', shift: true }))).toBeNull();
+    expect(resolveShortcut(k({ key: '!', code: 'Digit1', shift: true }))).toEqual({ kind: 'region', index: 0 });   // QWERTY Shift+1
+    expect(resolveShortcut(k({ key: '3', code: 'Digit3', shift: true }))).toEqual({ kind: 'region', index: 2 });   // AZERTY Shift+3
+    expect(resolveShortcut(k({ key: 'ArrowRight', code: 'ArrowRight', shift: true }))).toEqual({ kind: 'regionStep', delta: 1 });
+    expect(resolveShortcut(k({ key: 'ArrowLeft', code: 'ArrowLeft', shift: true }))).toEqual({ kind: 'regionStep', delta: -1 });
     expect(isFieldTarget('input', false)).toBe(true);
     expect(isFieldTarget('SELECT', false)).toBe(true);
     expect(isFieldTarget('button', false)).toBe(false);   // clicking a tab must not disable the arrows

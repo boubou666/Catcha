@@ -7,6 +7,8 @@ export type ShortcutAction =
   | { kind: 'groupStep'; delta: 1 | -1 }
   | { kind: 'tab'; index: number }          // 0-based tab within the current group
   | { kind: 'tabStep'; delta: 1 | -1 }
+  | { kind: 'region'; index: number }       // 0-based reachable region
+  | { kind: 'regionStep'; delta: 1 | -1 }
   | { kind: 'attack' }
   | { kind: 'search' }
   | { kind: 'help' }
@@ -19,6 +21,8 @@ export const SHORTCUT_DOCS: ShortcutDoc[] = [
   { keys: '1 – 9', does: 'Open the Nth tab of the current group' },
   { keys: '← / →', does: 'Previous / next tab' },
   { keys: '↑ / ↓', does: 'Previous / next group (Pals, Base, Progress — World on phones)' },
+  { keys: 'Shift+← / Shift+→', does: 'Previous / next region' },
+  { keys: 'Shift+1 – 9', does: 'Travel to the Nth unlocked region' },
   { keys: 'Space or A', does: 'Attack the Pal in the arena' },
   { keys: '/ or Ctrl+K', does: 'Focus the global search' },
   { keys: 'S', does: 'Save now' },
@@ -30,10 +34,10 @@ export const SHORTCUT_DOCS: ShortcutDoc[] = [
 export function resolveShortcut(e: KeyLike): ShortcutAction | null {
   if (e.inField || e.ctrl || e.meta || e.alt) return null;
   const digit = /^Digit([1-9])$/.exec(e.code);
-  if (digit && !e.shift) return { kind: 'tab', index: Number(digit[1]) - 1 };
+  if (digit) return e.shift ? { kind: 'region', index: Number(digit[1]) - 1 } : { kind: 'tab', index: Number(digit[1]) - 1 };
   switch (e.key) {
-    case 'ArrowLeft': return { kind: 'tabStep', delta: -1 };
-    case 'ArrowRight': return { kind: 'tabStep', delta: 1 };
+    case 'ArrowLeft': return e.shift ? { kind: 'regionStep', delta: -1 } : { kind: 'tabStep', delta: -1 };
+    case 'ArrowRight': return e.shift ? { kind: 'regionStep', delta: 1 } : { kind: 'tabStep', delta: 1 };
     case 'ArrowUp': return { kind: 'groupStep', delta: -1 };
     case 'ArrowDown': return { kind: 'groupStep', delta: 1 };
     case '?': return { kind: 'help' };

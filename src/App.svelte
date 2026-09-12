@@ -101,6 +101,8 @@
       case 'tabStep': { const i = group.tabs.findIndex((t) => t.id === tab); select(group.tabs[(i + action.delta + group.tabs.length) % group.tabs.length].id); break; }
       case 'group': { const g = groups[action.index]; if (g) selectGroup(g); break; }
       case 'groupStep': selectGroup(groups[(gi + action.delta + groups.length) % groups.length]); break;
+      case 'region': { const r = game.regions[action.index]; if (r && !game.inBossFight) game.travelToRegion(r.id); break; }
+      case 'regionStep': { if (game.inBossFight) break; const rs = game.regions; const ri = rs.findIndex((r) => r.id === game.region.id); game.travelToRegion(rs[(ri + action.delta + rs.length) % rs.length].id); break; }
       case 'attack': if (game.wild) game.click(); break;
       case 'search': ui.focusSearch += 1; break;
       case 'help': ui.shortcutsOpen = !ui.shortcutsOpen; break;
