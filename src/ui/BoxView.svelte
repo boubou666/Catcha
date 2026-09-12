@@ -11,7 +11,9 @@
   import { DEFAULT_FILTER, filterBox, isFiltering, type BoxFilter } from '../engine/boxfilter';
   import BoxFilterBar from './BoxFilterBar.svelte';
 
+  import { ui } from '../state/ui.svelte';
   let filter = $state<BoxFilter>({ ...DEFAULT_FILTER });
+  $effect(() => { const q = ui.boxQuery; if (q !== null) filter = { ...filter, query: ui.takeBoxQuery() ?? '' }; });
   const sorted = $derived(filterBox(game.save, filter));
   const filtering = $derived(isFiltering(filter));
   const clear = () => { filter = { ...DEFAULT_FILTER, sort: filter.sort }; };

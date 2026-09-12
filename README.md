@@ -119,6 +119,12 @@ time away, capped at 24 h, and a summary shows the deltas. Combat never runs off
 more than six lines it gets a search, an Everything / Gained / Consumed / Events view and a sort (biggest
 change, with events last, or name) — `offlineRows` / `filterOfflineRows` in `src/engine/offline.ts`.
 
+Global search: the header search box (Ctrl+K) finds tabs, your Pals, Paldeck species (unseen ones by number
+only), routes, bosses, owned items, recipes, techs, Ascension upgrades, achievements and settings sections —
+at most five per kind, thirty overall, with a kind filter — and jumps there: routes travel, a species opens
+its Paldeck entry, a Pal opens the Box pre-filtered to its name (`src/engine/globalsearch.ts`; cross-view
+intents in `src/state/ui.svelte.ts`). Arrow keys / Enter / Escape work in the list.
+
 Notifications: every toast is also kept in a session history (last 100) behind the 🔔 in the header, with an
 unread badge, search, kind filter (info / success / gold & rewards / warnings & Lucky), unread-only, mark all
 read and clear; the same panel chooses which kinds still pop up as toasts (per device, `catcha.toasts`).

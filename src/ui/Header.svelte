@@ -5,6 +5,10 @@
   import { SPHERE_TIERS } from '../data/types';
   import { achievementPoints } from '../engine/achievements';
   import NotificationCenter from './NotificationCenter.svelte';
+  import GlobalSearch from './GlobalSearch.svelte';
+  import type { TabEntry } from '../engine/globalsearch';
+
+  let { tabs, go }: { tabs: TabEntry[]; go: (tab: string) => void } = $props();
 
   const player = $derived(game.save.player);
   const expPct = $derived((player.exp / expToLevel(player.level + 1)) * 100);
@@ -40,6 +44,8 @@
       {#each spheres as s}<span class="chip">{SPHERES[s.tier].name} ×{s.n}</span>{/each}
     </div>
   </div>
+
+  <GlobalSearch {tabs} {go} />
 
   <div class="row">
     <NotificationCenter />

@@ -8,7 +8,10 @@
   import PalIcon from './PalIcon.svelte';
   import PalDetail from './PalDetail.svelte';
 
+  import { ui } from '../state/ui.svelte';
   let selected = $state<number | null>(null);
+  // global search may ask for an entry to open
+  $effect(() => { const id = ui.paldeckSelect; if (id !== null) selected = ui.takePaldeck(); });
   let filter = $state<DeckFilter>({ ...DEFAULT_DECK_FILTER });
   let showFilters = $state(false);
 

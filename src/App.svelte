@@ -67,10 +67,14 @@
   // a World tab restored on desktop has no home there
   $effect(() => { if (!isMobile && groupOf(tab).id === 'world') tab = 'party'; });
   const group = $derived(groupOf(tab));
+  // every tab the global search may jump to: World tabs only exist on mobile; on desktop those panels are always visible
+  const searchTabs = $derived([...(isMobile ? [WORLD] : []), ...GROUPS].flatMap((g) => g.tabs.map((t) => ({ id: t.id, label: t.label, group: g.label }))));
   // last tab visited in each group, so switching groups lands where you were
   const lastInGroup = $state<Record<string, Tab>>({});
 
   function select(t: Tab) {
+    // a World tab picked from search on desktop: those panels are already on screen
+    if (!isMobile && groupOf(t).id === 'world') return;
     tab = t;
     lastInGroup[groupOf(t).id] = t;
     try { localStorage.setItem(UI_KEY, t); } catch { /* ignore */ }
@@ -93,7 +97,7 @@
 <WhatsNew />
 
 <div class="app">
-  <Header />
+  <Header tabs={searchTabs} go={(t) => select(t as Tab)} />
   {#if isMobile}<div class="sticky-arena"><ArenaPanel compact /></div>{/if}
   <main class:mobile={isMobile}>
     {#if !isMobile}
