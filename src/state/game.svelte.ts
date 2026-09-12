@@ -30,6 +30,7 @@ import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
 import { buy, sell } from '../engine/shop';
 import { classifyLog, type LogEntry } from '../engine/logfilter';
+import { applyLoadout, deleteLoadout, renameLoadout, saveLoadout, updateLoadout } from '../engine/loadouts';
 import { loadToastPref, NOTICE_CAP, TOAST_PREF_KEY, type Notice, type NoticeKind, type ToastPref } from '../engine/notices';
 import { advanceTutorial, currentStep, finishTutorial } from '../engine/tutorial';
 import { condense } from '../engine/condense';
@@ -389,6 +390,24 @@ export class Game {
   // ---- party / box -------------------------------------------------------
 
   addToParty(uid: string) { addToParty(this.save, uid); }
+
+  // ---- loadouts ----------------------------------------------------------
+
+  saveLoadout(name: string): boolean {
+    const lo = saveLoadout(this.save, name);
+    if (lo) { this.push(`Saved party as “${lo.name}”.`); this.notify(`💾 Loadout “${lo.name}” saved`, 'success', 2500); }
+    return !!lo;
+  }
+  updateLoadout(id: string) { if (updateLoadout(this.save, id)) this.notify('💾 Loadout updated', 'success', 2000); }
+  renameLoadout(id: string, name: string) { renameLoadout(this.save, id, name); }
+  deleteLoadout(id: string) { deleteLoadout(this.save, id); }
+  applyLoadout(id: string) {
+    const r = applyLoadout(this.save, id);
+    if (!r) return;
+    const lo = this.save.loadouts.find((l) => l.id === id)!;
+    this.push(`Loaded party “${lo.name}” (${r.added.length} joined${r.skipped.length ? `, ${r.skipped.length} unavailable` : ''}).`);
+    this.notify(r.skipped.length ? `⚠️ “${lo.name}”: ${r.skipped.length} member${r.skipped.length === 1 ? '' : 's'} unavailable` : `✅ Party “${lo.name}” loaded`, r.skipped.length ? 'warn' : 'success', 3000);
+  }
   removeFromParty(uid: string) { removeFromParty(this.save, uid); }
   release(uid: string) { release(this.save, uid); }
 

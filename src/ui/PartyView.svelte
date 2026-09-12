@@ -5,6 +5,7 @@
   import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
   import PalCard from './PalCard.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
+  import Loadouts from './Loadouts.svelte';
 
   const party = $derived(partyInstances(game.save));
   const empty = $derived(Math.max(0, PARTY_SIZE - party.length));
@@ -32,6 +33,8 @@
     <div class="slot muted">Empty slot — add a Pal from below</div>
   {/each}
 </div>
+
+<Loadouts />
 
 {#if others > 0}
   <div class="picker">

@@ -202,6 +202,7 @@ export interface SaveState {
   achievements: string[];                // unlocked ids
   daily: DailyState | null;              // today's quests; regenerated when the day changes
   dailyHistory: DailyRecord[];           // past days, oldest first, capped
+  loadouts: { id: string; name: string; uids: string[]; createdAt: number }[];   // saved parties
   prestige: { relics: number; ascensions: number; upgrades: Record<string, number> };
   tutorial: { step: number; done: boolean };
   lastSavedAt: number;

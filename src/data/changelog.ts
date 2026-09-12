@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'Party loadouts: save up to 12 named teams and swap the whole party in one click; members at the base or breeding are pulled in, away or released ones are skipped.',
       'Global search in the header (Ctrl+K): find tabs, Pals, Paldeck entries, routes, bosses, items, recipes, techs, upgrades, achievements and settings, and jump straight there.',
       'Compare: search the comparison rows, pick a group (identity / combat / work / other), or show differences only.',
       'Paldeck detail: search a Pal\'s habitat and breeding pairs, show reachable places only, or only special combos / rank pairs; up to 40 rank pairs listed.',

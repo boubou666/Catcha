@@ -20,6 +20,7 @@ export function ascend(save: SaveState, keepUids: string[]): SaveState | null {
   next.tutorial = save.tutorial;
   next.daily = save.daily;
   next.dailyHistory = save.dailyHistory;
+  next.loadouts = save.loadouts;           // members that didn't make the Ark just show as gone
   next.settings = save.settings;
   next.prestige = { relics: save.prestige.relics + relics, ascensions: save.prestige.ascensions + 1, upgrades: save.prestige.upgrades };
   next.player.techPoints += startingTechPoints(save);
