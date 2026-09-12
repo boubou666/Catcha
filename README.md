@@ -194,6 +194,12 @@ Expeditions: a destination search (name or loot, with "hide locked") that also f
 usual Box filter bar over idle Pals for the party, and a **Pick best** button that fills the party with the
 strongest listed Pals by expedition score.
 
+Merchant (Base → Merchant): a **Buy** side — the three merchant spheres plus Red Berries from the start, Wood /
+Stone / Ore / Paldium after Fort Ruins, Ingot / Medical Supplies / Cake after the first tower, Pal Oil after
+the second (`src/data/shop.ts`, `STOCK`) — and a **Sell** side that takes drops, produce and stocked goods (25% of
+the buy price, or `SELL_PRICES` for the rest; spheres, slabs and keys are refused). Search, category, sort,
+"affordable now" and "hide locked" filters (`src/engine/shop.ts`). Selling counts as gold earned.
+
 Compare: pick up to four Pals (⚖ in the Box, or the searchable "Add to comparison" list on the Compare tab) for a side-by-side table — attack,
 base stats, effective work per job (stars, passives, sanity applied), food cost, SAN, expedition score,
 breeding rank, status — with the best value per row highlighted.

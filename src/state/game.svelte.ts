@@ -28,6 +28,7 @@ import { earnGold } from '../engine/inventory';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
+import { buy, sell } from '../engine/shop';
 import { advanceTutorial, currentStep, finishTutorial } from '../engine/tutorial';
 import { condense } from '../engine/condense';
 import { instanceByUid } from '../engine/party';
@@ -408,14 +409,19 @@ export class Game {
   }
 
   buySphere(tier: SphereTier, n = 1): boolean {
-    const s = SPHERES[tier];
-    if (!this.sphereAvailable(tier) || s.price === null) return false;
-    const cost = s.price * n;
-    if (this.save.player.gold < cost) return false;
-    this.save.player.gold -= cost;
-    this.save.stats.goldSpent += cost;
-    this.save.inventory[s.itemId] = (this.save.inventory[s.itemId] ?? 0) + n;
-    return true;
+    return this.buyItem(SPHERES[tier].itemId, n);
+  }
+
+  buyItem(itemId: string, n = 1): boolean {
+    const got = buy(this.save, itemId, n);
+    if (got > 0) this.push(`Bought ${got} ${itemName(itemId)}.`);
+    return got > 0;
+  }
+
+  sellItem(itemId: string, n = 1): boolean {
+    const gold = sell(this.save, itemId, n);
+    if (gold > 0) { this.push(`Sold ${itemName(itemId)} for ${gold.toLocaleString()} gold.`); this.notify(`💰 +${gold.toLocaleString()} gold`, 'gold', 2500); }
+    return gold > 0;
   }
 
   setDailyReset(mode: DailyReset) {
