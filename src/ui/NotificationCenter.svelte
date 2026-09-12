@@ -1,16 +1,17 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
+  import { ui } from '../state/ui.svelte';
   import { DEFAULT_NOTICE_FILTER, filterNotices, isNoticeFiltering, NOTICE_CAP, NOTICE_KIND_LABEL, NOTICE_KINDS, type NoticeFilter } from '../engine/notices';
 
-  let open = $state(false);
   let filter = $state<NoticeFilter>({ ...DEFAULT_NOTICE_FILTER });
   const rows = $derived(filterNotices(game.notices, filter));
   const filtering = $derived(isNoticeFiltering(filter));
   const clear = () => { filter = { ...DEFAULT_NOTICE_FILTER }; };
   const time = (at: number) => new Date(at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const open = $derived(ui.notificationsOpen);
   function toggle() {
-    open = !open;
-    if (!open) game.markNoticesRead();
+    ui.notificationsOpen = !ui.notificationsOpen;
+    if (!ui.notificationsOpen) game.markNoticesRead();
   }
 </script>
 

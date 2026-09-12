@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
-import { bonusReady, claimBonus, claimQuest, dayKey, generateDaily, msUntilRollover, progressTier, questDone, questProgress, rollDaily, DAILY_COUNT, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterQuests, isQuestFiltering, questStatus, QUEST_KIND_LABEL, archiveDaily, filterHistory, historySummary, questStreak, type QuestFilter } from './daily';
+import { bonusReady, claimAll, claimBonus, claimQuest, dayKey, generateDaily, msUntilRollover, progressTier, questDone, questProgress, rollDaily, DAILY_COUNT, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterQuests, isQuestFiltering, questStatus, QUEST_KIND_LABEL, archiveDaily, filterHistory, historySummary, questStreak, type QuestFilter } from './daily';
 import { ascend } from './ascend';
 import { applyDefeat } from './combat';
 import { routeById } from '../data/regions';
@@ -227,5 +227,21 @@ describe('quest history', () => {
     rollDaily(s, day(1)); rollDaily(s, day(2));
     s.progress.towers.push('rayne');
     expect(ascend(s, [])!.dailyHistory).toEqual(s.dailyHistory);
+  });
+});
+
+describe('claim all', () => {
+  it('claims every finished quest and the bonus once all are done', () => {
+    const s = newState();
+    rollDaily(s, Date.UTC(2026, 8, 12, 12));
+    expect(claimAll(s)).toEqual({ quests: [], bonus: false });
+    for (const q of s.daily!.quests) q.baseline = -1_000_000;        // everything counts as done
+    const gold = s.player.gold;
+    const r = claimAll(s);
+    expect(r.quests).toHaveLength(DAILY_COUNT);
+    expect(r.bonus).toBe(true);
+    expect(s.player.gold).toBeGreaterThan(gold);
+    expect(s.player.effigies).toBe(BONUS_EFFIGIES);
+    expect(claimAll(s)).toEqual({ quests: [], bonus: false });      // nothing left
   });
 });

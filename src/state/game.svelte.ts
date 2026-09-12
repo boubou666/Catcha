@@ -13,14 +13,14 @@ import { tickWorld } from '../engine/tick';
 import { clearPair, setPair } from '../engine/breeding';
 import { research, techMult } from '../engine/tech';
 import { bossName, completeRun, describeChest, dungeonUnlocked, isBossWave, spawnFor, startRun, type DungeonRun } from '../engine/dungeon';
-import { dungeonById } from '../data/dungeons';
+import { dungeonById, dungeonsOf } from '../data/dungeons';
 import { itemName } from '../data/items';
 import { clearReports, send } from '../engine/expedition';
 import { expeditionById } from '../data/expeditions';
 import { completeRaid, describeRaidChest, summon, summonBlocker } from '../engine/raid';
-import { raidById } from '../data/raids';
+import { raidById, RAIDS } from '../data/raids';
 import { checkAchievements } from '../engine/achievements';
-import { claimBonus, claimQuest, rollDaily, describeQuest, BONUS_EFFIGIES } from '../engine/daily';
+import { claimAll, claimBonus, claimQuest, rollDaily, describeQuest, BONUS_EFFIGIES } from '../engine/daily';
 import { buyUpgrade, relicsFor } from '../engine/prestige';
 import { ascend } from '../engine/ascend';
 import { prestigeUpgradeById } from '../data/prestige';
@@ -212,6 +212,24 @@ export class Game {
     if (q) { this.emit('questClaimed'); this.notify(`Quest complete: +${q.reward.gold.toLocaleString()} gold`, 'gold'); }
     if (q) this.push(`Quest complete: ${describeQuest(q, (r) => routeById(r).name)} — +${q.reward.gold.toLocaleString()} gold, ${Object.entries(q.reward.items).map(([i, n]) => `${n} ${itemName(i)}`).join(', ')}.`);
   }
+
+  /** Shortcut: claim everything that is ready today. */
+  claimAllQuests() {
+    const r = claimAll(this.save);
+    if (r.quests.length === 0 && !r.bonus) { this.notify('No finished quest to claim', 'info', 2000); return; }
+    for (const q of r.quests) this.push(`Quest complete: ${describeQuest(q, (id) => routeById(id).name)} (+${q.reward.gold.toLocaleString()} gold).`);
+    if (r.bonus) this.push(`Daily bonus claimed: +${BONUS_EFFIGIES} Effigy.`);
+    this.emit('questClaimed');
+    this.notify(`✅ Claimed ${r.quests.length} quest${r.quests.length === 1 ? '' : 's'}${r.bonus ? ' + the daily bonus' : ''}`, 'gold', 3500);
+  }
+
+  /** Shortcut targets in the current region: next unbeaten Alpha (else the first open one), the tower, the realm, the first summonable raid. */
+  get nextAlpha(): string | null {
+    const open = this.region.alphas.filter((a) => isUnlocked(this.save, a.unlock));
+    return (open.find((a) => !this.save.progress.alphas.includes(a.id)) ?? open[0])?.id ?? null;
+  }
+  get nextRealm(): string | null { return dungeonsOf(this.region.id).find((d) => this.canEnter(d.id))?.id ?? null; }
+  get nextRaid(): string | null { return RAIDS.find((r) => this.canSummon(r.id))?.id ?? null; }
 
   claimBonus() {
     if (claimBonus(this.save)) this.push(`Daily bonus claimed: +${BONUS_EFFIGIES} Effigy.`);

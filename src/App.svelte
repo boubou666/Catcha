@@ -34,6 +34,7 @@
   import { ui } from './state/ui.svelte';
   import ShortcutsHelp from './ui/ShortcutsHelp.svelte';
   import { isFieldTarget, resolveShortcut } from './engine/shortcuts';
+  import { isUnlocked } from './engine/progress';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings' | 'stats';
   type Group = { id: string; label: string; tabs: { id: Tab; label: string }[] };
@@ -94,6 +95,7 @@
     if (action.kind === 'attack' && e.code === 'Space' && el?.tagName === 'BUTTON') return;
     // a modal owns the keyboard while open (its own Escape handling still runs)
     if (game.offline || whatsNew.open || ui.shortcutsOpen) { if (action.kind === 'help') ui.shortcutsOpen = false; return; }
+    if (ui.notificationsOpen && action.kind !== 'notifications') return;
     e.preventDefault();
     const gi = groups.findIndex((g) => g.id === group.id);
     switch (action.kind) {
@@ -104,6 +106,15 @@
       case 'region': { const r = game.regions[action.index]; if (r && !game.inBossFight) game.travelToRegion(r.id); break; }
       case 'regionStep': { if (game.inBossFight) break; const rs = game.regions; const ri = rs.findIndex((r) => r.id === game.region.id); game.travelToRegion(rs[(ri + action.delta + rs.length) % rs.length].id); break; }
       case 'attack': if (game.wild) game.click(); break;
+      case 'tabId': { const all = groups.flatMap((g) => g.tabs); if (all.some((t) => t.id === action.id)) select(action.id as Tab); break; }
+      case 'flee': if (game.inBossFight) game.flee(); break;
+      case 'alpha': { const id = game.nextAlpha; if (id && !game.inBossFight) game.startAlpha(id); break; }
+      case 'tower': if (!game.inBossFight && isUnlocked(game.save, game.region.tower.unlock)) game.startTower(game.region.tower.id); break;
+      case 'realm': { const id = game.nextRealm; if (id) game.enterDungeon(id); break; }
+      case 'raid': { const id = game.nextRaid; if (id) game.summonRaid(id); break; }
+      case 'claimQuests': game.claimAllQuests(); break;
+      case 'spawnList': if (!isMobile) ui.spawnListOpen = !ui.spawnListOpen; break;
+      case 'notifications': ui.notificationsOpen = !ui.notificationsOpen; if (!ui.notificationsOpen) game.markNoticesRead(); break;
       case 'search': ui.focusSearch += 1; break;
       case 'help': ui.shortcutsOpen = !ui.shortcutsOpen; break;
       case 'save': game.persist(); game.notify('💾 Saved', 'info', 1500); break;

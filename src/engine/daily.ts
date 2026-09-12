@@ -274,3 +274,11 @@ export function filterHistory(save: SaveState, f: QuestFilter, routeName: (id: s
     .map((r) => ({ ...r, quests: r.quests.filter((q) => questMatches(q, q.claimed ? 'claimed' : 'missed', f, words, routeName)) }))
     .filter((r) => r.quests.length > 0);
 }
+
+/** Claim every finished quest, then the bonus if that completes the day. Returns what was claimed. */
+export function claimAll(save: SaveState): { quests: DailyQuest[]; bonus: boolean } {
+  const quests: DailyQuest[] = [];
+  for (const q of save.daily?.quests ?? []) { const c = claimQuest(save, q.id); if (c) quests.push(c); }
+  const bonus = claimBonus(save);
+  return { quests, bonus };
+}

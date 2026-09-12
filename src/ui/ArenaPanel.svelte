@@ -6,6 +6,7 @@
   import { dungeonById } from '../data/dungeons';
   import PalIcon from './PalIcon.svelte';
   import SpawnList from './SpawnList.svelte';
+  import { ui } from '../state/ui.svelte';
 
   /** compact: the sticky mobile bar (smaller art, one-line stats) */
   let { compact = false }: { compact?: boolean } = $props();
@@ -25,7 +26,7 @@
   });
   const secondsLeft = $derived(wild?.deadlineAt ? Math.max(0, Math.ceil((wild.deadlineAt - now) / 1000)) : null);
   const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toFixed(n < 10 ? 1 : 0));
-  let showHere = $state(false);
+  const showHere = $derived(ui.spawnListOpen);
 </script>
 
 <div class="panel arena" class:compact>
@@ -58,7 +59,7 @@
       <span>Party DPS: <b>{game.dps.toFixed(1)}</b></span>
       {#if wild.kind === 'wild'}
         <span>· Route progress: <b>{Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}</b></span>
-        {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (showHere = !showHere)} aria-expanded={showHere}>{showHere ? 'Hide' : 'Who lives here?'}</button>{/if}
+        {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? 'Hide' : 'Who lives here?'}</button>{/if}
       {:else}
         <button class="small" onclick={() => game.flee()}>{run ? 'Leave realm' : wild.kind === 'raid' ? 'Give up (slab lost)' : 'Retreat'}</button>
       {/if}
