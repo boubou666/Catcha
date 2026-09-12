@@ -6,7 +6,7 @@ Design notes: [DESIGN.md](DESIGN.md).
 
 ## Play
 
-Hosted build (no Pal art — see *Art* below): **https://boubou666.github.io/Catcha/**
+Hosted build: **https://boubou666.github.io/Catcha/**
 
 It installs as a PWA (Chrome/Edge: install icon in the address bar; Android: "Add to Home screen"; iOS Safari:
 Share → Add to Home Screen) and keeps working offline after the first load. When a new version is deployed, open tabs show a
@@ -89,10 +89,10 @@ and the wiki page name, then rerun.
 
 ## Art
 
-Pal images are Pocketpair's and are **not** in the repo. `npm run fetch-art` pulls the Paldeck icon and
-render for every Pal in `src/data/pals.ts` from palworld.wiki.gg into `public/pals/` (gitignored).
-Without them the UI shows element-coloured placeholder discs — which is what the GitHub Pages build
-shows, since the images are never committed or deployed.
+`public/pals/` holds the Paldeck icon and render for every Pal in `src/data/pals.ts` (about 19 MB), pulled
+from palworld.wiki.gg by `npm run fetch-art` and committed so the hosted build shows them. The art is
+Pocketpair's, used here as in the fan wiki — for a non-commercial fan project. A missing image falls back to
+an element-coloured placeholder disc.
 
 ## Look
 
