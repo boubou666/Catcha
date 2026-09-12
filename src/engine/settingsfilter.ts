@@ -1,4 +1,4 @@
-export type SettingsSection = 'daily' | 'sound' | 'catching' | 'save' | 'about';
+export type SettingsSection = 'daily' | 'sound' | 'catching' | 'keyboard' | 'save' | 'about';
 
 export interface SettingsSectionDef {
   id: SettingsSection;
@@ -10,8 +10,9 @@ export const SETTINGS_SECTIONS: SettingsSectionDef[] = [
   { id: 'daily', title: 'Daily quest reset', keywords: ['daily', 'quest', 'reset', 'midnight', 'utc', 'local', 'time', 'timezone', 'clock', 'day', 'rollover'] },
   { id: 'sound', title: 'Sound', keywords: ['sound', 'audio', 'sfx', 'effects', 'volume', 'mute', 'music', 'vibration', 'haptic', 'buzz', 'vibrate'] },
   { id: 'catching', title: 'Catching', keywords: ['catch', 'catching', 'sphere', 'policy', 'throw', 'merchant', 'auto'] },
+  { id: 'keyboard', title: 'Keyboard', keywords: ['keyboard', 'shortcuts', 'hotkeys', 'keys', 'rebind', 'binding', 'bindings', 'controls', 'remap'] },
   { id: 'save', title: 'Save', keywords: ['save', 'export', 'import', 'backup', 'transfer', 'copy', 'clipboard', 'reset game', 'delete', 'wipe', 'restart', 'autosave', 'storage', 'browser'] },
-  { id: 'about', title: 'About', keywords: ['about', 'version', 'build', 'changelog', "what's new", 'whats new', 'update', 'tutorial', 'help', 'replay', 'how to play', 'steps', 'guide', 'keyboard', 'shortcuts', 'hotkeys', 'keys'] },
+  { id: 'about', title: 'About', keywords: ['about', 'version', 'build', 'changelog', "what's new", 'whats new', 'update', 'tutorial', 'help', 'replay', 'how to play', 'steps', 'guide'] },
 ];
 
 /** Sections whose title or keywords match every word of the query (empty query = all). */

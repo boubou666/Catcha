@@ -34,6 +34,7 @@
   import { ui } from './state/ui.svelte';
   import ShortcutsHelp from './ui/ShortcutsHelp.svelte';
   import { isFieldTarget, resolveShortcut } from './engine/shortcuts';
+  import { keys } from './state/keys.svelte';
   import { isUnlocked } from './engine/progress';
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings' | 'stats';
@@ -89,7 +90,7 @@
 
   function onKey(e: KeyboardEvent) {
     const el = e.target as HTMLElement | null;
-    const action = resolveShortcut({ key: e.key, code: e.code, ctrl: e.ctrlKey, meta: e.metaKey, alt: e.altKey, shift: e.shiftKey, inField: isFieldTarget(el?.tagName, !!el?.isContentEditable) });
+    const action = resolveShortcut({ key: e.key, code: e.code, ctrl: e.ctrlKey, meta: e.metaKey, alt: e.altKey, shift: e.shiftKey, inField: isFieldTarget(el?.tagName, !!el?.isContentEditable) }, keys.bindings);
     if (!action) return;
     // Space on a focused button is that button's click, not an attack
     if (action.kind === 'attack' && e.code === 'Space' && el?.tagName === 'BUTTON') return;

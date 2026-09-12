@@ -126,8 +126,11 @@ Keyboard shortcuts: `1`–`9` open the Nth tab of the current group, `←`/`→`
 Routes/Bosses/Log on phones); `Space` or `A` attacks, `Backspace` retreats / leaves a realm / gives up a raid,
 `Shift+A` fights the next available Alpha, `Shift+T` the region's tower, `Shift+D` enters its Sealed Realm,
 `Shift+M` summons the first ready raid, `Shift+Q` claims every finished daily quest, `W` toggles "Who lives
-here?", `N` opens notifications, `/` or Ctrl+K focuses the global search, `S` saves, `?` shows the list (also
-Settings → About).
+here?", `N` opens notifications, `/` or Ctrl+K focuses the global search, `S` saves, `?` shows the list.
+Every single-key shortcut can be rebound or switched off under Settings → Keyboard (click the key, press a
+new one; clashes are flagged, Reset restores the defaults); bindings live per device in `catcha.keys` as a
+diff against the defaults (`src/engine/shortcuts.ts`, `src/state/keys.svelte.ts`). The digit, arrow, Space,
+Ctrl+K and Esc shortcuts stay fixed.
 Digits go by physical key so AZERTY/QWERTZ work unshifted; nothing fires while typing in a field or with
 Ctrl/Alt/Meta held (`src/engine/shortcuts.ts`).
 

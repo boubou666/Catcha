@@ -8,6 +8,7 @@
   import { LATEST_VERSION } from '../data/changelog';
   import { filterSettings, SETTINGS_SECTIONS, type SettingsSection } from '../engine/settingsfilter';
   import TutorialSteps from './TutorialSteps.svelte';
+  import KeyBindings from './KeyBindings.svelte';
   import { ui } from '../state/ui.svelte';
 
   let sound = $state(getPref());
@@ -109,6 +110,16 @@
 </section>
 {/if}
 
+{#if show('keyboard')}
+<section>
+  <div class="row">
+    <h3 class="grow">Keyboard</h3>
+    <button class="small" onclick={() => (ui.shortcutsOpen = true)}>Show the list</button>
+  </div>
+  <KeyBindings />
+</section>
+{/if}
+
 {#if show('save')}
 <section>
   <h3>Save</h3>
@@ -131,7 +142,6 @@
     <button class="small" onclick={() => whatsNew.showAll()}>What's new</button>
     <button class="small" onclick={() => game.restartTutorial()} disabled={!game.save.tutorial.done}>{game.save.tutorial.done ? 'Replay tutorial' : 'Tutorial in progress'}</button>
     <button class="small" onclick={() => (showSteps = !showSteps)} aria-expanded={showSteps}>{showSteps ? 'Hide steps' : 'How to play'}</button>
-    <button class="small" onclick={() => (ui.shortcutsOpen = true)}>Keyboard shortcuts</button>
   </div>
   {#if showSteps}
     <div class="steps"><TutorialSteps /></div>

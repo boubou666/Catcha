@@ -26,6 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tech: search by name, what it unlocks or effect; filter by kind, boosted stat, status (researchable now / researched) and hide levels above yours.',
       'Achievements: search and filter by category and status (unlocked / locked / almost there), sort by closest first, points or name.',
       'Daily quests: search and filter by status and kind, like every other list.',
+      'Settings → Keyboard: rebind or switch off any single-key shortcut; clashes are flagged and the help list follows your bindings.',
       'Keyboard shortcuts: 1–9 and letters for tabs, arrows for tabs and groups, Shift+arrows / Shift+1–9 for regions, Space/A to attack, Backspace to retreat, Shift+A/T/D/M to start an Alpha, tower, realm or raid, Shift+Q to claim quests, W and N for the spawn list and notifications, / for search, S to save, ? for the list.',
       'Base structures, the production table and the incubator get search and filters too — every list in the game now has them.',
       'Craft queue: search jobs, group by recipe, cancel a whole recipe or the whole queue with refunds.',

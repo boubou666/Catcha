@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { SHORTCUT_DOCS } from '../engine/shortcuts';
+  import { shortcutDocs } from '../engine/shortcuts';
+  import { keys } from '../state/keys.svelte';
+  const docs = $derived(shortcutDocs(keys.bindings));
   let { open = $bindable(false) }: { open?: boolean } = $props();
 </script>
 
@@ -10,10 +12,10 @@
       <h2 id="keys-title" class="grow">Keyboard shortcuts</h2>
       <button class="small" onclick={() => (open = false)}>✕</button>
     </div>
-    <p class="muted small">Shortcuts pause while you type in a field. Digits follow the physical keys, so they work on AZERTY and QWERTZ too.</p>
+    <p class="muted small">Shortcuts pause while you type in a field. Digits follow the physical keys, so they work on AZERTY and QWERTZ too. Change them under Settings → Keyboard.</p>
     <table>
       <tbody>
-        {#each SHORTCUT_DOCS as d (d.keys)}
+        {#each docs as d (d.does)}
           <tr><td class="keys"><kbd>{d.keys}</kbd></td><td>{d.does}</td></tr>
         {/each}
       </tbody>
