@@ -41,10 +41,13 @@ describe('a long session', () => {
     s.party = s.box.slice(0, 5).map((p) => p.uid);
     for (const id of [4, 3]) { const w = makeInstance(id, 8); addToBox(s, w); game.assignWorker(w.uid); }
     game.build('workbench'); game.build('logging'); game.build('watchtower');
+    s.progress.towers.push('lily'); s.player.gold = 50_000; s.inventory.ingot = 100;
+    game.foundOutpost('marsh');
+    { const w = makeInstance(2, 8); addToBox(s, w); game.removeFromParty(w.uid); game.postToOutpost('marsh', w.uid); }
     game.spawn();
     sane(s);
 
-    let raids = 0, rematches = 0, challengeDone = false, alphaFights = 0;
+    let raids = 0, rematches = 0, challengeDone = false, alphaFights = 0, duels = 0;
     const HOURS = 6, STEP = 5000;   // 5 s ticks: the store is reactive and jsdom is slow, 1 s ticks take a minute
     for (let t = 0; t < HOURS * 3600; t += STEP / 1000) {
       vi.advanceTimersByTime(STEP);
@@ -64,6 +67,13 @@ describe('a long session', () => {
         if (id) { game.startAlpha(id); alphaFights += 1; game.wild!.hp = 1; game.click(); }
       }
       if (t % 900 === 465) rematches = Object.keys(s.progress.alphaRematch).length;
+      // duel the region's rival whenever ready; win it fast
+      if (t % 700 === 350 && !game.inBossFight) {
+        const id = game.nextRival;
+        if (id) { game.startDuel(id); duels += 1; for (let k = 0; k < 3 && game.duel; k++) { game.wild!.hp = 1; game.click(); } }
+      }
+      // fire whatever skill is charged
+      for (const [uid, c] of Object.entries(game.charges)) if (c >= 20) game.fireSkill(uid);
       if (t % 3600 === 1800) sane(s);
       if (s.progress.challenge?.claimed) challengeDone = true;
     }
@@ -74,6 +84,10 @@ describe('a long session', () => {
     expect(raids).toBeGreaterThan(5);
     expect(alphaFights).toBeGreaterThan(5);
     expect(rematches).toBeGreaterThan(0);
+    expect(duels).toBeGreaterThan(2);
+    expect(s.stats.duelsWon).toBe(duels);
+    expect(s.stats.skillsFired).toBeGreaterThan(50);
+    expect(Object.values(s.outposts[0].taken).reduce((a, b) => a + b, 0)).toBeGreaterThan(100);
     expect(s.stats.defeated).toBeGreaterThan(1000);
     expect(s.stats.baseRaidsRepelled + s.stats.baseRaidsLost).toBe(raids);
     expect(s.daily?.date).toBe('2026-09-14');

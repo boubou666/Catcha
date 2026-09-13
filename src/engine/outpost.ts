@@ -11,7 +11,7 @@ import { pickWeighted, type Rng } from './combat';
 import { instanceByUid } from './party';
 import { isUnlocked } from './progress';
 import { addItem, canAfford, spend, type Cost } from './inventory';
-import { workerMult } from './base';
+import { structureLevel, workerMult } from './base';
 
 export interface Outpost { regionId: string; workers: string[]; slots: number; acc: number; taken: Record<string, number> }
 
@@ -37,8 +37,11 @@ export function outpostWorkers(save: SaveState, o: Outpost): PalInstance[] {
 }
 
 /** A Pal can be posted if it is in the box and doing nothing else. */
+/** Slots at an outpost: the base OUTPOST_SLOTS plus the Outpost Expansion's levels. */
+export const outpostSlots = (save: SaveState, o: Outpost) => o.slots + structureLevel(save, 'outpost_expansion');
+
 export function canPost(save: SaveState, o: Outpost, uid: string): boolean {
-  if (o.workers.length >= o.slots || !instanceByUid(save, uid)) return false;
+  if (o.workers.length >= outpostSlots(save, o) || !instanceByUid(save, uid)) return false;
   const busy = save.party.includes(uid) || save.base.workers.includes(uid) || save.outposts.some((x) => x.workers.includes(uid))
     || save.base.expeditions.some((e) => e.members.includes(uid)) || save.base.breeding?.a === uid || save.base.breeding?.b === uid;
   return !busy;

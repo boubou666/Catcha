@@ -12,7 +12,7 @@
   import PalIcon from './PalIcon.svelte';
   import { palById } from '../data/pals';
   import { REGIONS, regionById } from '../data/regions';
-  import { OUTPOST_COST, outpostRate, outpostWorkers } from '../engine/outpost';
+  import { OUTPOST_COST, outpostRate, outpostSlots, outpostWorkers } from '../engine/outpost';
   import { isUnlocked } from '../engine/progress';
   const partnerLines = $derived(summarizePartners(activePartners(game.save).filter((e) => e.stat === 'work')));
   import CostLine from './CostLine.svelte';
@@ -80,7 +80,7 @@
     {#each save.outposts as o (o.regionId)}
       <div class="outpost panel-2">
         <div class="row">
-          <b class="grow">{regionById(o.regionId).name} <span class="muted">{o.workers.length} / {o.slots} · {outpostRate(save, o).toFixed(1)} {tr("items/min")}</span></b>
+          <b class="grow">{regionById(o.regionId).name} <span class="muted">{o.workers.length} / {outpostSlots(save, o)} · {outpostRate(save, o).toFixed(1)} {tr("items/min")}</span></b>
         </div>
         <div class="small muted">{tr("Gathered:")} {Object.entries(o.taken).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') || '—'}</div>
         <div class="list">
@@ -88,7 +88,7 @@
             <PalCard inst={w} showWork><button class="small" onclick={() => game.recallFromOutpost(o.regionId, w.uid)}>{tr("Recall")}</button></PalCard>
           {/each}
         </div>
-        {#if o.workers.length < o.slots}
+        {#if o.workers.length < outpostSlots(save, o)}
           <div class="row post">
             <select onchange={(e) => { const uid = e.currentTarget.value; if (uid) game.postToOutpost(o.regionId, uid); e.currentTarget.value = ''; }} aria-label={tr("Post a Pal")}>
               <option value="">{tr("Post an idle Pal…")}</option>

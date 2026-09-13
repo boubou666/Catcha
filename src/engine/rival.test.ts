@@ -16,6 +16,7 @@ describe('rival duels', () => {
     expect(rivalInfo(s, scout).open).toBe(true);
     const team = rollTeam(s, scout, () => 0);
     expect(team.length).toBe(DUEL_TEAM);
+    expect(team[0].palId).toBe(scout.signature);   // the signature Pal leads
     expect(new Set(team.map((t) => t.palId)).size).toBe(DUEL_TEAM);
     expect(team.every((t) => t.level === 13)).toBe(true);
     const w = duelOpponent(s, { rivalId: 'scout', team, index: 0 }, 1000);
@@ -37,7 +38,7 @@ describe('rival duels', () => {
     s.stats.playSeconds += DUEL_COOLDOWN_SEC;
     expect(rivalInfo(s, rivalById('scout')).ready).toBe(true);
     const w = duelOpponent(s, { rivalId: 'scout', team: [{ palId: 1, level: 15 }], index: 0 });
-    expect(w.maxHp).toBe(Math.round(wildHp(15) * DUEL_HP_MULT * 1.2));
+    expect(w.maxHp).toBe(Math.round(wildHp(15) * DUEL_HP_MULT * 1.3));
     loseDuel(s, 'scout');
     info = rivalInfo(s, rivalById('scout'));
     expect(info.tier).toBe(1);

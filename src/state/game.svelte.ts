@@ -306,6 +306,7 @@ export class Game {
     const inst = partyInstances(this.save).find((p) => p.uid === uid);
     if (!inst || !this.wild || (this.charges[uid] ?? 0) < 20) return;
     this.charges[uid] = 0;
+    this.save.stats.skillsFired += 1;
     this.emit('skill');
     this.hit(skillDamage(this.save, inst, this.wild));
   }

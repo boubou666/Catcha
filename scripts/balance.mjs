@@ -21,6 +21,7 @@ import { PRESTIGE_UPGRADES } from '../src/data/prestige.ts';
 import { RAID_HP_MULT, RAID_TIME_SEC, WORKER_ATTACK_MULT } from '../src/engine/baseraid.ts';
 import { REMATCH_HP_STEP, REMATCH_LEVEL_STEP } from '../src/engine/rematch.ts';
 import { SKILL_CHARGE_SEC, SKILL_MULT } from '../src/engine/skills.ts';
+import { DUEL_HP_MULT, DUEL_ROUND_SEC, DUEL_TIER_HP, DUEL_TIER_LEVEL } from '../src/engine/rival.ts';
 
 const fmt = (s) => (s >= 3600 ? `${(s / 3600).toFixed(1)}h` : s >= 60 ? `${(s / 60).toFixed(1)}m` : `${s.toFixed(0)}s`);
 const pad = (s, n) => String(s).padEnd(n);
@@ -170,3 +171,16 @@ for (let k = 0; k <= runs; k++) {
   spend(save);
   carried = arkSlots(save);
 }
+
+// ---- rival duels: three Pals at DUEL_HP_MULT × wild HP, DUEL_ROUND_SEC each, tiers 0–5 ---------------------------------
+console.log('\nrival duels (worst round as % of the 90 s clock, tiers 0–5, region party):');
+REGIONS.forEach((region, i) => {
+  const stars = STARS_BY_REGION[i];
+  const top = region.routes[region.routes.length - 1].level;
+  const tiers = [0, 1, 2, 3, 4, 5].map((n) => {
+    const lvl = top + DUEL_TIER_LEVEL * n;
+    const hp = wildHp(lvl) * DUEL_HP_MULT * (1 + DUEL_TIER_HP * n);
+    return `${Math.round((hp / partyDps(fresh, region, top, stars, 0) / DUEL_ROUND_SEC) * 100)}%`;
+  });
+  console.log(' ', pad(region.name, 24), tiers.join('  '));
+});

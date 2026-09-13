@@ -18,8 +18,8 @@ export interface Duel { rivalId: string; team: { palId: number; level: number }[
 export const DUEL_TEAM = 3;
 export const DUEL_ROUND_SEC = 90;
 export const DUEL_COOLDOWN_SEC = 30 * 60;
-export const DUEL_HP_MULT = 3;
-export const DUEL_TIER_HP = 0.2;     // +20% HP per tier
+export const DUEL_HP_MULT = 8;
+export const DUEL_TIER_HP = 0.3;     // +30% HP per tier
 export const DUEL_TIER_LEVEL = 2;
 
 export interface RivalInfo { tier: number; wins: number; ready: boolean; secondsLeft: number; level: number; gold: number; open: boolean }
@@ -38,9 +38,9 @@ export function rollTeam(save: SaveState, r: RivalDef, rand: Rng = Math.random):
   const region = regionById(r.regionId);
   const ids = [...new Set(region.routes.flatMap((rt) => rt.spawns.map((s) => s.palId)))];
   const strong = ids.map((id) => palById(id)).sort((a, b) => b.baseAttack - a.baseAttack).slice(0, 6);
-  const team: Duel['team'] = [];
-  const pool = [...strong];
   const { level } = rivalInfo(save, r);
+  const team: Duel['team'] = [{ palId: r.signature, level }];   // the signature Pal always leads
+  const pool = strong.filter((d) => d.id !== r.signature);
   while (team.length < DUEL_TEAM && pool.length) {
     const [def] = pool.splice(Math.floor(rand() * pool.length), 1);
     team.push({ palId: def.id, level });

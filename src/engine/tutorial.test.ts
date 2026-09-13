@@ -69,6 +69,14 @@ describe('tutorial steps', () => {
 
     s.progress.challenge = { day: 'x', kills: 1, claimed: false };
     advanceTutorial(s);
+    expect(currentStep(s)?.id).toBe('skills');
+
+    s.stats.skillsFired = 1;
+    advanceTutorial(s);
+    expect(currentStep(s)?.id).toBe('rival');
+
+    s.stats.duelsWon = 1;
+    advanceTutorial(s);
     expect(currentStep(s)?.id).toBe('raid');
 
     s.stats.baseRaidsRepelled = 1;

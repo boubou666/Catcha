@@ -5,7 +5,7 @@ import { newStats } from './achievements';
 import { newTutorial, TUTORIAL } from './tutorial';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 26;
+export const SAVE_VERSION = 27;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -171,6 +171,10 @@ export function migrate(raw: unknown): SaveState | null {
     s.outposts ??= [];
     if (s.stats) { s.stats.duelsWon ??= 0; s.stats.duelsLost ??= 0; }
     s.version = 26;
+  }
+  if (s.version === 26) {
+    if (s.stats) s.stats.skillsFired ??= 0;
+    s.version = 27;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

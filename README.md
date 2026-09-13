@@ -131,12 +131,13 @@ spawn, `countChallengeKill` / `claimChallenge` track the `CHALLENGE_GOAL` and pa
 Rivals (`src/data/rivals.ts`, `src/engine/rival.ts`): one per region, unlocked by a route; a duel is `DUEL_TEAM`
 Pals from the region's routes (the six hardest hitters, three drawn) at the region's top level +`DUEL_TIER_LEVEL`
 per tier, each with `DUEL_HP_MULT` × wild HP (+`DUEL_TIER_HP` per tier) and a `DUEL_ROUND_SEC` clock; `kind: 'duel'`
-is never catchable. Winning pays gold × (1 + tier) and the prize and raises the tier; win or lose, the rival is
+is never catchable; `signature` always leads the team and `onWin` / `onLose` are the rival's lines. Winning pays gold × (1 + tier) and the prize and raises the tier; win or lose, the rival is
 back after `DUEL_COOLDOWN_SEC` of play (`progress.rivals`, v26). Active skills (`src/engine/skills.ts`): party
 Pals charge `SKILL_CHARGE_SEC` and fire `SKILL_MULT` seconds of their damage with their first element's matchup;
 charges live in the store, not the save. Outposts (`src/engine/outpost.ts`): one per region with a beaten tower,
 `OUTPOST_SLOTS` posted Pals gathering `OUTPOST_ITEMS_PER_MIN` × work multiplier items a minute from the region's
-spawn table (`save.outposts`); posted Pals count as away. A `#save=<code>` link imports on load after a confirm.
+spawn table (`save.outposts`); posted Pals count as away; the Outpost Expansion structure adds slots and the Training Ground multiplies skill
+damage. A `#save=<code>` link imports on load after a confirm.
 
 Partner skills (`src/data/partner.ts`) are read off each species' Palworld skill name: mounts and gliders
 give exp, diggers and anglers gold, helpers and harvest blessings base output (while the Pal works at the base),

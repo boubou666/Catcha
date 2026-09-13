@@ -11,6 +11,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.17.0', date: '2026-09-14', title: 'Signatures',
+    items: [
+      'Rivals have a face now: each leads with a signature Pal — the Syndicate Scout with a Grizzbolt, the Moonflower Warrior with a Selyne, the Marauder with a Bastigor — and has a line for winning and for losing. Duels retuned from the model: rounds are worth the clock (a third of it at tier 0, past it by tier 3 without Ascension), and every region’s rival is in the balance printout.',
+      'Two things to spend late gold on: the Training Ground (active skills +15% per level, five levels up to 600,000 gold) and the Outpost Expansion (+1 posted Pal at every outpost per level).',
+      'Duelist and Frontier achievements, tutorial steps for skills and rivals, Stats counts skills fired, and the six-hour simulation now duels, fires skills and staffs an outpost. Component tests for the rival button, the skill chips and the outpost section.',
+    ],
+    fr: { title: 'Signatures', items: [
+      "Les rivaux ont un visage : chacun ouvre avec un Pal signature — l’Éclaireur du Syndicat avec un Grizzbolt, le Guerrier Fleur-de-lune avec une Selyne, le Maraudeur avec un Bastigor — et a une réplique pour la victoire et pour la défaite. Duels rééquilibrés d’après le modèle : les manches valent leur chrono (un tiers au rang 0, au-delà dès le rang 3 sans Ascension), et le rival de chaque région figure dans le relevé d’équilibrage.",
+      "Deux choses où dépenser l’or de fin de partie : le Terrain d’entraînement (compétences actives +15 % par niveau, cinq niveaux jusqu’à 600 000 or) et l’Extension d’avant-poste (+1 Pal posté à chaque avant-poste par niveau).",
+      "Succès Duelliste et Frontière, étapes de tutoriel pour les compétences et les rivaux, les Stats comptent les compétences lancées, et la simulation de six heures affronte des rivaux, lance des compétences et poste un Pal. Tests de composants pour le bouton de rival, les jetons de compétence et la section des avant-postes.",
+    ] },
+  },
+  {
     version: '0.16.0', date: '2026-09-14', title: 'Rivals',
     items: [
       'A rival in every region: a faction fighter (Syndicate Scout, Alliance Zealot, Pyre Cultist, PIDF Trooper, Research Unit Guard, Moonflower Warrior, Feybreak Marauder) who duels you with three of the region’s hardest hitters in a row, 90 seconds each and none catchable. Win for gold and a prize — spheres, oil, Diamonds, a Legendary Sphere — and they come back a tier stronger after half an hour of play. Bosses panel and map.',

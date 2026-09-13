@@ -99,7 +99,7 @@ export function resolveDefeat(g: GameCore, w: Wild, byClick = false) {
     }
     const win = winDuel(save, g.duel.rivalId);
     g.duel = null;
-    g.pushT('Duel won! {rival} pays {gold} gold and {n} {prize}. Tier {tier} next time.', { rival: r.name, gold: win.gold.toLocaleString(), n: win.prize.n, prize: itemLabel(win.prize.itemId), tier: win.tier + 1 });
+    g.pushT('Duel won! {rival}: “{line}” — {gold} gold and {n} {prize}. Tier {tier} next time.', { rival: r.name, line: r.onWin, gold: win.gold.toLocaleString(), n: win.prize.n, prize: itemLabel(win.prize.itemId), tier: win.tier + 1 });
     g.emit('towerWin');
     g.notifyT('🏅 Duel won — {rival} +{gold} gold', { rival: r.name, gold: win.gold.toLocaleString() }, 'gold', 6000);
   } else if (w.kind === 'raid' && w.refId) {

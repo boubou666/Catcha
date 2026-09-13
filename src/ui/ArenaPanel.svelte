@@ -59,7 +59,7 @@
           {#if wild.kind === 'dungeonBoss'}<span class="tag realm">{tr("GUARDIAN")}</span>{/if}
           {#if wild.kind === 'raid'}<span class="tag raid">{tr("RAID")}</span>{/if}
           {#if challenge}<span class="tag challenge" title={tr(MOD_LABEL[challenge.mod])}>⭐ {challenge.kills}/{challenge.goal}</span>{/if}
-          {#if duel && wild.kind === 'duel'}<span class="tag duel" title={rivalById(duel.rivalId).name}>⚔ {tr("DUEL")} {duel.index + 1}/{duel.team.length} · {rivalById(duel.rivalId).name}</span>{/if}
+          {#if duel && wild.kind === 'duel'}<span class="tag duel" title={rivalById(duel.rivalId).name}>⚔ {duel.index + 1}/{duel.team.length}</span>{/if}
           {#if wild.lucky}<span class="tag lucky">{tr("LUCKY")}</span>{/if}
           {def.name} <span class="muted">Lv {wild.level}</span>
         </div>

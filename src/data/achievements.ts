@@ -54,6 +54,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'legendary', name: 'Legend', desc: 'Own a legendary species', category: 'collection', goal: 1, points: 3,
     metric: (s) => (PALS.some((p) => p.rarity === 'legendary' && (s.paldeck[p.id]?.caught ?? 0) > 0) ? 1 : 0) },
   // base
+  ...tiers('duelist', 'Duelist', 'combat', stat('duelsWon'), [[1, 1, 'Win a rival duel'], [10, 3, 'Win 10 rival duels'], [30, 5, 'Win 30 rival duels']]),
+  ...tiers('outposts', 'Frontier', 'base', (s) => s.outposts.length, [[1, 2, 'Found an outpost'], [3, 4, 'Found 3 outposts']]),
   ...tiers('defender', 'Defender', 'base', stat('baseRaidsRepelled'), [[1, 1, 'Repel a base raid'], [10, 2, 'Repel 10 base raids'], [50, 4, 'Repel 50 base raids']]),
   ...tiers('workers', 'Foreman', 'base', (s) => s.base.workers.length, [[3, 1, 'Have 3 Pals working'], [6, 2, 'Have 6 Pals working'], [10, 3, 'Have 10 Pals working']]),
   ...tiers('structures', 'Architect', 'base', structuresBuilt, [[3, 1, 'Build 3 structures'], [6, 2, 'Build 6 structures'], [STRUCTURES.length, 4, 'Build every structure']]),

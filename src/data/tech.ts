@@ -59,6 +59,8 @@ export const TECHS: TechDef[] = [
   S('pal_beds', 'Pal Beds', 9, 2, 'Resting Pals recover SAN faster.'),
   S('watchtower', 'Watchtower', 12, 3, 'Workers defend the base properly; higher levels buy time and rally the party.'),
   S('assembly_line', 'Sphere Assembly Line', 14, 3, 'Multiplies Handiwork on the craft queue.', ['s_workbench']),
+  S('training_ground', 'Training Ground', 40, 5, 'Party Pals’ active skills hit harder.'),
+  S('outpost_expansion', 'Outpost Expansion', 50, 6, 'More posted Pals at every outpost.'),
   S('breeding_farm', 'Breeding Farm', 8, 3, 'Pair Pals to produce eggs.', ['s_ranch']),
   R('cake', 'Cake', 8, 2, 'Bake Cake for the Breeding Farm.', ['s_breeding_farm']),
   // level 9

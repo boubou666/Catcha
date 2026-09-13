@@ -11,6 +11,7 @@ import { instanceAttack } from './formulas';
 import { partnerAttackMult } from './partner';
 import { techMult } from './tech';
 import { prestigeMult } from './prestige';
+import { structureLevel } from './base';
 import type { Wild } from './combat';
 
 export const SKILL_CHARGE_SEC = 20;
@@ -33,7 +34,7 @@ export function skillDamage(save: SaveState, inst: PalInstance, wild: Wild | nul
   if (!wild) return 0;
   const def = palById(inst.palId);
   return instanceAttack(inst) * elementMult([skillElement(inst)], palById(wild.palId).elements) * partnerAttackMult(save, def)
-    * techMult(save, 'attack') * prestigeMult(save, 'attack') * SKILL_MULT;
+    * techMult(save, 'attack') * prestigeMult(save, 'attack') * SKILL_MULT * (1 + 0.15 * structureLevel(save, 'training_ground'));
 }
 
 /** Advance every party Pal's charge; returns the uids whose skill is ready to fire. */

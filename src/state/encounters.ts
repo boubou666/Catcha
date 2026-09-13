@@ -98,7 +98,7 @@ export function endDuel(g: GameCore, won: boolean) {
   g.duel = null;
   if (!won) {
     loseDuel(g.save, duel.rivalId);
-    g.pushT('{rival} wins the duel and walks off. Back in half an hour of play.', { rival: r.name });
+    g.pushT('{rival} wins the duel: “{line}” Back in half an hour of play.', { rival: r.name, line: r.onLose });
     g.notifyT('❌ {rival} won the duel', { rival: r.name }, 'warn', 5000);
   }
   g.spawn();

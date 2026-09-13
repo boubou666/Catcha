@@ -4,7 +4,7 @@ import { ACHIEVEMENTS, POINT_GOLD_BONUS, type AchievementDef } from '../data/ach
 export function newStats(): SaveState['stats'] {
   return {
     defeated: 0, clicks: 0, caught: 0, luckyCaught: 0, hatched: 0, luckyHatched: 0, crafted: 0, expeditions: 0,
-    goldEarned: 0, goldSpent: 0, playSeconds: 0, throws: 0, condensed: 0, luckyDefeated: 0, chanceSum: 0, ratedThrows: 0, baseRaidsRepelled: 0, baseRaidsLost: 0, challengesDone: 0, rematchesWon: 0, duelsWon: 0, duelsLost: 0,
+    goldEarned: 0, goldSpent: 0, playSeconds: 0, throws: 0, condensed: 0, luckyDefeated: 0, chanceSum: 0, ratedThrows: 0, baseRaidsRepelled: 0, baseRaidsLost: 0, challengesDone: 0, rematchesWon: 0, duelsWon: 0, duelsLost: 0, skillsFired: 0,
     defeatedByElement: {}, defeatedByKind: {}, throwsByTier: {}, caughtByTier: {},
   };
 }

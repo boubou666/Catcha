@@ -100,6 +100,10 @@ export const STRUCTURES: StructureDef[] = [
     costs: [{ wood: 100, stone: 60, ingot: 5 }, { wood: 300, stone: 200, ingot: 25 }, { wood: 800, stone: 500, ingot: 80, paldium: 30 }] },
   { id: 'pal_beds', name: 'Pal Beds', desc: 'Resting Pals recover SAN ×2 / ×3.',
     costs: [{ wood: 60, wool: 10 }, { wood: 200, wool: 40, ingot: 5 }] },
+  { id: 'outpost_expansion', name: 'Outpost Expansion', desc: '+1 posted Pal at every outpost per level.',
+    costs: [{ gold: 20_000, ingot: 50 }, { gold: 60_000, ingot: 150, high_quality_pal_oil: 20 }, { gold: 180_000, ingot: 400, diamond: 3 }] },
+  { id: 'training_ground', name: 'Training Ground', desc: 'Active skills hit +15% harder per level.',
+    costs: [{ gold: 15_000 }, { gold: 40_000, ingot: 30 }, { gold: 100_000, ingot: 100 }, { gold: 250_000, ingot: 300, high_quality_pal_oil: 30 }, { gold: 600_000, diamond: 5 }] },
   { id: 'palbox', name: 'Palbox Expansion', desc: '+1 worker slot per level.',
     costs: [
       { gold: 150, paldium: 5 }, { gold: 300, paldium: 10 }, { gold: 600, paldium: 15 },
