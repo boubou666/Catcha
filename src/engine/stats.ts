@@ -141,6 +141,9 @@ export function statsReport(save: SaveState, live: { dps: number; clickDmg: numb
     { title: 'World', rows: [
       { label: 'Routes cleared', value: `${routes.filter((r) => routeCleared(save, r)).length} / ${routes.length}` },
       { label: 'Alphas beaten', value: `${save.progress.alphas.length} / ${alphas.length}` },
+      { label: 'Alpha rematches won', value: fmtInt(st.rematchesWon), hint: Object.keys(save.progress.alphaRematch).length ? `highest tier ${Math.max(...Object.values(save.progress.alphaRematch).map((r) => r.tier)) - 1}` : undefined },
+      { label: 'Base raids', value: `${fmtInt(st.baseRaidsRepelled)} repelled · ${fmtInt(st.baseRaidsLost)} lost` },
+      { label: 'Daily challenges done', value: fmtInt(st.challengesDone) },
       { label: 'Towers cleared', value: `${save.progress.towers.length} / ${REGIONS.length}` },
       { label: 'Sealed Realm clears', value: fmtInt(realmClears), hint: `${Object.keys(save.progress.dungeons).length} / ${DUNGEONS.length} realms cleared at least once` },
       { label: 'Raid wins', value: fmtInt(raidWins), hint: `${Object.keys(save.progress.raids).length} / ${RAIDS.length} raid bosses beaten` },

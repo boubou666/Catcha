@@ -65,6 +65,14 @@ describe('tutorial steps', () => {
 
     s.progress.alphas.push('chillet');
     advanceTutorial(s);
+    expect(currentStep(s)?.id).toBe('challenge');
+
+    s.progress.challenge = { day: 'x', kills: 1, claimed: false };
+    advanceTutorial(s);
+    expect(currentStep(s)?.id).toBe('raid');
+
+    s.stats.baseRaidsRepelled = 1;
+    advanceTutorial(s);
     expect(currentStep(s)?.id).toBe('onward');
     expect(s.tutorial.done).toBe(false);
     expect(advanceTutorial(s)).toBe(false);   // the last step waits for the player to dismiss it

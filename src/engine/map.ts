@@ -38,7 +38,7 @@ export interface MapRegion {
 }
 
 /** Every region with its pins placed on its island and coloured by the save's progress. */
-export function worldMap(save: SaveState): MapRegion[] {
+export function worldMap(save: SaveState, now = save.stats.playSeconds): MapRegion[] {
   const challengeId = todaysChallenge(save)?.route.id ?? null;
   return REGIONS.map((region) => {
     const pins: MapPin[] = [];
@@ -58,7 +58,7 @@ export function worldMap(save: SaveState): MapRegion[] {
       const open = isUnlocked(save, a.unlock);
       const [x, y] = spotOf(region.id, a.id);
       const done = save.progress.alphas.includes(a.id);
-      const rm = rematchInfo(save, a);
+      const rm = rematchInfo(save, a, now);
       pins.push({
         kind: 'alpha', id: a.id, regionId: region.id, name: `Alpha ${palById(a.palId).name}`, level: rm.level, x, y,
         status: !open ? 'locked' : done && !rm.ready ? 'cleared' : 'open', current: false,

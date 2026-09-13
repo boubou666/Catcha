@@ -204,6 +204,7 @@ export interface SaveState {
     throws: number; condensed: number; luckyDefeated: number;
     chanceSum: number;                   // sum of the odds each throw was made at (expected catches)
     baseRaidsRepelled: number; baseRaidsLost: number;
+    challengesDone: number; rematchesWon: number;
     ratedThrows: number;                 // throws counted in chanceSum (older saves started mid-way)
     defeatedByElement: Partial<Record<Element, number>>;
     defeatedByKind: Partial<Record<WildKind, number>>;

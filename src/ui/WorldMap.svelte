@@ -12,7 +12,7 @@
   import { prefs } from '../state/prefs.svelte';
   import { t, t as tr } from '../i18n/index.svelte';
 
-  const regions = $derived(worldMap(game.save));
+  const regions = $derived(worldMap(game.save, game.playSecond));
   const byId = $derived(new Map(regions.map((r) => [r.id, r])));
   let zoom = $state<string | null>(game.region.id);   // region id, or null for the whole archipelago
   let selected = $state<MapPin | null>(null);

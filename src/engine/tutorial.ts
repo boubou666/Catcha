@@ -32,6 +32,10 @@ export const TUTORIAL: TutorialStep[] = [
     tab: 'craft', done: (s) => s.stats.crafted >= 1 },
   { id: 'alpha', title: 'Beat an Alpha', text: 'Clear Fort Ruins, then challenge Alpha Chillet from the Bosses panel. Alphas gate routes and pay Effigies, which raise your catch rate.',
     done: (s) => s.progress.alphas.length >= 1 },
+  { id: 'challenge', title: "Take today's challenge", text: 'One open route a day carries a modifier — more Lucky Pals, double gold, tougher Pals or triple drops. It is starred in the route list and on the map and sits at the top of Daily; thirty defeats there pay 2,000 gold and an Effigy. Go and beat one Pal there.', tab: 'daily',
+    done: (s) => (s.progress.challenge?.kills ?? 0) > 0 },
+  { id: 'raid', title: 'Defend the base', text: 'Now and then a wild Pal raids your base. Workers fight back; rally the party from the Base tab (or the 🚨 button in the arena) to finish it fast, or build a Watchtower so they can hold on their own. Beaten Alphas also come back stronger after an hour of play — the Bosses panel shows the countdown.', tab: 'base',
+    done: (s) => s.stats.baseRaidsRepelled + s.stats.baseRaidsLost > 0 || (s.base.structures.watchtower ?? 0) > 0 },
   { id: 'onward', title: 'You know the loop', text: 'Towers unlock new regions. Breeding, condensing, expeditions, Sealed Realms, raids and Ascension unlock as you progress — check Daily quests each day and the Paldeck for where to find any Pal.',
     done: () => false },
 ];

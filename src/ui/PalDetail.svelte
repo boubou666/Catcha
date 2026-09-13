@@ -14,6 +14,7 @@
   import { catchPreview, catchTable } from '../engine/catch';
   import { catchText, pct } from './catchText';
   import { LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
+  import { alphaById } from '../data/regions';
   import { describePartner } from '../data/partner';
   import PalIcon from './PalIcon.svelte';
   import ItemIcon from './ItemIcon.svelte';
@@ -121,7 +122,7 @@
             {#if open && !game.inBossFight && game.route.id !== r.routeId}<button class="tiny" onclick={() => { game.travel(r.routeId); onclose(); }}>Go</button>{/if}
             <button class="tiny" onclick={() => { ui.showOnMap('route', r.routeId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>
         {/each}
-        {#each habitat.alphas as a}<li>{tr("Alpha in")} {a.regionName} <span class="muted">(Lv {a.level})</span> <span class="odds" class:no={!alphaPreview.throws} title={`Catch: ${catchText(alphaPreview)}`}>🎯 {alphaPreview.throws ? pct(alphaPreview.chance) : '—'}</span> <button class="tiny" onclick={() => { ui.showOnMap('alpha', a.alphaId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>{/each}
+        {#each habitat.alphas as a}{@const rm = save.progress.alphaRematch[a.alphaId]}<li>{tr("Alpha in")} {a.regionName} <span class="muted">(Lv {a.level}{rm ? ` · ${tr("rematch tier {n} reached", { n: rm.tier - 1 })}` : ''})</span> <span class="odds" class:no={!alphaPreview.throws} title={`Catch: ${catchText(alphaPreview)}`}>🎯 {alphaPreview.throws ? pct(alphaPreview.chance) : '—'}</span> <button class="tiny" onclick={() => { ui.showOnMap('alpha', a.alphaId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>{/each}
         {#each habitat.towers as t}<li>{t.boss} — {t.name} <span class="muted">{tr("(tower boss, not catchable)")}</span> <button class="tiny" onclick={() => { ui.showOnMap('tower', t.towerId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>{/each}
         {#each habitat.realms as d}<li>{d.name} <span class="muted">({d.role === 'guardian' ? 'guardian' : `${pct(d.chance)} of waves`}{isUnlocked(save, dungeonById(d.dungeonId).unlock) ? '' : ` · 🔒 ${describeRequirement(dungeonById(d.dungeonId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('realm', d.dungeonId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>{/each}
         {#each habitat.raids as r}<li>{r.name} {tr("raid")} <span class="muted">{tr("(egg on victory")}{isUnlocked(save, raidById(r.raidId).unlock) ? '' : ` · 🔒 ${describeRequirement(raidById(r.raidId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('altar', 'altar'); onclose(); }} title={tr("Show the altar on the map")}>🗺</button></li>{/each}

@@ -5,6 +5,7 @@ import { MESSAGES, LOCALES } from './messages';
 import { t, tOr } from './index.svelte';
 import { prefs } from '../state/prefs.svelte';
 import { TUTORIAL } from '../engine/tutorial';
+import { CHANGELOG } from '../data/changelog';
 
 describe('i18n', () => {
   it('every chrome key is translated, and every dotted French key exists in English', () => {
@@ -28,6 +29,11 @@ describe('i18n', () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+
+  it('keeps French changelog entries in step with the English ones', () => {
+    for (const e of CHANGELOG) if (e.fr) expect(e.fr.items.length, `v${e.version}`).toBe(e.items.length);
+    expect(CHANGELOG.slice(0, 4).every((e) => e.fr)).toBe(true);
   });
 
   it('translates the tutorial completely', () => {

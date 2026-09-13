@@ -887,4 +887,8 @@ export const FR_TEXT: Record<string, string> = {
   "Search the changelog": "Chercher dans les notes de version",
   "Version": "Version",
   "All versions": "Toutes les versions",
+  "rematch tier {n} reached": "revanche de rang {n} atteinte",
+  "Alpha rematches won": "Revanches d’Alpha gagnées",
+  "Base raids": "Raids sur la base",
+  "Daily challenges done": "Défis du jour réussis",
 };

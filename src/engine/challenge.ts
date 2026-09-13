@@ -75,6 +75,7 @@ export function claimChallenge(save: SaveState, now = Date.now()): boolean {
   save.player.gold += CHALLENGE_REWARD.gold;
   save.stats.goldEarned += CHALLENGE_REWARD.gold;
   save.player.effigies += CHALLENGE_REWARD.effigies;
+  save.stats.challengesDone += 1;
   return true;
 }
 

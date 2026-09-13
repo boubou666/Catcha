@@ -1,5 +1,7 @@
 <script lang="ts">
   import { t as tr } from '../i18n/index.svelte';
+  import { prefs } from '../state/prefs.svelte';
+  const localized = (e: (typeof CHANGELOG)[number]) => (prefs.lang === 'fr' && e.fr ? e.fr : e);
   import { whatsNew } from '../state/whatsnew.svelte';
   import { CHANGELOG, DEFAULT_CHANGELOG_FILTER, filterChangelog, isChangelogFiltering, type ChangelogFilter } from '../data/changelog';
 
@@ -26,7 +28,7 @@
         <input type="search" placeholder={tr("Search the changelog…")} bind:value={filter.query} aria-label={tr("Search the changelog")} />
         <select bind:value={filter.version} aria-label={tr("Version")}>
           <option value="any">{tr("All versions")}</option>
-          {#each CHANGELOG as e (e.version)}<option value={e.version}>v{e.version} — {e.title}</option>{/each}
+          {#each CHANGELOG as e (e.version)}<option value={e.version}>v{e.version} — {localized(e).title}</option>{/each}
         </select>
         <span class="muted small">{filtering ? `${itemCount(shown)} of ${itemCount(CHANGELOG)}` : ''}</span>
         {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
@@ -37,8 +39,8 @@
       <div class="entries">
         {#each shown as e (e.version)}
           <section>
-            <h3><span class="ver">v{e.version}</span> {e.title} <span class="muted date">{fmtDate(e.date)}</span></h3>
-            <ul>{#each e.items as item}<li>{item}</li>{/each}</ul>
+            <h3><span class="ver">v{e.version}</span> {localized(e).title} <span class="muted date">{fmtDate(e.date)}</span></h3>
+            <ul>{#each localized(e).items as item}<li>{item}</li>{/each}</ul>
           </section>
         {/each}
       </div>

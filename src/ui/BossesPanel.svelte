@@ -89,7 +89,7 @@
       {@const unlocked = isUnlocked(game.save, a.unlock)}
       {@const done = game.save.progress.alphas.includes(a.id)}
       {@const pv = catchPreview(game.save, a.palId, false, true)}
-      {@const rm = rematchInfo(game.save, a)}
+      {@const rm = rematchInfo(game.save, a, game.playSecond)}
       <button disabled={!unlocked || game.inBossFight || !rm.ready} onclick={() => game.startAlpha(a.id)}
         title={unlocked ? `${ALPHA_TIME_LIMIT_SEC / 60} minutes to win. ${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time. Catch: ${catchText(pv)}.` : describeRequirement(a.unlock)}>
         Alpha {palById(a.palId).name} Lv {rm.level}{done ? ' ✓' : ''}{#if done}<span class="muted"> · {rm.ready ? tr("rematch {tier}", { tier: rm.tier }) : `⏳ ${fmtCooldown(rm.secondsLeft)}`}</span>{/if}{#if unlocked && rm.ready} <span class="odds" class:no={!pv.throws}>🎯 {pv.throws ? `${pct(pv.chance)}` : '—'}</span>{/if}

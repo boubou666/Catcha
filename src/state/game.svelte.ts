@@ -108,6 +108,8 @@ export class Game {
   get dps(): number { return this.wild ? partyDps(this.save, this.wild) : 0; }
   get clickDmg(): number { return clickDamage(this.save.player.level, this.save.player.weaponTier) * techMult(this.save, 'click'); }
   get inBossFight(): boolean { return this.wild?.kind !== 'wild'; }
+  /** The play clock rounded to the second: views that show countdowns read this instead of stats.playSeconds, so they re-render once a second, not ten times. */
+  playSecond = $derived(Math.floor(this.save.stats.playSeconds));
 
   // ---- loop --------------------------------------------------------------
 

@@ -6,6 +6,7 @@ export interface ChangelogEntry {
   date: string;        // YYYY-MM-DD
   title: string;
   items: string[];
+  fr?: { title: string; items: string[] };   // shown when the language is French; English otherwise
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
@@ -14,8 +15,17 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       'Three structures for the late base: the Watchtower (workers defend raids at full attack; Lv 2 adds a minute to the clock; Lv 3 rallies the party on its own), the Sphere Assembly Line (Handiwork on the craft queue ×1.5 / ×2 / ×2.5) and Pal Beds (resting Pals recover SAN ×2 / ×3).',
       'Raids and rematches retuned from the balance model: raiders have ×4 wild HP instead of ×6 and workers fight at 60% attack, so a crew can hold the first three regions alone and needs the Watchtower or a rally after that; rematch tiers add +1 level and +25% HP instead of +2 and +50%, so tier 5 is within reach without Ascension up to the Astral Mountains.',
-      'Every Base tab string, job name and effect, the What’s new panel and the partner-skill summary are in French too.',
+      'Every Base tab string, job name and effect, the What’s new panel and the partner-skill summary are in French too — and these notes are, from 0.12.0 on.',
+      'Two tutorial steps for the newer systems: Take today’s challenge and Defend the base. Stats count Alpha rematches won (with the highest tier), base raids and daily challenges done; a Pal’s page shows the rematch tier reached on its Alpha.',
+      'Countdowns on the map and the Bosses buttons now tick once a second instead of ten times, which is kinder to phone batteries.',
     ],
+    fr: { title: "Tour de guet", items: [
+      "Trois structures pour la base avancée : la Tour de guet (les travailleurs défendent les raids à pleine attaque ; le Nv 2 ajoute une minute au chrono ; le Nv 3 rallie l’équipe tout seul), la Chaîne d’assemblage de sphères (Bricolage sur la file ×1,5 / ×2 / ×2,5) et les Lits pour Pals (les Pals au repos récupèrent leur SAN ×2 / ×3).",
+      "Raids et revanches rééquilibrés d’après le modèle : les assaillants ont ×4 PV sauvages au lieu de ×6 et les travailleurs se battent à 60 % d’attaque, donc une équipe tient seule les trois premières régions et a besoin de la Tour de guet ou d’un ralliement ensuite ; les rangs de revanche ajoutent +1 niveau et +25 % de PV au lieu de +2 et +50 %, donc le rang 5 est accessible sans Ascension jusqu’aux Monts astraux.",
+      "Toutes les chaînes de l’onglet Base, les noms et effets des métiers, le panneau Nouveautés et le résumé des compétences partenaires sont aussi en français — et ces notes le sont, à partir de la 0.12.0.",
+      "Deux étapes de tutoriel pour les nouveaux systèmes : Relevez le défi du jour et Défendez la base. Les Stats comptent les revanches d’Alpha gagnées (avec le rang le plus haut), les raids sur la base et les défis réussis ; la page d’un Pal indique le rang de revanche atteint sur son Alpha.",
+      "Les comptes à rebours de la carte et des boutons Boss se mettent à jour une fois par seconde au lieu de dix, ce qui ménage la batterie des téléphones.",
+    ] },
   },
   {
     version: '0.14.0', date: '2026-09-14', title: 'Rematches and challenges',
@@ -25,6 +35,12 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Raids, finished: Defender achievements (1 / 10 / 50 repelled), an alarm sound and buzz when one starts, a Recent raids list in the Base tab, and an honest toast when nothing was worth stealing.',
       'The Log search now matches the text you see, so it works in French.',
     ],
+    fr: { title: "Revanches et défis", items: [
+      "Les Alphas reviennent. Un Alpha battu passe en récupération une heure (de jeu), puis revient un rang plus fort — +1 niveau, +25 % de PV et double, triple… or — et, en tant que Pal sauvage de niveau boss, un nouveau lancer à chaque fois. Les boutons Boss et la carte affichent le rang ou le temps restant.",
+      "Une zone défi quotidienne : l’une de vos zones ouvertes reçoit un modificateur pour la journée — Jour de chance (Pals chanceux ×10), Ruée vers l’or (or doublé), Gros bras (PV et exp doublés) ou Jour de butin (triple butin, aucun lancer). Trente victoires là-bas rapportent 2 000 or et une Effigie. Elle figure en tête de Quotidien, est étoilée dans la liste des zones et sur la carte, et l’arène la signale.",
+      "Raids, finalisés : succès Défenseur (1 / 10 / 50 repoussés), une alarme sonore et une vibration au début, une liste des Raids récents dans l’onglet Base, et une notification honnête quand il n’y avait rien à voler.",
+      "La recherche du Journal porte désormais sur le texte affiché, donc elle fonctionne en français.",
+    ] },
   },
   {
     version: '0.13.0', date: '2026-09-14', title: 'Base raids',
@@ -34,6 +50,12 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Updates apply themselves: when a new version is ready, the game reloads once the tab is hidden or you have been idle for a minute and a half — never mid-boss or inside a realm.',
       'French: every sentence that was stitched around a number is a proper sentence again; achievement, tech and statistics descriptions are translated too.',
     ],
+    fr: { title: "Raids sur la base", items: [
+      "Des Pals sauvages attaquent maintenant votre base. Toutes les 15 à 25 minutes de jeu (dès que vous avez des travailleurs et une structure), un Pal de votre zone actuelle débarque avec des PV de boss et trois minutes au chrono. Les travailleurs ripostent à demi-attaque ; ralliez l’équipe depuis l’onglet Base (ou le bouton 🚨 de l’arène) pour ajouter ses dégâts. La production s’arrête pendant ce temps.",
+      "Repoussez-le pour un triple butin, cinq fois l’or et un lancer sur l’assaillant ; perdez et il emporte un dixième de deux piles et secoue la SAN des travailleurs. Votre base brille en rouge sur la carte pendant le raid ; les Stats comptent les raids repoussés et perdus.",
+      "Les mises à jour s’installent seules : quand une nouvelle version est prête, le jeu se recharge une fois l’onglet masqué ou après une minute et demie d’inactivité — jamais en plein boss ni dans un royaume.",
+      "Français : chaque phrase qui était recousue autour d’un nombre est redevenue une vraie phrase ; les descriptions des succès, des technologies et des statistiques sont traduites aussi.",
+    ] },
   },
   {
     version: '0.12.0', date: '2026-09-14', title: 'En français',
@@ -43,6 +65,12 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Save codes: Settings → Save shows a compact code (gzip, about a fifth of the old string) with Copy, and a box to paste one from another device. Old export strings still load.',
       'Under the hood: defeat resolution and encounter starters moved out of the store into their own modules.',
     ],
+    fr: { title: "En français", items: [
+      "Tout le jeu en français : Options → Langue. Menus, chaque vue, filtres, journal, notifications et tutoriel ; les noms de Pals, de zones et d’objets gardent leur nom du wiki, comme Palworld lui-même. Les chaînes manquantes retombent sur l’anglais.",
+      "Les lignes du journal et les notifications voyagent maintenant sous forme de modèles avec leurs valeurs, donc elles s’affichent dans la langue en cours (et le filtre du Journal travaille sur les données plutôt que sur la formulation).",
+      "Codes de sauvegarde : Options → Sauvegarde affiche un code compact (gzip, environ un cinquième de l’ancienne chaîne) avec Copier, et une zone pour en coller un venant d’un autre appareil. Les anciennes chaînes d’export se chargent toujours.",
+      "Sous le capot : la résolution des victoires et le lancement des combats ont quitté le store pour leurs propres modules.",
+    ] },
   },
   {
     version: '0.11.0', date: '2026-09-14', title: 'The map',

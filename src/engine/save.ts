@@ -5,7 +5,7 @@ import { newStats } from './achievements';
 import { newTutorial, TUTORIAL } from './tutorial';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 24;
+export const SAVE_VERSION = 25;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -160,6 +160,10 @@ export function migrate(raw: unknown): SaveState | null {
     if (s.progress) { s.progress.alphaRematch ??= {}; s.progress.challenge ??= null; }
     if (s.base) s.base.raidLog ??= [];
     s.version = 24;
+  }
+  if (s.version === 24) {
+    if (s.stats) { s.stats.challengesDone ??= 0; s.stats.rematchesWon ??= 0; }
+    s.version = 25;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

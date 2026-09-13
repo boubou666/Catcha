@@ -22,12 +22,13 @@ export interface RematchInfo {
   gold: number;
 }
 
-export function rematchInfo(save: SaveState, alpha: AlphaDef): RematchInfo {
+/** `now` is the play clock (stats.playSeconds); pass a coarse copy from the UI so countdowns do not re-render ten times a second. */
+export function rematchInfo(save: SaveState, alpha: AlphaDef, now = save.stats.playSeconds): RematchInfo {
   const beaten = save.progress.alphas.includes(alpha.id);
   const st = save.progress.alphaRematch[alpha.id];
   const tier = beaten ? (st?.tier ?? 1) : 0;
   const readyAt = st?.readyAt ?? 0;
-  const secondsLeft = beaten ? Math.max(0, readyAt - save.stats.playSeconds) : 0;
+  const secondsLeft = beaten ? Math.max(0, readyAt - now) : 0;
   return {
     beaten, tier, ready: !beaten || secondsLeft <= 0, secondsLeft,
     level: alpha.level + REMATCH_LEVEL_STEP * tier,
@@ -42,6 +43,7 @@ export function recordAlphaWin(save: SaveState, alphaId: string): { first: boole
   if (first) save.progress.alphas.push(alphaId);
   const prev = save.progress.alphaRematch[alphaId]?.tier ?? (first ? 0 : 1);
   const tier = first ? 1 : prev + 1;
+  if (!first) save.stats.rematchesWon += 1;
   save.progress.alphaRematch[alphaId] = { tier, readyAt: save.stats.playSeconds + REMATCH_COOLDOWN_SEC };
   return { first, tier: first ? 0 : prev };
 }
