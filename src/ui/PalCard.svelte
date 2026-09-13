@@ -3,6 +3,7 @@
   import { palById } from '../data/pals';
   import { expToLevel, instanceAttack } from '../engine/formulas';
   import PalIcon from './PalIcon.svelte';
+  import { describePartner } from '../data/partner';
   import PassiveChips from './PassiveChips.svelte';
   import type { Snippet } from 'svelte';
 
@@ -23,7 +24,7 @@
   <PalIcon palId={inst.palId} size={40} lucky={inst.lucky} />
   <div class="grow">
     <div>
-      <b>{def.name}</b> <span class="muted">Lv {inst.level}</span>
+      <b title={describePartner(def)}>{def.name}</b> <span class="muted">Lv {inst.level}</span>
       {#if inst.stars > 0}<span class="stars">{'★'.repeat(inst.stars)}</span>{/if}
       {#if inst.lucky}<span class="lucky">✨</span>{/if}
     </div>

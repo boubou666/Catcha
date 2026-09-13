@@ -66,7 +66,6 @@
   td { padding: 0.35rem 0.25rem; border-bottom: 1.5px solid var(--border-soft); vertical-align: top; }
   tr.none { opacity: 0.55; }
   .iconcell { width: 2.4rem; padding-right: 0; }
-  .odds { color: var(--accent-2); font-weight: 700; }
   .n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
   .cat { font-size: 0.75rem; margin-left: 0.3rem; }
   .tiny { font-size: 0.75rem; }

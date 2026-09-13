@@ -4,7 +4,7 @@
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { catchPreview } from '../engine/catch';
   import { spawnTable } from '../engine/arenafilter';
-  import { catchText } from './catchText';
+  import { catchText, pct } from './catchText';
   import { describeRequirement, isUnlocked } from '../engine/progress';
   import { dungeonsOf } from '../data/dungeons';
   import { bossName, dungeonClears, dungeonUnlocked } from '../engine/dungeon';
@@ -88,7 +88,7 @@
       {@const pv = catchPreview(game.save, a.palId, false, true)}
       <button disabled={!unlocked || game.inBossFight} onclick={() => game.startAlpha(a.id)}
         title={unlocked ? `${ALPHA_TIME_LIMIT_SEC / 60} minutes to win. ${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time. Catch: ${catchText(pv)}.` : describeRequirement(a.unlock)}>
-        Alpha {palById(a.palId).name} Lv {a.level}{done ? ' ✓' : ''}{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {pv.throws ? `${Math.round(pv.chance * 100)}%` : '—'}</span>{/if}
+        Alpha {palById(a.palId).name} Lv {a.level}{done ? ' ✓' : ''}{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {pv.throws ? `${pct(pv.chance)}` : '—'}</span>{/if}
       </button>
     {/each}
     <button class:primary={towerUnlocked && !towerDone}
@@ -104,8 +104,8 @@
         {@const wins = raidWins(game.save, r.id)}
         {@const slabs = countOf(game.save, r.slabItemId)}
         <button class="raid-btn" class:primary={!block && wins === 0} disabled={!game.canSummon(r.id)} onclick={() => game.summonRaid(r.id)}
-          title={block === 'locked' ? describeRequirement(r.unlock) : block ? RAID_BLOCK[block] : `${(r.hp / 1000).toLocaleString()}k HP in ${r.timeLimitSec / 60} minutes. Win: ${r.reward.gold.toLocaleString()} gold, loot, and a ${r.name} egg that inherits passives from your party (${Math.round(r.luckyChance * 100)}% Lucky).`}>
-          🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} <ItemIcon id={r.slabItemId} size={14} /> {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>{#if block !== 'locked'} <span class="odds egg" title="No sphere: winning gives a {r.name} egg, {Math.round(r.luckyChance * 100)}% Lucky">🥚 egg · ✨ {Math.round(r.luckyChance * 100)}%</span>{/if}
+          title={block === 'locked' ? describeRequirement(r.unlock) : block ? RAID_BLOCK[block] : `${(r.hp / 1000).toLocaleString()}k HP in ${r.timeLimitSec / 60} minutes. Win: ${r.reward.gold.toLocaleString()} gold, loot, and a ${r.name} egg that inherits passives from your party (${pct(r.luckyChance)} Lucky).`}>
+          🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} <ItemIcon id={r.slabItemId} size={14} /> {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>{#if block !== 'locked'} <span class="odds egg" title="No sphere: winning gives a {r.name} egg, {pct(r.luckyChance)} Lucky">🥚 egg · ✨ {pct(r.luckyChance)}</span>{/if}
         </button>
       {/each}
     </div>
@@ -116,8 +116,8 @@
     {@const pv = catchPreview(game.save, d.boss.palId)}
     <div class="row realm-row">
       <button class="realm-btn" class:primary={unlocked && clears === 0} disabled={!game.canEnter(d.id)} onclick={() => game.enterDungeon(d.id)}
-        title={unlocked ? `${d.waves} waves of Lv ${d.level} Pals, then ${bossName(d.id)} — ${d.timeLimitSec / 60} min. Waves and the guardian can be caught at normal odds. Waves: ${spawnTable(game.save, d.pool).map((r) => `${r.name} ${r.catch.throws ? `${Math.round(r.catch.chance * 100)}%` : '—'}`).join(', ')}. Guardian ${bossName(d.id)}: ${catchText(pv)}.` : describeRequirement(d.unlock)}>
-        🗝 {d.name} <span class="muted">Lv {d.level}{clears ? ` · cleared ×${clears}` : ''}</span>{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {bossName(d.id)} {pv.throws ? `${Math.round(pv.chance * 100)}%` : '—'}</span>{/if}
+        title={unlocked ? `${d.waves} waves of Lv ${d.level} Pals, then ${bossName(d.id)} — ${d.timeLimitSec / 60} min. Waves and the guardian can be caught at normal odds. Waves: ${spawnTable(game.save, d.pool).map((r) => `${r.name} ${r.catch.throws ? `${pct(r.catch.chance)}` : '—'}`).join(', ')}. Guardian ${bossName(d.id)}: ${catchText(pv)}.` : describeRequirement(d.unlock)}>
+        🗝 {d.name} <span class="muted">Lv {d.level}{clears ? ` · cleared ×${clears}` : ''}</span>{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {bossName(d.id)} {pv.throws ? `${pct(pv.chance)}` : '—'}</span>{/if}
       </button>
     </div>
   {/each}
@@ -126,8 +126,7 @@
 
 <style>
   .raid-btn { text-align: left; }
-  .odds { font-size: 0.75rem; color: var(--accent-2); margin-left: 0.25rem; }
-  .odds.no { color: var(--muted); }
+  .odds { font-size: 0.75rem; margin-left: 0.25rem; }
   .odds.egg { color: var(--accent); }
   .realm-row { margin-top: 0.5rem; }
   .realm-btn { text-align: left; }

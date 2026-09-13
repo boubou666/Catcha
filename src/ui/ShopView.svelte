@@ -1,7 +1,7 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
   import { SPHERES } from '../data/spheres';
-  import { sphereVsWild } from './catchText';
+  import { sphereVsWild, pct } from './catchText';
   import { SPHERE_TIERS } from '../data/types';
   import { STOCK, SELL_SHARE } from '../data/shop';
   import { describeRequirement } from '../engine/progress';
@@ -72,7 +72,7 @@
     {/each}
   </div>
 {:else}
-  <p class="muted small">The merchant pays {Math.round(SELL_SHARE * 100)}% of the buy price for stocked goods and fixed rates for drops. Spheres, slabs and keys aren't taken.</p>
+  <p class="muted small">The merchant pays {pct(SELL_SHARE)} of the buy price for stocked goods and fixed rates for drops. Spheres, slabs and keys aren't taken.</p>
   {#if sellableTotal === 0}
     <p class="muted">Nothing to sell yet — defeat Pals for drops or put Farming Pals on a Ranch.</p>
   {:else if sellable.length === 0}
@@ -97,7 +97,6 @@
 <p class="muted small">Which sphere gets thrown, and whether to throw at species you already own, is under <b>Settings → Catching</b>.</p>
 
 <style>
-  .odds { color: var(--accent-2); font-weight: 700; }
   .gold { font-weight: 600; color: var(--accent); }
   .sides { display: flex; gap: 0.25rem; }
   .sides button.active { background: var(--accent-2); color: #fff; }

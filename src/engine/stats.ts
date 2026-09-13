@@ -10,6 +10,7 @@ import { RARITIES } from '../data/types';
 import { catchChance } from './catch';
 import { techMult } from './tech';
 import { prestigeMult } from './prestige';
+import { partnerMult } from './partner';
 import { instanceAttack } from './formulas';
 import { achievementPoints, totalPoints } from './achievements';
 import { ACHIEVEMENTS } from '../data/achievements';
@@ -69,12 +70,13 @@ export function defeatsByKind(save: SaveState): { kind: WildKind; label: string;
 }
 
 /** The multipliers on every throw right now, and the sphere the "new species" policy would use (a Pal Sphere when it says none). */
-export function catchBonus(save: SaveState): { total: number; effigies: number; tech: number; mastery: number; tier: SphereTier } {
+export function catchBonus(save: SaveState): { total: number; effigies: number; tech: number; mastery: number; partner: number; tier: SphereTier } {
   const effigies = 1 + EFFIGY_CAPTURE_BONUS * save.player.effigies;
   const tech = techMult(save, 'catch');
   const mastery = prestigeMult(save, 'catch');
+  const partner = partnerMult(save, 'catch');
   const tier: SphereTier = save.settings.sphereForNew === 'none' ? 'pal' : save.settings.sphereForNew;
-  return { total: effigies * tech * mastery, effigies, tech, mastery, tier };
+  return { total: effigies * tech * mastery * partner, effigies, tech, mastery, partner, tier };
 }
 
 /** Everything the Stats tab shows, as labelled sections; `live` carries values only the running game knows. */
@@ -95,8 +97,9 @@ export function statsReport(save: SaveState, live: { dps: number; clickDmg: numb
     save.player.effigies ? `Effigies +${Math.round((bonus.effigies - 1) * 100)}%` : '',
     bonus.tech !== 1 ? `Capture Technique ×${bonus.tech.toFixed(2)}` : '',
     bonus.mastery !== 1 ? `Sphere Mastery ×${bonus.mastery.toFixed(2)}` : '',
+    bonus.partner !== 1 ? `partner skills ×${bonus.partner.toFixed(2)}` : '',
   ].filter(Boolean);
-  const byRarity = RARITIES.map((r) => `${r} ${fmtPct(catchChance(r, bonus.tier, save.player.effigies, false, bonus.tech * bonus.mastery))}`).join(' · ');
+  const byRarity = RARITIES.map((r) => `${r} ${fmtPct(catchChance(r, bonus.tier, save.player.effigies, false, bonus.tech * bonus.mastery * bonus.partner))}`).join(' · ');
   const palName = (p: PalInstance | null, extra?: (p: PalInstance) => string) => (p ? `${palById(p.palId).name} Lv ${p.level}${p.lucky ? ' ✨' : ''}${p.stars ? ' ★' + p.stars : ''}${extra ? ' — ' + extra(p) : ''}` : '—');
 
   return [

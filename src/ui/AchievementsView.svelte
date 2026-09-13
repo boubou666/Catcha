@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { ACHIEVEMENTS, categoryLabel, POINT_GOLD_BONUS } from '../data/achievements';
   import { achievementPoints, totalPoints } from '../engine/achievements';
@@ -21,7 +22,7 @@
 
 <div class="row">
   <h2 class="grow">Achievements <span class="muted">{unlockedCount} / {ACHIEVEMENTS.length}</span></h2>
-  <span class="points">🏆 {points} / {totalPoints} pts · +{Math.round(points * POINT_GOLD_BONUS * 100)}% gold</span>
+  <span class="points">🏆 {points} / {totalPoints} pts · +{pct(points * POINT_GOLD_BONUS)} gold</span>
 </div>
 <div class="row">
   <input type="search" placeholder="Search achievements…" bind:value={filter.query} aria-label="Search achievements" />
@@ -72,7 +73,7 @@
 <style>
   .points { color: var(--accent); font-weight: 600; }
   .small { font-size: 0.8rem; }
-  .odds { color: var(--accent-2); margin-top: 0.2rem; }
+  .odds { margin-top: 0.2rem; }
   section { margin-top: 1rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.5rem; }
   .ach { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.5rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.25rem; }

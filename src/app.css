@@ -185,3 +185,10 @@ table { font-variant-numeric: tabular-nums; }
   h1 { font-size: 1.2rem; }
   .panel { padding: 0.75rem; --c: 10px; backdrop-filter: none; }
 }
+
+/* catch odds: 🎯 62% — cyan and bold; .no = nothing would be thrown */
+.odds { color: var(--accent-2); font-weight: 700; font-variant-numeric: tabular-nums; }
+.odds.no { color: var(--muted); font-weight: 400; }
+
+/* visually hidden, read by screen readers */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

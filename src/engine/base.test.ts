@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { partnerMult } from './partner';
 import { newState, migrate, SAVE_VERSION } from './save';
 import { addToBox, addToParty, makeInstance, release } from './party';
 import {
@@ -74,7 +75,7 @@ describe('production', () => {
     const save = staffed(1, 4); // Lifmunk: Lumbering 1
     const before = computeRates(save).items.wood;
     const transport = 1 + RATES.transportBonus * (palById(4).work.Transporting ?? 0);
-    expect(before).toBeCloseTo(RATES.wood * transport);
+    expect(before).toBeCloseTo(RATES.wood * transport * partnerMult(save, 'work'));   // Lifmunk Recoil: a work skill
     save.inventory.wood = 30; save.inventory.stone = 10;
     expect(build(save, 'logging')).toBe(true);
     expect(computeRates(save).items.wood).toBeCloseTo(before * 2);

@@ -16,7 +16,7 @@ const pct = (n: number) => `${n < 0.1 ? (n * 100).toFixed(1) : Math.round(n * 10
 export function achievementCatchHint(save: SaveState, def: AchievementDef): string | null {
   if (isUnlocked(save, def.id)) return null;
   const b = catchBonus(save);
-  const mult = b.tech * b.mastery;
+  const mult = b.tech * b.mastery * b.partner;
   const st = save.stats;
   if (def.id.startsWith('caught_')) {
     const left = def.goal - progressOf(save, def);

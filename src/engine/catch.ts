@@ -7,6 +7,12 @@ import { techMult } from './tech';
 import { prestigeMult } from './prestige';
 import { rollWildPassives } from './passives';
 import { isUnlocked } from './progress';
+import { partnerMult } from './partner';
+
+/** Everything that multiplies catch odds besides the sphere: tech, Sphere Mastery and partner skills. */
+export function catchMult(save: SaveState): number {
+  return techMult(save, 'catch') * prestigeMult(save, 'catch') * partnerMult(save, 'catch');
+}
 import type { Rng, Wild } from './combat';
 
 export function catchChance(rarity: Rarity, tier: SphereTier, effigies: number, lucky: boolean, mult = 1, alpha = false): number {
@@ -48,7 +54,7 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
   save.stats.throws += 1;
   save.stats.throwsByTier[tier] = (save.stats.throwsByTier[tier] ?? 0) + 1;
 
-  const chance = catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch') * prestigeMult(save, 'catch'), wild.kind === 'alpha');
+  const chance = catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, catchMult(save), wild.kind === 'alpha');
   save.stats.chanceSum += chance;
   save.stats.ratedThrows += 1;
   if (rand() < chance) {
@@ -69,7 +75,7 @@ export function isCatchable(wild: Wild | null | undefined): wild is Wild {
 /** Odds of a specific sphere tier against the current wild (Lucky and Alpha penalties included), or null when nothing catchable is out. */
 export function chanceVsWild(save: SaveState, wild: Wild | null | undefined, tier: SphereTier, extraMult = 1): number | null {
   if (!isCatchable(wild)) return null;
-  return catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch') * prestigeMult(save, 'catch') * extraMult, wild.kind === 'alpha');
+  return catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, catchMult(save) * extraMult, wild.kind === 'alpha');
 }
 
 export interface CatchTableRow { tier: SphereTier; stock: number; chance: number; alpha: number }
@@ -77,7 +83,7 @@ export interface CatchTableRow { tier: SphereTier; stock: number; chance: number
 /** Odds for this species with every sphere the merchant has unlocked so far (wild, and as an Alpha), with what's in the bag. */
 export function catchTable(save: SaveState, palId: number): CatchTableRow[] {
   const rarity = palById(palId).rarity;
-  const mult = techMult(save, 'catch') * prestigeMult(save, 'catch');
+  const mult = catchMult(save);
   return SPHERE_TIERS
     .filter((t) => isUnlocked(save, SPHERES[t].unlock))
     .map((tier) => ({
@@ -99,5 +105,5 @@ export function catchPreview(save: SaveState, palId: number, lucky = false, alph
   if (preferred === 'none') return { throws: false, reason: 'policy', dupe };
   const tier = chooseSphere(save, palId);
   if (!tier) return { throws: false, reason: 'no-spheres', dupe };
-  return { throws: true, tier, chance: catchChance(palById(palId).rarity, tier, save.player.effigies, lucky, techMult(save, 'catch') * prestigeMult(save, 'catch'), alpha), dupe };
+  return { throws: true, tier, chance: catchChance(palById(palId).rarity, tier, save.player.effigies, lucky, catchMult(save), alpha), dupe };
 }

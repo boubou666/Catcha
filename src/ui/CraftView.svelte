@@ -142,7 +142,7 @@
 <style>
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
   .weapon { font-size: 1.4rem; width: 34px; text-align: center; }
-  .odds { color: var(--accent-2); font-weight: 700; float: right; }
+  .odds { float: right; }
   .recipe, .job { padding: 0.5rem; border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); }
   .locked { opacity: 0.55; }
   .small { font-size: 0.8rem; }

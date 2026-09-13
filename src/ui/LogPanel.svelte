@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { catchSummary, DEFAULT_LOG_FILTER, filterLog, isLogFiltering, LOG_KIND_LABEL, LOG_KINDS, type LogFilter } from '../engine/logfilter';
 
@@ -11,7 +12,6 @@
   const shown = $derived(filtering || expanded ? matches : matches.slice(0, COMPACT));
   // realized vs expected odds over the throws in view, shown when the Catching category is picked
   const summary = $derived(filter.kind === 'catch' ? catchSummary(matches) : null);
-  const pct = (n: number) => `${Math.round(n * 100)}%`;
   const clear = () => { filter = { ...DEFAULT_LOG_FILTER }; };
   const time = (at: number) => new Date(at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 </script>
@@ -54,7 +54,7 @@
   .small { font-size: 0.8rem; }
   .more { margin-top: 0.4rem; }
   .summary { color: var(--text); margin: 0 0 0.3rem; }
-  .odds { color: var(--accent-2); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .odds { white-space: nowrap; }
   .odds.hit { color: var(--ok); }
   .odds.miss { color: var(--muted); font-weight: 400; }
   input[type='search'] { min-width: 6rem; flex: 1; max-width: 11rem; font-size: 0.85rem; }

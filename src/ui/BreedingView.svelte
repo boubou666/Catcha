@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
   import { itemName } from '../data/items';
@@ -58,7 +59,7 @@
   const activePool = $derived(parents ? inheritable(parents[0], parents[1]) : []);
   const previewPool = $derived(inheritable(save.box.find((p) => p.uid === aUid), save.box.find((p) => p.uid === bUid)));
   const eggEta = (remaining: number) => formatDuration(Math.max(0, remaining) * 1000);
-  const pct = (n: number) => (n * 100 < 1 ? `${(n * 100).toFixed(1)}%` : `${Math.round(n * 100)}%`);
+  const pctFine = (n: number) => (n * 100 < 1 ? `${(n * 100).toFixed(1)}%` : pct(n));
   const activeLucky = $derived(parents ? luckyEggChance(parents[0], parents[1]) : 0);
   const previewLucky = $derived.by(() => {
     const a = save.box.find((p) => p.uid === aUid); const b = save.box.find((p) => p.uid === bUid);
@@ -80,12 +81,12 @@
     <div class="row child">
       <span class="muted">Offspring:</span>
       {#if activeChild !== null}<PalIcon palId={activeChild} size={28} /> <b>{palById(activeChild).name}</b>{/if}
-      <span class="muted small">· incubates {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)} · ✨ {pct(activeLucky)} Lucky</span>
+      <span class="muted small">· incubates {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)} · ✨ {pctFine(activeLucky)} Lucky</span>
       {#if activeChild !== null}<span class="muted small">· or in the wild</span> <CatchOdds palId={activeChild} prefix={`Catching a wild ${palById(activeChild).name} instead`} />{/if}
     </div>
     <div class="row child muted small">
       <span>Passives it can inherit:</span>
-      {#if activePool.length}<PassiveChips ids={activePool} />{:else}<span>none — {Math.round(MUTATION_CHANCE * 100)}% chance of a random one per slot</span>{/if}
+      {#if activePool.length}<PassiveChips ids={activePool} />{:else}<span>none — {pct(MUTATION_CHANCE)} chance of a random one per slot</span>{/if}
     </div>
     {#if pair?.progress !== null && pair}
       <div class="bar grow"><span style:width="{pair.progress * 100}%"></span></div>
@@ -115,7 +116,7 @@
     {#if preview !== null}
       <span class="muted">Offspring:</span> <PalIcon palId={preview} size={28} /> <b>{palById(preview).name}</b>
       {#if previewPool.length}<span class="muted small">· may inherit</span> <PassiveChips ids={previewPool} />{/if}
-      <span class="muted small">· ✨ {pct(previewLucky)} Lucky</span>
+      <span class="muted small">· ✨ {pctFine(previewLucky)} Lucky</span>
       <span class="muted small">· or in the wild</span> <CatchOdds palId={preview} prefix={`Catching a wild ${palById(preview).name} instead`} />
     {/if}
     <span class="grow"></span>

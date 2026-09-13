@@ -11,8 +11,9 @@
   import { raidById } from '../data/raids';
   import { ui } from '../state/ui.svelte';
   import { catchPreview, catchTable } from '../engine/catch';
-  import { catchText } from './catchText';
+  import { catchText, pct } from './catchText';
   import { LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
+  import { describePartner } from '../data/partner';
   import PalIcon from './PalIcon.svelte';
   import ItemIcon from './ItemIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
@@ -41,7 +42,6 @@
   const showControls = $derived(places(allHabitat) + pairs(allBreeding) >= 4);
   const owned = $derived(ownedCopies(save, palId));
   const work = $derived(Object.entries(def.work) as [WorkType, number][]);
-  const pct = (n: number) => `${Math.round(n * 100)}%`;
   const name = (id: number) => (isSeen(save, palById(id)) ? palById(id).name : '???');
 </script>
 
@@ -54,7 +54,8 @@
       <div class="grow">
         <div class="muted small">{paldeckNumber(def)}{def.variantOf ? ` · subspecies of ${name(def.variantOf)}` : ''}</div>
         <h2 id="pal-title">{seen ? def.name : '???'}</h2>
-        <div class="muted">{seen ? `${def.elements.join(' / ')} · ${def.rarity}${def.partnerSkill ? ` · ${def.partnerSkill}` : ''}` : 'Unknown element'}</div>
+        <div class="muted">{seen ? `${def.elements.join(' / ')} · ${def.rarity}` : 'Unknown element'}</div>
+        {#if seen && def.partnerSkill}<div class="small partner" title="Partner skill">🤝 {describePartner(def)}</div>{/if}
         {#if owned.count > 0}
           <div class="small">Owned ×{owned.count}{owned.best ? ` · best Lv ${owned.best.level}${owned.best.stars ? ' ' + '★'.repeat(owned.best.stars) : ''}` : ''}</div>
         {:else if seen}<div class="muted small">Seen, not yet caught</div>
@@ -166,9 +167,9 @@
   .tiers { display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; margin-top: 0.35rem; }
   .tier { display: inline-flex; align-items: center; gap: 0.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
   .tier.none { opacity: 0.5; font-weight: 400; }
-  .odds { color: var(--accent-2); font-weight: 700; margin-left: 0.3rem; }
+  .odds { margin-left: 0.3rem; }
   .best { margin: 0.2rem 0 0.4rem; color: var(--accent-2); }
-  .odds.no { color: var(--muted); font-weight: 400; }
+  .partner { color: var(--accent); }
   .link { background: none; border: none; padding: 0; color: var(--accent-2); cursor: pointer; font: inherit; text-decoration: underline; }
   .controls { margin-top: 1rem; }
   .controls input[type='search'] { min-width: 8rem; flex: 1; max-width: 14rem; font-size: 0.85rem; }

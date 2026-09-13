@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
   import { PRESTIGE_UPGRADES } from '../data/prestige';
@@ -44,10 +45,10 @@
     const u = PRESTIGE_UPGRADES.find((x) => x.id === id)!;
     const lv = upgradeLevel(save, id);
     switch (u.effect.kind) {
-      case 'mult': return `now +${Math.round(u.effect.perLevel * lv * 100)}%`;
+      case 'mult': return `now +${pct(u.effect.perLevel * lv)}`;
       case 'ark': return `carry ${slots}`;
       case 'techPoints': return `+${u.effect.perLevel * lv} TP`;
-      case 'quota': return `−${Math.round(Math.min(0.5, u.effect.perLevel * lv) * 100)}% kills`;
+      case 'quota': return `−${pct(Math.min(0.5, u.effect.perLevel * lv))} kills`;
       case 'spheres': return `+${u.effect.perLevel * lv} spheres`;
     }
   };

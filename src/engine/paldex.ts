@@ -5,9 +5,7 @@ import { DUNGEONS, dungeonById } from '../data/dungeons';
 import { RAIDS, raidById } from '../data/raids';
 import { isUnlocked } from './progress';
 import { childOf, comboKey, SPECIAL_COMBOS } from './breeding';
-import { catchChance, catchPreview } from './catch';
-import { techMult } from './tech';
-import { prestigeMult } from './prestige';
+import { catchChance, catchMult, catchPreview } from './catch';
 
 export interface BestPlace { routeId: string; routeName: string; regionName: string; share: number; odds: number; perDefeat: number }
 
@@ -17,7 +15,7 @@ export interface BestPlace { routeId: string; routeName: string; regionName: str
  */
 export function bestPlace(save: SaveState, palId: number): BestPlace | null {
   const pv = catchPreview(save, palId);
-  const odds = pv.throws ? pv.chance : catchChance(palById(palId).rarity, 'pal', save.player.effigies, false, techMult(save, 'catch') * prestigeMult(save, 'catch'));
+  const odds = pv.throws ? pv.chance : catchChance(palById(palId).rarity, 'pal', save.player.effigies, false, catchMult(save));
   let best: BestPlace | null = null;
   for (const r of habitatOf(palId).routes) {
     if (!isUnlocked(save, routeById(r.routeId).unlock)) continue;

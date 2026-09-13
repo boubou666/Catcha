@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
   import { itemName } from '../data/items';
@@ -52,7 +53,6 @@
   function pickBest() {
     picked = bestMembers(candidates, def.size).map((p) => p.uid);
   }
-  const pct = (n: number) => `${Math.round(n * 100)}%`;
   const lootText = (id: string) => {
     const e = expeditionById(id);
     return [`${e.loot.gold.toLocaleString()} gold`, ...e.loot.items.map((d) => `${itemName(d.itemId)}${d.chance < 1 ? ` (${pct(d.chance)})` : ''}`)].join(', ');

@@ -32,7 +32,10 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(VERSION),
     __BUILT_AT__: JSON.stringify(BUILT_AT),
   },
+  // component tests (*.svelte.test.ts) run in jsdom with Svelte's browser build; engine tests stay in node
+  resolve: process.env.VITEST ? { conditions: ['browser'] } : undefined,
   test: {
     include: ['src/**/*.test.ts'],
+    setupFiles: ['src/test-setup.ts'],
   },
 });

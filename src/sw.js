@@ -2,6 +2,7 @@
 // index.html is network-first (so deploys show up on reload); hashed assets and images are cache-first.
 // __VERSION__ is replaced at build time, so each deploy produces a new worker and the page can offer a reload.
 const VERSION = 'catcha-__VERSION__';
+const ART = 'catcha-art';   // Pal and item images: identical across deploys, so they are kept when a new worker takes over
 const SHELL = ['./', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -15,7 +16,7 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== ART).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
   );
 });
 
@@ -33,9 +34,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const bucket = /\/(pals|items)\/[^/]+\.png$/.test(new URL(req.url).pathname) ? ART : VERSION;
   event.respondWith(
     caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-      if (res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); }
+      if (res.ok) { const copy = res.clone(); caches.open(bucket).then((c) => c.put(req, copy)); }
       return res;
     })),
   );

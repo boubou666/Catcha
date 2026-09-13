@@ -6,6 +6,8 @@
   import { countOf } from '../engine/inventory';
   import PalCard from './PalCard.svelte';
   import CatchOdds from './CatchOdds.svelte';
+  import { activePartners, summarizePartners } from '../engine/partner';
+  const partnerLines = $derived(summarizePartners(activePartners(game.save).filter((e) => e.stat === 'work')));
   import CostLine from './CostLine.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
   import ItemIcon from './ItemIcon.svelte';
@@ -47,6 +49,7 @@
 </script>
 
 <h2>Base <span class="muted">{workers.length} / {save.base.slots} workers</span></h2>
+{#if partnerLines.length}<p class="partners small" title="Work-flavoured partner skills of the workers, added up">🤝 Partner skills: {partnerLines.join(' · ')}</p>{/if}
 
 <div class="status row">
   <span><ItemIcon id={FOOD_ITEM} size={18} /> {itemName(FOOD_ITEM)}: <b>{berries}</b>
@@ -170,6 +173,7 @@
 </section>
 
 <style>
+  .partners { color: var(--accent); font-size: 0.85rem; margin: -0.3rem 0 0.5rem; }
   section { margin-top: 1.25rem; }
   .status { padding: 0.5rem 0.75rem; background: var(--panel-2); border-radius: var(--radius-sm); }
   .warn { color: var(--accent); }

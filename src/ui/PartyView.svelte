@@ -7,6 +7,8 @@
   import BoxFilterBar from './BoxFilterBar.svelte';
   import Loadouts from './Loadouts.svelte';
   import CatchOdds from './CatchOdds.svelte';
+  import { activePartners, summarizePartners } from '../engine/partner';
+  const partnerLines = $derived(summarizePartners(activePartners(game.save).filter((e) => e.stat !== 'work')));
 
   const party = $derived(partyInstances(game.save));
   const empty = $derived(Math.max(0, PARTY_SIZE - party.length));
@@ -23,6 +25,7 @@
 
 <h2>Party <span class="muted">{party.length} / {PARTY_SIZE}</span></h2>
 <p class="muted">Party Pals attack automatically. Element matchups against the wild Pal change their damage.</p>
+{#if partnerLines.length}<p class="partners small" title="Partner skills of the party, added up">🤝 Partner skills: {partnerLines.join(' · ')}</p>{/if}
 
 <div class="list">
   {#each party as inst (inst.uid)}
@@ -73,5 +76,6 @@
   .picker { margin-top: 1rem; padding-top: 0.75rem; border-top: 1.5px solid var(--border-soft); }
   .picker .list { max-height: 45vh; overflow-y: auto; }
   .small { font-size: 0.8rem; }
+  .partners { color: var(--accent); margin: -0.4rem 0 0.6rem; }
   h3 { margin: 0; }
 </style>

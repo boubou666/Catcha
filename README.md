@@ -101,6 +101,11 @@ or a legendary catch takes. The Paldeck sorts by "Easiest to catch", and a Pal's
 hunt it (spawn share × odds, with a Go button). Settings → Catching has a per-device switch that hides the 🎯
 chips in lists; the arena line and Pal pages keep theirs.
 
+Partner skills (`src/data/partner.ts`) are read off each species' Palworld skill name: mounts and gliders
+give exp, diggers and anglers gold, helpers and harvest blessings base output (while the Pal works at the base),
+senses, webs and glares catch odds; the rest are fighting skills and add damage for party members sharing the
+Pal's first element. +3/4/6/8/12% by rarity, additive within a stat; the Party and Base tabs show the totals.
+
 ## Data
 
 `src/data/pals.ts` and `src/data/combos.ts` are generated from palworld.wiki.gg infoboxes by

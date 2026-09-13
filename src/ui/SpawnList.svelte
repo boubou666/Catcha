@@ -3,7 +3,7 @@
   import { ELEMENTS } from '../data/types';
   import { DEFAULT_SPAWN_FILTER, filterSpawns, isSpawnFiltering, spawnTable, SPAWN_STATUS_LABEL, type SpawnFilter, type SpawnTable } from '../engine/arenafilter';
   import { catchPreview } from '../engine/catch';
-  import { catchText } from './catchText';
+  import { catchText, pct } from './catchText';
   import { palById } from '../data/pals';
   import PalIcon from './PalIcon.svelte';
   import { prefs } from '../state/prefs.svelte';
@@ -17,7 +17,6 @@
   const rows = $derived(filterSpawns(all, filter));
   const filtering = $derived(isSpawnFiltering(filter));
   const clear = () => { filter = { ...DEFAULT_SPAWN_FILTER }; };
-  const pct = (n: number) => `${Math.round(n * 100)}%`;
 </script>
 
 <div class="row head">
@@ -78,8 +77,7 @@
   .spawn.here { border-color: var(--accent); }
   .spawn.missing { opacity: 0.7; }
   .chance { min-width: 2.5rem; text-align: right; font-variant-numeric: tabular-nums; }
-  .odds { color: var(--accent-2); min-width: 3.6rem; font-weight: 700; }
-  .odds.no { color: var(--muted); font-weight: 400; }
+  .odds { min-width: 3.6rem; }
   .guardian { border-style: dashed; }
   .watch { opacity: 0.5; }
   .watch.on { opacity: 1; border-color: var(--accent); }

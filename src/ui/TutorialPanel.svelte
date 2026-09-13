@@ -15,7 +15,7 @@
   <div class="panel tutorial" role="status" aria-live="polite">
     <div class="row head">
       <span class="label">Tutorial</span>
-      <span class="dots" aria-label="Step {index + 1} of {TUTORIAL.length}">
+      <span class="dots" role="img" aria-label="Step {index + 1} of {TUTORIAL.length}">
         {#each TUTORIAL as _, i}<span class="dot" class:done={i < index} class:now={i === index}></span>{/each}
       </span>
       <span class="grow"></span>

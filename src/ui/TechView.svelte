@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { chanceVsWild, chooseSphere } from '../engine/catch';
   import { palById } from '../data/pals';
@@ -76,7 +77,7 @@
             {@const tier = demoTier(game.wild.palId)}
             {@const now = chanceVsWild(game.save, game.wild, tier)}
             {@const after = chanceVsWild(game.save, game.wild, tier, t.effect.mult)}
-            {#if now !== null && after !== null}<div class="small odds">🎯 {palById(game.wild.palId).name} with a {SPHERES[tier].name}: {Math.round(now * 100)}% → {Math.round(after * 100)}%</div>{/if}
+            {#if now !== null && after !== null}<div class="small odds">🎯 {palById(game.wild.palId).name} with a {SPHERES[tier].name}: {pct(now)} → {pct(after)}</div>{/if}
           {/if}
           {#if block !== 'researched'}
             <button class="small" class:primary={block === null} disabled={block !== null} title={block ? BLOCK[block](t) : ''}
@@ -91,7 +92,6 @@
 {/each}
 
 <style>
-  .odds { color: var(--accent-2); font-weight: 700; }
   .points { font-weight: 600; color: var(--accent); }
   .small { font-size: 0.8rem; }
   section { margin-top: 1rem; }

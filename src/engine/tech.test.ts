@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { partnerMult } from './partner';
 import { newState, migrate, SAVE_VERSION } from './save';
 import { addToBox, makeInstance } from './party';
 import { assignWorker, build, canCraft, computeRates, nextCost } from './base';
@@ -68,7 +69,7 @@ describe('multipliers', () => {
     save.tech = ['labor_1'];
     const inst = makeInstance(4, 1); addToBox(save, inst); assignWorker(save, inst.uid);
     const transport = 1 + 0.03 * (palById(4).work.Transporting ?? 0);
-    expect(computeRates(save).mult).toBeCloseTo(transport * 1.15);
+    expect(computeRates(save).mult).toBeCloseTo(transport * 1.15 * partnerMult(save, 'work'));   // Lifmunk Recoil
 
     expect(catchChance('common', 'pal', 0, false, 1.15)).toBeCloseTo(0.69);
   });

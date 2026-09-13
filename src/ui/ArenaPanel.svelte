@@ -7,7 +7,7 @@
   import PalIcon from './PalIcon.svelte';
   import SpawnList from './SpawnList.svelte';
   import { catchPreview, isCatchable } from '../engine/catch';
-  import { catchText } from './catchText';
+  import { catchText, pct } from './catchText';
   import { raidById } from '../data/raids';
   import { ui } from '../state/ui.svelte';
 
@@ -32,8 +32,8 @@
   const catchLine = $derived(preview ? catchText(preview) : '');
   // towers and raids never throw a sphere: say so where the odds would be
   const raid = $derived(wild?.kind === 'raid' && wild.refId ? raidById(wild.refId) : null);
-  const noCatchLine = $derived(wild?.kind === 'tower' ? 'not catchable — a tower boss is a human and their Pal' : raid ? `no sphere — win for a ${raid.name} egg (✨ ${Math.round(raid.luckyChance * 100)}% Lucky)` : '');
-  const noCatchShort = $derived(wild?.kind === 'tower' ? 'no catch' : raid ? `🥚 ${Math.round(raid.luckyChance * 100)}% ✨` : '');
+  const noCatchLine = $derived(wild?.kind === 'tower' ? 'not catchable — a tower boss is a human and their Pal' : raid ? `no sphere — win for a ${raid.name} egg (✨ ${pct(raid.luckyChance)} Lucky)` : '');
+  const noCatchShort = $derived(wild?.kind === 'tower' ? 'no catch' : raid ? `🥚 ${pct(raid.luckyChance)} ✨` : '');
   const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toFixed(n < 10 ? 1 : 0));
   const showHere = $derived(ui.spawnListOpen);
 </script>
@@ -57,12 +57,12 @@
         <div class="muted tiny">
           {fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)}{#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
           · DPS <b>{game.dps.toFixed(1)}</b>
-          {#if preview}· 🎯 {preview.throws ? `${Math.round(preview.chance * 100)}%` : 'no throw'}{:else if noCatchShort}· {noCatchShort}{/if}
+          {#if preview}· 🎯 {preview.throws ? `${pct(preview.chance)}` : 'no throw'}{:else if noCatchShort}· {noCatchShort}{/if}
           {#if wild.kind === 'wild'} · {Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}
           {:else} · <button class="tiny flee" onclick={() => game.flee()}>{run ? 'Leave' : wild.kind === 'raid' ? 'Give up' : 'Retreat'}</button>{/if}
         </div>
       </div>
-      <button class="primary attack-c" onclick={() => game.click()} aria-label="Attack">⚔<span class="dmg">+{game.clickDmg.toFixed(1)}</span></button>
+      <button class="primary attack-c" onclick={() => game.click()}><span class="sr-only">Attack</span>⚔<span class="dmg">+{game.clickDmg.toFixed(1)}</span></button>
     </div>
   {:else if wild && def}
     <div class="row">
