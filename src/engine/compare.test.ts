@@ -42,6 +42,21 @@ describe('comparison', () => {
     expect(rows.some((r) => r.label.includes('Kindling'))).toBe(false); // nobody does
   });
 
+  it('compares the odds of catching another, ignoring Pals that would not be thrown at', () => {
+    const save = newState();
+    save.inventory.sphere_pal = 3;
+    save.settings.sphereForDupe = 'pal';
+    const lamball = makeInstance(1, 5), penking = makeInstance(11, 20);
+    addToBox(save, lamball); addToBox(save, penking);
+    let row = compareRows(save, [lamball, penking]).find((r) => r.label === '🎯 Catch another')!;
+    expect(row.values[0]).toMatch(/^\d+% \(Pal Sphere\)$/);
+    expect(row.best).toEqual([0]);                       // common beats rare
+    save.settings.sphereForDupe = 'none';
+    row = compareRows(save, [lamball, penking]).find((r) => r.label === '🎯 Catch another')!;
+    expect(row.values).toEqual(['no throw', 'no throw']);
+    expect(row.best).toEqual([]);
+  });
+
   it('ties are not highlighted and a single Pal has no bests', () => {
     const save = newState();
     const a = makeInstance(1, 5); const b = makeInstance(1, 5);

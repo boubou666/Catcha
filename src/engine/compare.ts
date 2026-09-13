@@ -7,6 +7,8 @@ import { sanStatus, workerMult } from './base';
 import { memberScore } from './expedition';
 import { isAway } from './party';
 import { isBreeding } from './breeding';
+import { catchPreview } from './catch';
+import { SPHERES } from '../data/spheres';
 
 export interface CompareRow {
   label: string;
@@ -67,6 +69,14 @@ export function compareRows(save: SaveState, insts: PalInstance[]): CompareRow[]
     num('Expedition score', insts.map(memberScore), f1),
     num('Breeding rank', defs.map((d) => d.breedPower), String, false),
   );
+
+  // odds of catching one more of each species under the current policy; best = highest, no-throws never win
+  const catches = defs.map((d) => catchPreview(save, d.id));
+  rows.push({
+    label: '🎯 Catch another',
+    values: catches.map((c) => (c.throws ? `${Math.round(c.chance * 100)}% (${SPHERES[c.tier].name})` : c.reason === 'no-spheres' ? 'no spheres' : 'no throw')),
+    best: bestOf(catches.map((c) => (c.throws ? c.chance : -1))).filter((i) => catches[i].throws),
+  });
   return rows;
 }
 

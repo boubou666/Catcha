@@ -86,7 +86,8 @@ Sealed Realm waves and guardians are caught at normal wild odds; the realm butto
 and lists the waves', and "Who lives here?" during a run shows the wave pool with spawn share and catch odds.
 The route spawn list has the same 🎯 column, and so does every seen Paldeck card; a Pal's detail
 has a Catching section with the odds per unlocked sphere (wild and as an Alpha) and what's in the bag.
-Box and Party rows show the odds of catching another of that species (what condensing and breeding run on).
+Box and Party rows show the odds of catching another of that species (what condensing and breeding run on),
+and Compare has a "🎯 Catch another" row.
 
 ## Data
 
