@@ -219,8 +219,11 @@ function fromBase64Url(s: string): Uint8Array {
 }
 async function pipe(bytes: Uint8Array, stream: { readable: ReadableStream; writable: WritableStream }): Promise<Uint8Array> {
   const w = stream.writable.getWriter();
-  void w.write(bytes); void w.close();
-  return new Uint8Array(await new Response(stream.readable).arrayBuffer());
+  // a bad payload rejects both the writer and the read; the read's rejection is the one callers see
+  const writing = w.write(bytes).then(() => w.close()).catch(() => { /* reported through the read */ });
+  const out = new Uint8Array(await new Response(stream.readable).arrayBuffer());
+  await writing;
+  return out;
 }
 
 /** A short shareable code for this save: gzip + base64url, prefixed. Falls back to the plain export string where compression is unavailable. */
