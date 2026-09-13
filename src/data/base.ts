@@ -94,6 +94,12 @@ export const STRUCTURES: StructureDef[] = [
     costs: [{ wood: 30, stone: 10, paldium: 5 }] },
   { id: 'hot_spring', name: 'Hot Spring', desc: 'Workers lose SAN 40% / 70% slower.',
     costs: [{ wood: 30, stone: 20, paldium: 10 }, { wood: 150, stone: 100, paldium: 30, ingot: 5 }] },
+  { id: 'watchtower', name: 'Watchtower', desc: 'Base raids: workers defend at full attack; Lv 2 adds a minute to the raid clock; Lv 3 rallies the party on its own.',
+    costs: [{ wood: 80, stone: 40 }, { wood: 250, stone: 150, ingot: 10 }, { wood: 600, stone: 400, ingot: 40, paldium: 20 }] },
+  { id: 'assembly_line', name: 'Sphere Assembly Line', desc: 'Handiwork on the craft queue ×1.5 / ×2 / ×2.5.',
+    costs: [{ wood: 100, stone: 60, ingot: 5 }, { wood: 300, stone: 200, ingot: 25 }, { wood: 800, stone: 500, ingot: 80, paldium: 30 }] },
+  { id: 'pal_beds', name: 'Pal Beds', desc: 'Resting Pals recover SAN ×2 / ×3.',
+    costs: [{ wood: 60, wool: 10 }, { wood: 200, wool: 40, ingot: 5 }] },
   { id: 'palbox', name: 'Palbox Expansion', desc: '+1 worker slot per level.',
     costs: [
       { gold: 150, paldium: 5 }, { gold: 300, paldium: 10 }, { gold: 600, paldium: 15 },

@@ -78,7 +78,7 @@
     </ul>
   </details>
 {/if}
-{#if partnerLines.length}<p class="partners small" title={tr("Work-flavoured partner skills of the workers, added up")}>{tr("🤝 Partner skills:")} {partnerLines.join(' · ')}</p>{/if}
+{#if partnerLines.length}<p class="partners small" title={tr("Work-flavoured partner skills of the workers, added up")}>{tr("🤝 Partner skills:")} {partnerLines.map((l) => l.replace(/(Neutral|Fire|Water|Grass|Electric|Ice|Ground|Dark|Dragon) damage|damage|catch odds|gold|exp|base output|extra drops|unseen species named|sphere refunds|boss time|ranch skills?/, (m) => tr(m))).join(' · ')}</p>{/if}
 
 <div class="status row">
   <span><ItemIcon id={FOOD_ITEM} size={18} /> {itemName(FOOD_ITEM)}: <b>{berries}</b>
@@ -129,8 +129,8 @@
         {@const lvl = levels[job.type]}
         <tr class:idle={lvl === 0}>
           <td class="icon">{job.icon}</td>
-          <td>{job.type} <span class="muted">Lv {fmt(lvl)}</span></td>
-          <td class="muted small">{job.effect}</td>
+          <td>{tr(job.type)} <span class="muted">Lv {fmt(lvl)}</span></td>
+          <td class="muted small">{tr(job.effect)}</td>
         </tr>
       {/each}
     </tbody>
@@ -163,7 +163,7 @@
         <div class="grow">
           <b>{s.name}</b>
           {#if level > 0}<span class="muted">Lv {level}{cost ? '' : ' (max)'}</span>{/if}
-          <div class="muted small">{s.desc}</div>
+          <div class="muted small">{tr(s.desc)}</div>
           {#if cost}<CostLine {cost} />{/if}
           {#if locked}<div class="muted small">{tr("🔒 Research")} <b>{structureTech(s.id)?.name}</b> {tr("(Tech tab)")}</div>{/if}
         </div>

@@ -56,6 +56,9 @@ export const TECHS: TechDef[] = [
   M('haggling', 'Haggling', 7, 2, 'gold', 1.2, '+20% gold from defeated Pals.'),
   // level 8
   S('hot_spring', 'Hot Spring', 8, 2, 'Workers lose SAN much slower.'),
+  S('pal_beds', 'Pal Beds', 9, 2, 'Resting Pals recover SAN faster.'),
+  S('watchtower', 'Watchtower', 12, 3, 'Workers defend the base properly; higher levels buy time and rally the party.'),
+  S('assembly_line', 'Sphere Assembly Line', 14, 3, 'Multiplies Handiwork on the craft queue.', ['s_workbench']),
   S('breeding_farm', 'Breeding Farm', 8, 3, 'Pair Pals to produce eggs.', ['s_ranch']),
   R('cake', 'Cake', 8, 2, 'Bake Cake for the Breeding Farm.', ['s_breeding_farm']),
   // level 9

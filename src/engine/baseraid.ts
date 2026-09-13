@@ -14,6 +14,7 @@ import { partnerAttackMult } from './partner';
 import { earnGold, addItem, countOf } from './inventory';
 import { pickWeighted, type Rng, type Wild } from './combat';
 import { tryCatch, type CatchResult } from './catch';
+import { structureLevel } from './base';
 
 export interface BaseRaid {
   palId: number;
@@ -26,10 +27,11 @@ export interface BaseRaid {
 
 export const RAID_EVERY_SEC = { min: 15 * 60, max: 25 * 60 };   // of play, between raids
 export const RAID_TIME_SEC = 180;
-export const RAID_HP_MULT = 6;
+export const WATCHTOWER_EXTRA_SEC = 60;   // Lv 2
+export const RAID_HP_MULT = 4;
 export const RAID_LOOT_MULT = 3;
 export const RAID_GOLD_MULT = 5;
-export const WORKER_ATTACK_MULT = 0.5;
+export const WORKER_ATTACK_MULT = 0.6;
 export const STEAL_FRACTION = 0.1;
 export const STEAL_SAN = 20;
 
@@ -51,6 +53,15 @@ export function rollRaid(route: RouteDef, rand: Rng = Math.random): BaseRaid {
   return { palId, level, hp: maxHp, maxHp, secondsLeft: RAID_TIME_SEC, rallied: false };
 }
 
+/** The same roll, with the Watchtower's help applied: a longer clock at Lv 2, the party already rallied at Lv 3. */
+export function rollRaidFor(save: SaveState, route: RouteDef, rand: Rng = Math.random): BaseRaid {
+  const raid = rollRaid(route, rand);
+  const tower = structureLevel(save, 'watchtower');
+  if (tower >= 2) raid.secondsLeft += WATCHTOWER_EXTRA_SEC;
+  if (tower >= 3) raid.rallied = true;
+  return raid;
+}
+
 /** Damage per second the defenders put out: workers at half attack, plus the party when rallied. */
 export function defenceDps(save: SaveState, raid: BaseRaid): number {
   const target = palById(raid.palId).elements;
@@ -58,7 +69,8 @@ export function defenceDps(save: SaveState, raid: BaseRaid): number {
     const def = palById(inst.palId);
     return instanceAttack(inst) * elementMult(def.elements, target) * partnerAttackMult(save, def) * mult;
   };
-  let dps = baseWorkers(save).reduce((s, w) => s + dmg(w, WORKER_ATTACK_MULT), 0);
+  const workerMult = structureLevel(save, 'watchtower') >= 1 ? 1 : WORKER_ATTACK_MULT;   // a Watchtower lets them fight properly
+  let dps = baseWorkers(save).reduce((s, w) => s + dmg(w, workerMult), 0);
   if (raid.rallied) dps += partyInstances(save).reduce((s, p) => s + dmg(p, 1), 0);
   return dps;
 }

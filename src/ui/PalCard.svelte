@@ -32,7 +32,7 @@
     <div class="muted small">
       {def.elements.join('/')} {tr("· ATK")} {instanceAttack(inst).toFixed(1)}
       {#if showWork}
-        · {#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}
+        · {#each work as [job, lvl]}<span class="job" title={tr(job)}>{JOB_ICON[job]}{lvl}</span>{/each}
       {/if}
     </div>
     {#if inst.passives.length > 0}<div class="passives"><PassiveChips ids={inst.passives} /></div>{/if}

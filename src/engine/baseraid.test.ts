@@ -94,3 +94,33 @@ describe('base raids', () => {
     expect(s.stats.baseRaidsLost).toBe(0);
   });
 });
+
+describe('watchtower, assembly line and beds', () => {
+  it('change how raids, crafting and rest behave', async () => {
+    const { s } = staffed();
+    const { computeRates, restMult, tickBase } = await import('./base');
+    const { rollRaidFor, defenceDps, RAID_TIME_SEC, WATCHTOWER_EXTRA_SEC, WORKER_ATTACK_MULT } = await import('./baseraid');
+    const plain = rollRaidFor(s, routeById('plateau'), () => 0);
+    const halfDps = defenceDps(s, plain);
+    s.base.structures.watchtower = 1;
+    expect(defenceDps(s, plain)).toBeCloseTo(halfDps / WORKER_ATTACK_MULT);   // full attack
+    expect(rollRaidFor(s, routeById('plateau'), () => 0).secondsLeft).toBe(RAID_TIME_SEC);
+    s.base.structures.watchtower = 2;
+    expect(rollRaidFor(s, routeById('plateau'), () => 0).secondsLeft).toBe(RAID_TIME_SEC + WATCHTOWER_EXTRA_SEC);
+    s.base.structures.watchtower = 3;
+    expect(rollRaidFor(s, routeById('plateau'), () => 0).rallied).toBe(true);
+
+    s.base.structures.workbench = 1;
+    const w = computeRates(s).handiworkPerSec;
+    s.base.structures.assembly_line = 2;
+    expect(computeRates(s).handiworkPerSec).toBeCloseTo(w * 2);
+
+    expect(restMult(s)).toBe(1);
+    s.base.structures.pal_beds = 2;
+    expect(restMult(s)).toBe(3);
+    const resting = makeInstance(1, 1); resting.san = 10; addToBox(s, resting);
+    s.base.raid = null;
+    tickBase(s, 60);
+    expect(resting.san).toBeGreaterThan(10);
+  });
+});

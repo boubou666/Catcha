@@ -8,8 +8,8 @@ import { wildHp } from './formulas';
 export interface RematchState { tier: number; readyAt: number }   // tier 1 = first rematch; readyAt in stats.playSeconds
 
 export const REMATCH_COOLDOWN_SEC = 60 * 60;   // an hour of play
-export const REMATCH_HP_STEP = 0.5;            // +50% HP per tier
-export const REMATCH_LEVEL_STEP = 2;
+export const REMATCH_HP_STEP = 0.25;           // +25% HP per tier
+export const REMATCH_LEVEL_STEP = 1;
 export const REMATCH_GOLD_STEP = 1;            // gold × (1 + tier)
 
 export interface RematchInfo {

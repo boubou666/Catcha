@@ -10,9 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.15.0', date: '2026-09-14', title: 'Watchtower',
+    items: [
+      'Three structures for the late base: the Watchtower (workers defend raids at full attack; Lv 2 adds a minute to the clock; Lv 3 rallies the party on its own), the Sphere Assembly Line (Handiwork on the craft queue ×1.5 / ×2 / ×2.5) and Pal Beds (resting Pals recover SAN ×2 / ×3).',
+      'Raids and rematches retuned from the balance model: raiders have ×4 wild HP instead of ×6 and workers fight at 60% attack, so a crew can hold the first three regions alone and needs the Watchtower or a rally after that; rematch tiers add +1 level and +25% HP instead of +2 and +50%, so tier 5 is within reach without Ascension up to the Astral Mountains.',
+      'Every Base tab string, job name and effect, the What’s new panel and the partner-skill summary are in French too.',
+    ],
+  },
+  {
     version: '0.14.0', date: '2026-09-14', title: 'Rematches and challenges',
     items: [
-      'Alphas come back. A beaten Alpha goes on a one-hour (play time) cooldown, then returns one tier stronger — +2 levels, +50% HP and double, triple… gold — and, being a boss-level wild Pal, a fresh throw each time. The Bosses buttons and the map show the tier or the time left.',
+      'Alphas come back. A beaten Alpha goes on a one-hour (play time) cooldown, then returns one tier stronger — +1 level, +25% HP and double, triple… gold — and, being a boss-level wild Pal, a fresh throw each time. The Bosses buttons and the map show the tier or the time left.',
       'A daily challenge route: one of your open routes gets a modifier for the day — Lucky day (Lucky Pals ×10), Gold rush (double gold), Tough crowd (double HP, double exp) or Loot day (triple drops, no throws). Thirty defeats there pay 2,000 gold and an Effigy. It sits at the top of Daily, is starred in the route list and on the map, and the arena tags it.',
       'Raids, finished: Defender achievements (1 / 10 / 50 repelled), an alarm sound and buzz when one starts, a Recent raids list in the Base tab, and an honest toast when nothing was worth stealing.',
       'The Log search now matches the text you see, so it works in French.',

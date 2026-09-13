@@ -73,7 +73,7 @@
         </div>
         <div>
           <h3>{tr("Work")}</h3>
-          <div class="small">{#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}{#if work.length === 0}<span class="muted">{tr("none")}</span>{/if}
+          <div class="small">{#each work as [job, lvl]}<span class="job" title={tr(job)}>{JOB_ICON[job]}{lvl}</span>{/each}{#if work.length === 0}<span class="muted">{tr("none")}</span>{/if}
             {#if def.farmDrop}<div class="muted">{tr("Ranch:")} <ItemIcon id={def.farmDrop.itemId} size={16} label /></div>{/if}</div>
         </div>
         <div>

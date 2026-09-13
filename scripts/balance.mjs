@@ -18,6 +18,8 @@ import { makeInstance } from '../src/engine/party.ts';
 import { newState } from '../src/engine/save.ts';
 import { arkSlots, buyUpgrade, prestigeMult, routeQuota } from '../src/engine/prestige.ts';
 import { PRESTIGE_UPGRADES } from '../src/data/prestige.ts';
+import { RAID_HP_MULT, RAID_TIME_SEC, WORKER_ATTACK_MULT } from '../src/engine/baseraid.ts';
+import { REMATCH_HP_STEP, REMATCH_LEVEL_STEP } from '../src/engine/rematch.ts';
 
 const fmt = (s) => (s >= 3600 ? `${(s / 3600).toFixed(1)}h` : s >= 60 ? `${(s / 60).toFixed(1)}m` : `${s.toFixed(0)}s`);
 const pad = (s, n) => String(s).padEnd(n);
@@ -119,6 +121,33 @@ for (const raid of RAIDS) {
   const s = raid.hp / dps;
   console.log(' ', pad(raid.name, 18), pad(fmt(s), 8), `(${Math.round((s / raid.timeLimitSec) * 100)}% of limit)`);
 }
+// ---- base raids: a route Pal with boss HP vs three workers (half attack) and, rallied, the party ---------------
+console.log('\nbase raids (top route of each region; 3 workers of region Pals at 0.6 attack; rallied = + party):');
+REGIONS.forEach((region, i) => {
+  const top = region.routes[region.routes.length - 1];
+  const level = top.level + 2;
+  const hp = wildHp(level) * RAID_HP_MULT;
+  const stars = STARS_BY_REGION[i];
+  const workers = 3 * regionPal(region, Math.max(1, top.level - 5), stars) * WORKER_ATTACK_MULT;
+  const party = partyDps(fresh, region, top.level, stars, 0);
+  const alone = hp / workers, rallied = hp / (workers + party);
+  console.log(' ', pad(region.name, 24), pad(`${(hp / 1000).toFixed(1)}k HP`, 9), pad(`workers ${fmt(alone)} (${Math.round((alone / RAID_TIME_SEC) * 100)}%)`, 26), `rallied ${fmt(rallied)} (${Math.round((rallied / RAID_TIME_SEC) * 100)}%)`, alone <= RAID_TIME_SEC ? '' : ' ← needs the party');
+});
+
+// ---- Alpha rematches: the first Alpha of each region, tiers 1–5, against the region party ------------------------
+console.log('\nalpha rematches (first Alpha per region, % of the 5-minute clock per tier, region party):');
+REGIONS.forEach((region, i) => {
+  const a = region.alphas[0];
+  const stars = STARS_BY_REGION[i];
+  const tiers = [1, 2, 3, 4, 5].map((n) => {
+    const lvl = a.level + REMATCH_LEVEL_STEP * n;
+    const hp = wildHp(lvl) * a.hpMult * (1 + REMATCH_HP_STEP * n);
+    const t = hp / partyDps(fresh, region, region.routes[region.routes.length - 1].level, stars, 0);
+    return `${Math.round((t / ALPHA_TIME_LIMIT_SEC) * 100)}%`;
+  });
+  console.log(' ', pad(region.name, 24), pad(palById(a.palId).name, 12), tiers.join('  '));
+});
+
 console.log(`\nearly game: first Lamball ${wildHp(1).toFixed(0)} HP → ${Math.ceil(wildHp(1) / 5.15)} clicks; gold/kill ${goldReward(1)}, sphere 40g`);
 
 // ---- ascensions ----------------------------------------------------------------------

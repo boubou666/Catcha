@@ -26,7 +26,7 @@ import { prestigeUpgradeById } from '../data/prestige';
 import { applyOffline, type OfflineReport } from '../engine/offline';
 import { classifyLog, fillTemplate, type LogMessage, type LogEntry } from '../engine/logfilter';
 import { resolveDefeat } from './defeat';
-import { canRaid, nextRaidDelay, rollRaid, tickRaid } from '../engine/baseraid';
+import { canRaid, nextRaidDelay, rollRaidFor, tickRaid } from '../engine/baseraid';
 import { rematchInfo } from '../engine/rematch';
 import { activeMods, claimChallenge, countChallengeKill, todaysChallenge } from '../engine/challenge';
 import { canEnter, canSummon, endRun, enterDungeon, flee, startAlpha, startTower, summonRaid } from './encounters';
@@ -217,7 +217,7 @@ export class Game {
     }
     if (this.save.stats.playSeconds >= base.nextRaidAt) {
       if (!canRaid(this.save)) { base.nextRaidAt = this.save.stats.playSeconds + 60; return; }
-      base.raid = rollRaid(this.route);
+      base.raid = rollRaidFor(this.save, this.route);
       this.emit('raidAlarm');
       const name = palById(base.raid.palId).name;
       this.pushT('🚨 {pal} Lv {level} is raiding the base! The workers fight back — rally the party from the Base tab.', { pal: name, level: base.raid.level });

@@ -61,7 +61,7 @@
         <div class="muted tiny">
           {fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)}{#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
           · DPS <b>{game.dps.toFixed(1)}</b>
-          {#if preview}· 🎯 {preview.throws ? `${pct(preview.chance)}` : 'no throw'}{:else if noCatchShort}· {noCatchShort}{/if}
+          {#if preview}· 🎯 {preview.throws ? `${pct(preview.chance)}` : tr("no throw")}{:else if noCatchShort}· {noCatchShort}{/if}
           {#if wild.kind === 'wild'} · {Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}
           {:else} · <button class="tiny flee" onclick={() => game.flee()}>{run ? t('arena.leave') : wild.kind === 'raid' ? t('arena.giveUpShort') : t('arena.retreat')}</button>{/if}
         </div>

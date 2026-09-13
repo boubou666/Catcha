@@ -115,7 +115,11 @@ a Pal from the current route attacks it with `RAID_HP_MULT` × wild HP and a 3-m
 next arrival in `save.base.nextRaidAt` play-seconds, v23). Workers defend at `WORKER_ATTACK_MULT`; `game.rally()`
 adds the party. Production pauses during a raid. Repelling pays `RAID_GOLD_MULT` × gold, `RAID_LOOT_MULT` × drops
 and a throw at the raider; failing steals `STEAL_FRACTION` of two stacks (never spheres or slabs) and costs
-workers `STEAL_SAN`. Deploys apply themselves when the tab is hidden or idle (`update.autoApply`).
+workers `STEAL_SAN`. The Watchtower lets workers fight at full attack (Lv 2 +60 s, Lv 3 auto-rally), the Sphere Assembly Line
+multiplies Handiwork, Pal Beds speed SAN recovery. `npm run balance` prints raid times (workers alone / rallied)
+and rematch tiers per region alongside the rest of the model; `src/state/longrun.test.ts` drives the real store
+through six simulated hours of fights, raids, rematches, the challenge and rollovers and checks the save stays
+sane. Deploys apply themselves when the tab is hidden or idle (`update.autoApply`).
 
 Alpha rematches (`src/engine/rematch.ts`): a beaten Alpha is on a `REMATCH_COOLDOWN_SEC` play-time cooldown and
 returns at tier n with +`REMATCH_LEVEL_STEP`·n levels, ×(1 + `REMATCH_HP_STEP`·n) HP and ×(1 + n) gold; state in

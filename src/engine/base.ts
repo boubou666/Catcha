@@ -155,7 +155,7 @@ export function computeRates(save: SaveState): BaseRates {
   return {
     items,
     smeltPerMin: lvl('furnace') > 0 ? w.Kindling * RATES.smelt * mult : 0,
-    handiworkPerSec: lvl('workbench') > 0 ? w.Handiwork * RATES.handiwork * mult : 0,
+    handiworkPerSec: lvl('workbench') > 0 ? w.Handiwork * RATES.handiwork * mult * (1 + 0.5 * lvl('assembly_line')) : 0,
     foodPerMin: foodPerMinute(save, w),
     medicalPerMin: lvl('medicine_bench') > 0 ? w.Medicine * RATES.medicinePerLevel * mult : 0,
     sanDrainPerMin: sanDrainPerMin(save),
@@ -212,13 +212,18 @@ function produce(save: SaveState, itemId: string, amount: number): void {
 }
 
 /** Sanity: workers drain (rates already reflect this tick's bands), everyone else rests, medicine treats the worst off. */
+/** Pal Beds: resting Pals recover SAN ×2 / ×3. */
+export function restMult(save: SaveState): number {
+  return 1 + structureLevel(save, 'pal_beds');
+}
+
 function tickSan(save: SaveState, dtMin: number, drainPerMin: number, medicalPerMin: number): void {
   const workers = new Set(save.base.workers);
   for (const inst of save.box) {
     inst.san ??= 100;
     inst.san = workers.has(inst.uid)
       ? Math.max(0, inst.san - drainPerMin * dtMin)
-      : Math.min(100, inst.san + RATES.sanRest * dtMin);
+      : Math.min(100, inst.san + RATES.sanRest * dtMin * restMult(save));
   }
   if (medicalPerMin > 0) produce(save, MEDICINE_ITEM, medicalPerMin * dtMin);
   const needy = baseWorkers(save).filter((w) => w.san < RATES.medicineThreshold).sort((a, b) => a.san - b.san);

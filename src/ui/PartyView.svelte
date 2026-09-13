@@ -26,7 +26,7 @@
 
 <h2>{t('panel.party')} <span class="muted">{party.length} / {PARTY_SIZE}</span></h2>
 <p class="muted">{tr("Party Pals attack automatically. Element matchups against the wild Pal change their damage.")}</p>
-{#if partnerLines.length}<p class="partners small" title={tr("Partner skills of the party, added up")}>{tr("🤝 Partner skills:")} {partnerLines.join(' · ')}</p>{/if}
+{#if partnerLines.length}<p class="partners small" title={tr("Partner skills of the party, added up")}>{tr("🤝 Partner skills:")} {partnerLines.map((l) => l.replace(/(Neutral|Fire|Water|Grass|Electric|Ice|Ground|Dark|Dragon) damage|damage|catch odds|gold|exp|base output|extra drops|unseen species named|sphere refunds|boss time|ranch skills?/, (m) => tr(m))).join(' · ')}</p>{/if}
 
 <div class="list">
   {#each party as inst (inst.uid)}

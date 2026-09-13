@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { whatsNew } from '../state/whatsnew.svelte';
   import { CHANGELOG, DEFAULT_CHANGELOG_FILTER, filterChangelog, isChangelogFiltering, type ChangelogFilter } from '../data/changelog';
 
@@ -18,20 +19,20 @@
   <div class="backdrop">
     <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="whatsnew-title">
       <div class="row">
-        <h2 id="whatsnew-title" class="grow">What's new</h2>
+        <h2 id="whatsnew-title" class="grow">{tr("What's new")}</h2>
         <button class="small" onclick={() => whatsNew.close()}>✕</button>
       </div>
       <div class="row">
-        <input type="search" placeholder="Search the changelog…" bind:value={filter.query} aria-label="Search the changelog" />
-        <select bind:value={filter.version} aria-label="Version">
-          <option value="any">All versions</option>
+        <input type="search" placeholder={tr("Search the changelog…")} bind:value={filter.query} aria-label={tr("Search the changelog")} />
+        <select bind:value={filter.version} aria-label={tr("Version")}>
+          <option value="any">{tr("All versions")}</option>
           {#each CHANGELOG as e (e.version)}<option value={e.version}>v{e.version} — {e.title}</option>{/each}
         </select>
         <span class="muted small">{filtering ? `${itemCount(shown)} of ${itemCount(CHANGELOG)}` : ''}</span>
-        {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+        {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
       </div>
       {#if shown.length === 0}
-        <p class="muted">Nothing matches. <button class="small" onclick={clear}>Clear</button></p>
+        <p class="muted">{tr("Nothing matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>
       {/if}
       <div class="entries">
         {#each shown as e (e.version)}
@@ -41,7 +42,7 @@
           </section>
         {/each}
       </div>
-      <button class="primary" onclick={() => whatsNew.close()}>Got it</button>
+      <button class="primary" onclick={() => whatsNew.close()}>{tr("Got it")}</button>
     </div>
   </div>
 {/if}
