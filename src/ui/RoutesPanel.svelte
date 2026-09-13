@@ -6,6 +6,7 @@
   import { ELEMENTS } from '../data/types';
   import { DEFAULT_ROUTE_FILTER, filterRoutes, isRouteFiltering, ROUTE_STATUS_LABEL, type RouteFilter } from '../engine/routefilter';
   import { prefs } from '../state/prefs.svelte';
+  import { ui } from '../state/ui.svelte';
   import WorldMap from './WorldMap.svelte';
 
   let filter = $state<RouteFilter>({ ...DEFAULT_ROUTE_FILTER });
@@ -22,6 +23,7 @@
   const clear = () => { filter = { ...DEFAULT_ROUTE_FILTER }; };
   // folded: one line with where you are; searching unfolds it
   const folded = $derived(!prefs.routesOpen && !filtering);
+  $effect(() => { if (ui.mapFocus) { prefs.setRoutesView('map'); prefs.setRoutesOpen(true); filter.query = ''; } });
 </script>
 
 <div class="panel" class:folded>

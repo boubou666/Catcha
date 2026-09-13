@@ -32,6 +32,7 @@
   import SpawnList from './ui/SpawnList.svelte';
   import { whatsNew } from './state/whatsnew.svelte';
   import { ui } from './state/ui.svelte';
+  import { prefs } from './state/prefs.svelte';
   import ShortcutsHelp from './ui/ShortcutsHelp.svelte';
   import { isFieldTarget, resolveShortcut } from './engine/shortcuts';
   import { keys } from './state/keys.svelte';
@@ -116,6 +117,8 @@
       case 'raid': { const id = game.nextRaid; if (id) game.summonRaid(id); break; }
       case 'claimQuests': game.claimAllQuests(); break;
       case 'spawnList': if (!isMobile) ui.spawnListOpen = !ui.spawnListOpen; break;
+      case 'map': prefs.setRoutesView(prefs.routesView === 'map' ? 'list' : 'map'); prefs.setRoutesOpen(true); if (isMobile) select('routes'); break;
+      case 'foldMap': prefs.setRoutesOpen(!prefs.routesOpen); break;
       case 'notifications': ui.notificationsOpen = !ui.notificationsOpen; if (!ui.notificationsOpen) game.markNoticesRead(); break;
       case 'search': ui.focusSearch += 1; break;
       case 'help': ui.shortcutsOpen = !ui.shortcutsOpen; break;

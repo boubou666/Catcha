@@ -20,6 +20,8 @@ export const TUTORIAL: TutorialStep[] = [
     tab: 'party', done: (s) => s.party.length >= 2 || s.stats.defeated >= 15 },
   { id: 'route', title: 'Clear the first route', text: 'Each route unlocks the next after a number of defeats — Plateau of Beginnings needs 10. New routes bring new species and higher levels.',
     done: (s) => routeCleared(s, routeById('plateau')) },
+  { id: 'map', title: 'Find your way', text: 'The Routes panel is a map of the Palpagos Islands: tap a pin for a route, Alpha, tower or realm, tap it again to go. Travel to Grassy Behemoth Hills. ▴ folds the map away; ☰ List brings the old list back.', tab: 'routes',
+    done: (s) => s.progress.route !== 'plateau' },
   { id: 'tech', title: 'Research the Workbench', text: 'You earn 2 tech points per level. Spend them under Progress → Tech; start with the Primitive Workbench.',
     tab: 'tech', done: (s) => s.tech.includes('s_workbench') },
   { id: 'worker', title: 'Put a Pal to work', text: 'Under Base → Base, assign a caught Pal as a worker. Lumbering makes Wood, Mining makes Stone and Ore — even while you\'re away.',

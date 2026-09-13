@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.11.0', date: '2026-09-14', title: 'The map',
+    items: [
+      'The Routes panel is now a map: the official Palpagos map (from the wiki, like the Pal art) with a pin for every route, tower, Alpha and Sealed Realm, plus your base and the Summoning Altar. Tap a pin for its status and odds, tap again to travel, fight, enter — or summon a raid from the altar. Zoom from the whole archipelago to a region; locked regions say what opens them; the fight you are in glows red.',
+      '🗺 buttons on a Pal’s habitat lines open the map on that spot. J switches map ⇄ list, Shift+J folds the panel to one line; ☰ List and ▴ do the same by mouse. A tutorial step introduces it.',
+      'Partner skills now do something. Every Pal’s skill (shown on its page and when hovering its name) gives +3–12% by rarity while it is in the party: damage for party members of its element for fighting skills, exp for mounts and gliders, gold for diggers and anglers, catch odds for senses and glares — and base output for helper-type skills while the Pal works at the base. Party and Base show the totals.',
+      'Bellanoir Libero has 2.3M HP instead of 2.8M: the balance model had a party from Feybreak finishing it with 25 seconds to spare, where the other raids leave about two minutes.',
+      'A deploy no longer throws away the cached Pal and item art, and a few accessibility nits from Lighthouse are fixed.',
+    ],
+  },
+  {
     version: '0.10.0', date: '2026-09-14', title: 'Know your odds',
     items: [
       'Catch odds wherever a species or a sphere comes up. Towers and raids say what a win gives instead (a tower boss cannot be caught; a raid gives an egg, with its ✨ Lucky odds); Sealed Realm buttons show the guardian’s and the waves’ odds.',
@@ -20,9 +30,6 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Route tooltips list species odds; search results and watch toasts carry the figure.',
       'Log lines get a 🎯 badge (green landed, grey broke free, cyan on a boss’s arrival) and the Catching category sums up throws landed vs average odds. Stats: lifetime landed vs expected, your catch bonus and its parts, the odds by rarity. Catching achievements hint at what the odds say.',
       'Settings → Catching: a switch to hide the 🎯 chips in lists if you find them noisy — the arena line and the Pal page keep theirs.',
-      'A world map. The Routes panel now opens on the real Palpagos map (from the wiki, like the Pal art) with a pin for every route, tower, Alpha and Sealed Realm: tap one for its status and odds, tap again to travel, fight or enter. Zoom from the whole archipelago to a region; locked regions say what opens them. ☰ List brings the list back, and ▴ folds the panel to one line with where you are.',
-      'Partner skills now do something. Every Pal’s skill (shown on its page and when hovering its name) gives +3–12% by rarity while it is in the party: damage for party members of its element for fighting skills, exp for mounts and gliders, gold for diggers and anglers, catch odds for senses and glares — and base output for helper-type skills while the Pal works at the base. Party and Base show the totals.',
-      'Bellanoir Libero has 2.3M HP instead of 2.8M: the balance model had a party from Feybreak finishing it with 25 seconds to spare, where the other raids leave about two minutes.',
     ],
   },
   {

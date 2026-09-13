@@ -103,7 +103,9 @@ chips in lists; the arena line and Pal pages keep theirs.
 
 The Routes panel opens as a map: the official Palpagos map from palworld.wiki.gg (`public/map/`, fetched by
 `npm run fetch-map` at 1024 and 2048 px) with a pin per route, tower, Alpha and Sealed Realm, placed by hand
-in `src/data/map.ts`. Tap a pin for its status, odds and a Travel / Fight / Enter button; tap it again to go.
+in `src/data/map.ts`. Tap a pin for its status, odds and a Travel / Fight / Enter button; tap it again to go. Your base and the
+Summoning Altar are pins too (raids summon from the altar), the fight you are in glows red, 🗺 buttons on a
+Pal's habitat lines open the map on that spot, and J / Shift+J switch map ⇄ list and fold the panel.
 The world view frames the seven regions (locked ones say what opens them) and zooms to one on tap; the
 current route pulses, cleared spots tick, and the ☰ List button brings the old list back; ▴ folds the panel to one line with the current route (both
 remembered per device). Searching always uses the list and unfolds the panel.

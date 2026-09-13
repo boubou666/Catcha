@@ -117,12 +117,13 @@
         {#each habitat.routes as r}
           {@const open = isUnlocked(save, routeById(r.routeId).unlock)}
           <li class:locked={!open}>{r.routeName} <span class="muted">({r.regionName}, Lv {r.level}) · {pct(r.chance)} of spawns{open ? '' : ` · 🔒 ${describeRequirement(routeById(r.routeId).unlock)}`}</span>
-            {#if open && !game.inBossFight && game.route.id !== r.routeId}<button class="tiny" onclick={() => { game.travel(r.routeId); onclose(); }}>Go</button>{/if}</li>
+            {#if open && !game.inBossFight && game.route.id !== r.routeId}<button class="tiny" onclick={() => { game.travel(r.routeId); onclose(); }}>Go</button>{/if}
+            <button class="tiny" onclick={() => { ui.showOnMap('route', r.routeId); onclose(); }} title="Show on the map">🗺</button></li>
         {/each}
-        {#each habitat.alphas as a}<li>Alpha in {a.regionName} <span class="muted">(Lv {a.level})</span> <span class="odds" class:no={!alphaPreview.throws} title={`Catch: ${catchText(alphaPreview)}`}>🎯 {alphaPreview.throws ? pct(alphaPreview.chance) : '—'}</span></li>{/each}
-        {#each habitat.towers as t}<li>{t.boss} — {t.name} <span class="muted">(tower boss, not catchable)</span></li>{/each}
-        {#each habitat.realms as d}<li>{d.name} <span class="muted">({d.role === 'guardian' ? 'guardian' : `${pct(d.chance)} of waves`}{isUnlocked(save, dungeonById(d.dungeonId).unlock) ? '' : ` · 🔒 ${describeRequirement(dungeonById(d.dungeonId).unlock)}`})</span></li>{/each}
-        {#each habitat.raids as r}<li>{r.name} raid <span class="muted">(egg on victory{isUnlocked(save, raidById(r.raidId).unlock) ? '' : ` · 🔒 ${describeRequirement(raidById(r.raidId).unlock)}`})</span></li>{/each}
+        {#each habitat.alphas as a}<li>Alpha in {a.regionName} <span class="muted">(Lv {a.level})</span> <span class="odds" class:no={!alphaPreview.throws} title={`Catch: ${catchText(alphaPreview)}`}>🎯 {alphaPreview.throws ? pct(alphaPreview.chance) : '—'}</span> <button class="tiny" onclick={() => { ui.showOnMap('alpha', a.alphaId); onclose(); }} title="Show on the map">🗺</button></li>{/each}
+        {#each habitat.towers as t}<li>{t.boss} — {t.name} <span class="muted">(tower boss, not catchable)</span> <button class="tiny" onclick={() => { ui.showOnMap('tower', t.towerId); onclose(); }} title="Show on the map">🗺</button></li>{/each}
+        {#each habitat.realms as d}<li>{d.name} <span class="muted">({d.role === 'guardian' ? 'guardian' : `${pct(d.chance)} of waves`}{isUnlocked(save, dungeonById(d.dungeonId).unlock) ? '' : ` · 🔒 ${describeRequirement(dungeonById(d.dungeonId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('realm', d.dungeonId); onclose(); }} title="Show on the map">🗺</button></li>{/each}
+        {#each habitat.raids as r}<li>{r.name} raid <span class="muted">(egg on victory{isUnlocked(save, raidById(r.raidId).unlock) ? '' : ` · 🔒 ${describeRequirement(raidById(r.raidId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('altar', 'altar'); onclose(); }} title="Show the altar on the map">🗺</button></li>{/each}
       </ul>
     </section>
 

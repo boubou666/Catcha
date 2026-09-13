@@ -13,7 +13,7 @@ export type ActionId =
   | 'tab:base' | 'tab:craft' | 'tab:items' | 'tab:shop' | 'tab:expedition'
   | 'tab:tech' | 'tab:daily' | 'tab:achievements' | 'tab:stats' | 'tab:prestige' | 'tab:settings'
   | 'tab:routes' | 'tab:bosses' | 'tab:log'
-  | 'attack' | 'flee' | 'alpha' | 'tower' | 'realm' | 'raid' | 'claimQuests' | 'spawnList' | 'notifications' | 'search' | 'save' | 'help';
+  | 'attack' | 'flee' | 'alpha' | 'tower' | 'realm' | 'raid' | 'claimQuests' | 'map' | 'foldMap' | 'spawnList' | 'notifications' | 'search' | 'save' | 'help';
 
 export type ActionGroup = 'Tabs' | 'World tabs (phone)' | 'Playing' | 'Panels';
 export interface ActionDef { id: ActionId; label: string; group: ActionGroup }
@@ -30,6 +30,7 @@ export const ACTIONS: ActionDef[] = [
   { id: 'alpha', label: 'Fight the next available Alpha', group: 'Playing' }, { id: 'tower', label: "Fight this region's tower", group: 'Playing' },
   { id: 'realm', label: "Enter this region's Sealed Realm", group: 'Playing' }, { id: 'raid', label: 'Summon the first ready raid', group: 'Playing' },
   { id: 'claimQuests', label: 'Claim every finished daily quest', group: 'Playing' },
+  { id: 'map', label: 'Map ⇄ list in the Routes panel', group: 'Panels' }, { id: 'foldMap', label: 'Fold / unfold the Routes panel', group: 'Panels' },
   { id: 'spawnList', label: 'Toggle "Who lives here?"', group: 'Panels' }, { id: 'notifications', label: 'Open / close notifications', group: 'Panels' },
   { id: 'search', label: 'Focus the global search', group: 'Panels' }, { id: 'save', label: 'Save now', group: 'Panels' }, { id: 'help', label: 'Show the shortcut list', group: 'Panels' },
 ];
@@ -42,7 +43,7 @@ export const DEFAULT_BINDINGS: Bindings = {
   'tab:tech': K('t'), 'tab:daily': K('q'), 'tab:achievements': K('v'), 'tab:stats': K('g'), 'tab:prestige': K('u'), 'tab:settings': K('o'),
   'tab:routes': K('r'), 'tab:bosses': K('k'), 'tab:log': K('l'),
   attack: K('a'), flee: K('backspace'), alpha: K('a', true), tower: K('t', true), realm: K('d', true), raid: K('m', true), claimQuests: K('q', true),
-  spawnList: K('w'), notifications: K('n'), search: K('/'), save: K('s'), help: K('?'),
+  map: K('j'), foldMap: K('j', true), spawnList: K('w'), notifications: K('n'), search: K('/'), save: K('s'), help: K('?'),
 };
 
 /** Fixed families, for the help list. */
@@ -67,7 +68,7 @@ export type ShortcutAction =
   | { kind: 'regionStep'; delta: 1 | -1 }
   | { kind: 'attack' } | { kind: 'flee' }
   | { kind: 'alpha' } | { kind: 'tower' } | { kind: 'realm' } | { kind: 'raid' }
-  | { kind: 'claimQuests' } | { kind: 'spawnList' } | { kind: 'notifications' }
+  | { kind: 'claimQuests' } | { kind: 'map' } | { kind: 'foldMap' } | { kind: 'spawnList' } | { kind: 'notifications' }
   | { kind: 'search' } | { kind: 'help' } | { kind: 'save' };
 
 const UNBINDABLE = new Set(['shift', 'control', 'alt', 'meta', 'capslock', 'tab', 'enter', 'escape', 'space', 'unidentified', 'dead']);

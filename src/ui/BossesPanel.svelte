@@ -3,6 +3,7 @@
   import { palById } from '../data/pals';
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { catchPreview } from '../engine/catch';
+  import { ui } from '../state/ui.svelte';
   import { spawnTable } from '../engine/arenafilter';
   import { catchText, pct } from './catchText';
   import { describeRequirement, isUnlocked } from '../engine/progress';

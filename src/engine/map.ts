@@ -6,8 +6,12 @@ import { spotOf } from '../data/map';
 import { describeRequirement, isUnlocked, routeCleared, routeKills } from './progress';
 import { dungeonClears, dungeonUnlocked } from './dungeon';
 import { routeQuota } from './prestige';
+import { ALTAR, RAIDS } from '../data/raids';
+import { REGION_MAPS } from '../data/map';
+import { alphaById, routeById, towerById } from '../data/regions';
+import { dungeonById } from '../data/dungeons';
 
-export type PinKind = 'route' | 'tower' | 'alpha' | 'realm';
+export type PinKind = 'route' | 'tower' | 'alpha' | 'realm' | 'base' | 'altar';
 export type PinStatus = 'locked' | 'open' | 'cleared';
 
 export interface MapPin {
@@ -77,7 +81,31 @@ export function worldMap(save: SaveState): MapRegion[] {
         detail: open ? `${d.waves} waves and a guardian${clears ? ` · cleared ×${clears}` : ''}` : describeRequirement(d.unlock),
       });
     }
+    if (region.id === 'windswept') {
+      // home: the base, and the Summoning Altar once it is built
+      const [bx, by] = spotOf(region.id, 'base');
+      const structures = Object.values(save.base.structures).reduce((n, lvl) => n + lvl, 0);
+      pins.push({ kind: 'base', id: 'base', regionId: region.id, name: 'Your base', level: 0, x: bx, y: by, status: 'open', current: false,
+        detail: `${save.base.workers.length} / ${save.base.slots} workers · ${structures} structure${structures === 1 ? '' : 's'}` });
+      const [ax, ay] = spotOf(region.id, 'altar');
+      const built = (save.base.structures[ALTAR] ?? 0) > 0;
+      const wins = RAIDS.filter((r) => (save.progress.raids[r.id] ?? 0) > 0).length;
+      pins.push({ kind: 'altar', id: 'altar', regionId: region.id, name: 'Summoning Altar', level: RAIDS[0].level, x: ax, y: ay,
+        status: !built ? 'locked' : wins === RAIDS.length ? 'cleared' : 'open', current: false,
+        detail: built ? `Raids: ${wins} / ${RAIDS.length} won` : 'Build the Summoning Altar (Base → Structures)' });
+    }
     const first = region.routes[0];
     return { id: region.id, name: region.name, reachable: isUnlocked(save, first.unlock), requirement: describeRequirement(first.unlock), pins };
   });
+}
+
+/** Which region a pin lives in, for "show on map" links; null when the id is unknown. */
+export function pinRegion(kind: PinKind, id: string): string | null {
+  try {
+    if (kind === 'route') return routeById(id).regionId;
+    if (kind === 'alpha') return alphaById(id).regionId;
+    if (kind === 'tower') return towerById(id).regionId;
+    if (kind === 'realm') return dungeonById(id).regionId;
+    return REGION_MAPS.find((m) => m.spots[id])?.regionId ?? null;
+  } catch { return null; }
 }

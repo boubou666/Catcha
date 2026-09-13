@@ -39,6 +39,10 @@ describe('tutorial steps', () => {
 
     s.progress.routeKills.plateau = routeById('plateau').killsToClear;
     advanceTutorial(s);
+    expect(currentStep(s)?.id).toBe('map');
+
+    s.progress.route = 'behemoth';
+    advanceTutorial(s);
     expect(currentStep(s)?.id).toBe('tech');
 
     expect(research(s, 's_workbench')).toBe(true);
@@ -70,6 +74,7 @@ describe('tutorial steps', () => {
     const s = newState();
     s.stats.defeated = 20; s.stats.caught = 3;
     s.progress.routeKills.plateau = 99;
+    s.progress.route = 'behemoth';
     expect(advanceTutorial(s)).toBe(true);
     expect(currentStep(s)?.id).toBe('tech');
   });

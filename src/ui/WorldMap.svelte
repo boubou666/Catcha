@@ -3,7 +3,10 @@
   // to see it, click again (or the button) to go. World view ⇄ one region, so pins stay tappable on a phone.
   import { game } from '../state/game.svelte';
   import { MAP_IMAGE, MAP_SIZE, regionMapById } from '../data/map';
-  import { worldMap, type MapPin, type MapRegion } from '../engine/map';
+  import { pinRegion, worldMap, type MapPin, type MapRegion } from '../engine/map';
+  import { ui } from '../state/ui.svelte';
+  import { RAIDS } from '../data/raids';
+  import { summonBlocker, type SummonBlock } from '../engine/raid';
   import { routeById } from '../data/regions';
   import { tableOddsText } from './catchText';
   import { prefs } from '../state/prefs.svelte';
@@ -33,13 +36,37 @@
   // keep the selected pin fresh when the save changes (status, detail)
   const current = $derived(selected ? regions.flatMap((r) => r.pins).find((p) => p.kind === selected!.kind && p.id === selected!.id) ?? null : null);
 
-  const ICON: Record<MapPin['kind'], string> = { route: '', tower: '🗼', alpha: '💀', realm: '🗝' };
-  const ACTION: Record<MapPin['kind'], string> = { route: 'Travel', tower: 'Challenge tower', alpha: 'Fight Alpha', realm: 'Enter realm' };
+  const ICON: Record<MapPin['kind'], string> = { route: '', tower: '🗼', alpha: '💀', realm: '🗝', base: '🏠', altar: '🔮' };
+  const ACTION: Record<MapPin['kind'], string> = { route: 'Travel', tower: 'Challenge tower', alpha: 'Fight Alpha', realm: 'Enter realm', base: 'Open the base', altar: '' };
+  const RAID_BLOCK: Record<SummonBlock, string> = { 'no-altar': 'Build the Summoning Altar', locked: 'Locked', 'no-slab': 'Craft a slab first' };
 
-  const canAct = (p: MapPin) => p.status !== 'locked' && !game.inBossFight && !(p.kind === 'route' && p.current) && !(p.kind === 'realm' && !game.canEnter(p.id));
+  // the boss / realm / raid you are fighting right now, if any
+  const fighting = $derived.by((): { kind: MapPin['kind']; id: string } | null => {
+    const w = game.wild;
+    if (!w || w.kind === 'wild') return null;
+    if (w.kind === 'alpha' || w.kind === 'tower') return w.refId ? { kind: w.kind, id: w.refId } : null;
+    if (w.kind === 'raid') return { kind: 'altar', id: 'altar' };
+    return game.run ? { kind: 'realm', id: game.run.id } : null;
+  });
+  const isFighting = (p: MapPin) => !!fighting && fighting.kind === p.kind && fighting.id === p.id;
+
+  // "show on map" from elsewhere: zoom to the pin's region and select it
+  $effect(() => {
+    const f = ui.mapFocus;
+    if (!f) return;
+    ui.mapFocus = null;
+    const regionId = pinRegion(f.kind as MapPin['kind'], f.id);
+    const pin = regionId ? byId.get(regionId)?.pins.find((p) => p.kind === f.kind && p.id === f.id) : null;
+    if (!pin) return;
+    zoom = regionId;
+    selected = pin;
+  });
+
+  const canAct = (p: MapPin) => p.kind === 'base' || (p.status !== 'locked' && !game.inBossFight && !(p.kind === 'route' && p.current) && !(p.kind === 'realm' && !game.canEnter(p.id)) && p.kind !== 'altar');
   function act(p: MapPin) {
     if (!canAct(p)) return;
-    if (p.kind === 'route') game.travel(p.id);
+    if (p.kind === 'base') ui.requestTab = 'base';
+    else if (p.kind === 'route') game.travel(p.id);
     else if (p.kind === 'alpha') game.startAlpha(p.id);
     else if (p.kind === 'tower') game.startTower(p.id);
     else game.enterDungeon(p.id);
@@ -54,7 +81,7 @@
     selected = null;
   }
   const odds = (p: MapPin) => (p.kind === 'route' && p.status !== 'locked' ? `Catch: ${tableOddsText(game.save, routeById(p.id).spawns)}` : '');
-  const short = (p: MapPin) => (p.kind === 'route' ? p.name : p.kind === 'tower' ? 'Tower' : p.kind === 'alpha' ? p.name.replace('Alpha ', 'α ') : 'Realm');
+  const short = (p: MapPin) => (p.kind === 'route' ? p.name : p.kind === 'tower' ? 'Tower' : p.kind === 'alpha' ? p.name.replace('Alpha ', 'α ') : p.kind === 'realm' ? 'Realm' : p.kind === 'base' ? 'Base' : 'Altar');
 </script>
 
 <div class="map" class:world={!zoom}>
@@ -91,9 +118,9 @@
       {@const sel = selected?.kind === p.kind && selected?.id === p.id}
       {@const r = p.kind === 'route' ? pinR : pinR + 2}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <g class="pin {p.kind} {p.status}" class:current={p.current} class:sel transform="translate({p.x},{p.y})" role="button" tabindex="0" aria-label="{p.name}, level {p.level}, {p.status}"
+      <g class="pin {p.kind} {p.status}" class:current={p.current} class:sel class:fighting={isFighting(p)} transform="translate({p.x},{p.y})" role="button" tabindex="0" aria-label="{p.name}, level {p.level}, {p.status}"
         onclick={(e) => { e.stopPropagation(); tap(p); }} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(p); } }}>
-        {#if p.current}<circle class="pulse" r={r + 8} />{/if}
+        {#if p.current || isFighting(p)}<circle class="pulse" r={r + 8} />{/if}
         <circle {r} />
         {#if p.kind === 'route'}
           <text class="lvl" y={fs * 0.36} text-anchor="middle" font-size={fs}>{p.status === 'locked' ? '🔒' : p.status === 'cleared' ? '✓' : p.level}</text>
@@ -102,7 +129,7 @@
           {#if p.status === 'cleared'}<circle class="done" cx={r - 2} cy={-r + 2} r={fs * 0.45} /><text class="tick" x={r - 2} y={-r + 2 + fs * 0.25} text-anchor="middle" font-size={fs * 0.7}>✓</text>{/if}
           {#if p.status === 'locked'}<text class="lock" x={r - 2} y={-r + 6} text-anchor="middle" font-size={fs * 0.8}>🔒</text>{/if}
         {/if}
-        <text class="name" class:show={sel || p.current} y={r + fs + 2} text-anchor="middle" font-size={fs * 0.9}>{short(p)}</text>
+        <text class="name" class:show={sel || p.current || isFighting(p)} y={r + fs + 2} text-anchor="middle" font-size={fs * 0.9}>{short(p)}</text>
         <title>{p.name} · Lv {p.level} · {p.detail}{odds(p) ? `. ${odds(p)}` : ''}</title>
       </g>
     {/each}
@@ -114,8 +141,18 @@
         <b>{ICON[current.kind]} {current.name}</b> <span class="muted">Lv {current.level}{current.current ? ' · you are here' : ''}</span>
         <div class="muted small">{current.status === 'locked' ? `🔒 ${current.detail}` : current.detail}</div>
         {#if odds(current)}<div class="small odds-line">🎯 {odds(current).replace('Catch: ', '')}</div>{/if}
+        {#if isFighting(current)}<div class="small fight">⚔ Fighting here now</div>{/if}
       </div>
-      <button class="small" class:primary={canAct(current)} disabled={!canAct(current)} onclick={() => act(current!)} title={game.inBossFight ? 'Finish or leave the current fight first' : ''}>{current.current ? 'Here' : ACTION[current.kind]}</button>
+      {#if current.kind === 'altar'}
+        <div class="raids">
+          {#each RAIDS as r (r.id)}
+            {@const block = summonBlocker(game.save, r.id)}
+            <button class="small" class:primary={!block && game.canSummon(r.id)} disabled={!game.canSummon(r.id)} onclick={() => game.summonRaid(r.id)} title={block ? RAID_BLOCK[block] : `Lv ${r.level} · ${(r.hp / 1000).toLocaleString()}k HP`}>🔮 {r.name}{(game.save.progress.raids[r.id] ?? 0) > 0 ? ' ✓' : ''}</button>
+          {/each}
+        </div>
+      {:else}
+        <button class="small" class:primary={canAct(current)} disabled={!canAct(current)} onclick={() => act(current!)} title={game.inBossFight && current.kind !== 'base' ? 'Finish or leave the current fight first' : ''}>{current.current ? 'Here' : ACTION[current.kind]}</button>
+      {/if}
     </div>
   {:else}
     <p class="muted small hint">{zoom ? 'Tap a pin for details, tap it again to go. Routes follow the trail in order.' : 'Tap a region to zoom in. Locked regions show what opens them.'} <span class="credit">Map: palworld.wiki.gg</span></p>
@@ -147,7 +184,14 @@
   .pin.tower circle { fill: #ff5f5f; }
   .pin.alpha circle { fill: #c026d3; }
   .pin.realm circle { fill: #35d0ff; }
-  .pin.locked.tower circle, .pin.locked.alpha circle, .pin.locked.realm circle { fill: #64748b; }
+  .pin.base circle { fill: #fff; }
+  .pin.altar circle { fill: #7b2cbf; }
+  .pin.fighting > circle:not(.pulse) { fill: #ff5f5f; }
+  .pin.fighting .pulse { stroke: #ff5f5f; }
+  .fight { color: var(--danger); font-weight: 700; }
+  .raids { display: flex; flex-direction: column; gap: 0.25rem; }
+  .raids button { text-align: left; }
+  .pin.locked.tower circle, .pin.locked.alpha circle, .pin.locked.realm circle, .pin.locked.altar circle { fill: #64748b; }
   .pin.sel circle:not(.pulse):not(.done) { stroke: #fff; stroke-width: 5; filter: drop-shadow(0 0 8px #fff); }
   .pin:focus-visible { outline: none; }
   .pin:focus-visible circle:not(.pulse) { stroke: #fff; stroke-width: 5; }

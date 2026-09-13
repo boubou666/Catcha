@@ -46,7 +46,7 @@ describe('default bindings', () => {
     expect(resolveShortcut(k({ key: 's', code: 'KeyS' }))).toEqual({ kind: 'save' });
     expect(resolveShortcut(k({ key: 'w', code: 'KeyZ' }))).toEqual({ kind: 'spawnList' });
     expect(resolveShortcut(k({ key: 'n', code: 'KeyN' }))).toEqual({ kind: 'notifications' });
-    expect(resolveShortcut(k({ key: 'j', code: 'KeyJ' }))).toBeNull();
+    expect(resolveShortcut(k({ key: 'z', code: 'KeyZ' }))).toBeNull();
     expect(resolveShortcut(k({ key: 'Z', code: 'KeyW', shift: true }))).toBeNull();
   });
 });
@@ -65,8 +65,8 @@ describe('rebinding', () => {
   });
 
   it('resolves against custom bindings, honours disabled ones and reports clashes', () => {
-    const b: Bindings = { ...DEFAULT_BINDINGS, attack: { key: 'j', shift: false }, save: null, 'tab:box': { key: 'p', shift: false } };
-    expect(resolveShortcut(k({ key: 'j', code: 'KeyJ' }), b)).toEqual({ kind: 'attack' });
+    const b: Bindings = { ...DEFAULT_BINDINGS, attack: { key: 'z', shift: false }, save: null, 'tab:box': { key: 'p', shift: false } };
+    expect(resolveShortcut(k({ key: 'z', code: 'KeyZ' }), b)).toEqual({ kind: 'attack' });
     expect(resolveShortcut(k({ key: 'a', code: 'KeyA' }), b)).toBeNull();                 // old key freed
     expect(resolveShortcut(k({ key: 's', code: 'KeyS' }), b)).toBeNull();                 // disabled
     expect(resolveShortcut(k({ key: ' ', code: 'Space' }), b)).toEqual({ kind: 'attack' }); // Space always attacks
