@@ -1,6 +1,6 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
   import { ui } from '../state/ui.svelte';
   import { globalSearch, SEARCH_KIND_LABEL, SEARCH_KINDS, type SearchAction, type SearchKind, type TabEntry } from '../engine/globalsearch';
 
@@ -37,24 +37,24 @@
 
 <div class="search">
   <div class="row box">
-    <input type="search" bind:this={input} bind:value={query} placeholder={t('header.search')} aria-label="Search the game"
+    <input type="search" bind:this={input} bind:value={query} placeholder={t('header.search')} aria-label={tr("Search the game")}
       onfocus={() => (open = true)} onkeydown={onKey} onblur={() => setTimeout(() => (open = false), 150)} />
-    <select bind:value={kind} aria-label="Search kind" onchange={() => input?.focus()}>
-      <option value="any">All</option>
-      {#each SEARCH_KINDS as k}<option value={k}>{SEARCH_KIND_LABEL[k]}</option>{/each}
+    <select bind:value={kind} aria-label={tr("Search kind")} onchange={() => input?.focus()}>
+      <option value="any">{tr("All")}</option>
+      {#each SEARCH_KINDS as k}<option value={k}>{tr(SEARCH_KIND_LABEL[k])}</option>{/each}
     </select>
   </div>
   {#if open && query.trim()}
     <div class="results panel" role="listbox">
       {#if results.length === 0}
-        <div class="muted small empty">Nothing found{kind !== 'any' ? ` in ${SEARCH_KIND_LABEL[kind]}` : ''}.</div>
+        <div class="muted small empty">{tr("Nothing found")}{kind !== 'any' ? ` in ${tr(SEARCH_KIND_LABEL[kind])}` : ''}.</div>
       {/if}
       {#each results as r, i (r.kind + r.id)}
         <button class="result" class:active={i === active} role="option" aria-selected={i === active}
           onmousedown={(e) => e.preventDefault()} onclick={() => pick(r.action)} onmouseenter={() => (active = i)}>
           <span class="icon">{ICON[r.kind]}</span>
           <span class="grow"><b>{r.title}</b> <span class="muted small">{r.subtitle}</span></span>
-          <span class="muted tiny">{SEARCH_KIND_LABEL[r.kind]}</span>
+          <span class="muted tiny">{tr(SEARCH_KIND_LABEL[r.kind])}</span>
         </button>
       {/each}
     </div>

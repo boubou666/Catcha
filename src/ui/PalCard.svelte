@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import type { PalInstance } from '../data/types';
   import { palById } from '../data/pals';
   import { expToLevel, instanceAttack } from '../engine/formulas';
@@ -29,7 +30,7 @@
       {#if inst.lucky}<span class="lucky">✨</span>{/if}
     </div>
     <div class="muted small">
-      {def.elements.join('/')} · ATK {instanceAttack(inst).toFixed(1)}
+      {def.elements.join('/')} {tr("· ATK")} {instanceAttack(inst).toFixed(1)}
       {#if showWork}
         · {#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}
       {/if}
@@ -37,7 +38,7 @@
     {#if inst.passives.length > 0}<div class="passives"><PassiveChips ids={inst.passives} /></div>{/if}
     <div class="bar exp"><span style:width="{expPct}%"></span></div>
     {#if showSan}
-      <div class="san row" title="SAN {Math.round(san)} / 100 — output {status === 'fine' ? 'normal' : status === 'stressed' ? '75%' : status === 'depressed' ? '40%' : 'stopped'}">
+      <div class="san row" title="SAN {Math.round(san)} {tr("/ 100 — output")} {status === 'fine' ? 'normal' : status === 'stressed' ? '75%' : status === 'depressed' ? '40%' : 'stopped'}">
         <div class="bar san-bar grow"><span class={status} style:width="{san}%"></span></div>
         <span class="small status {status}">{status === 'fine' ? 'SAN' : status}</span>
       </div>

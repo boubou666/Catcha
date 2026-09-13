@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { keys } from '../state/keys.svelte';
   import { ACTIONS, bindingFromKey, bindingLabel, conflicts, DEFAULT_BINDINGS, sameBinding, type ActionGroup, type ActionId } from '../engine/shortcuts';
 
@@ -20,8 +21,8 @@
 
 <svelte:window onkeydown={onKey} />
 
-<p class="muted small">Click a key, then press the new one (Esc cancels). Digits, arrows, Space, Ctrl+K and Esc stay fixed. Bindings are stored on this device.</p>
-{#if clash.size}<p class="warn small">⚠ Some shortcuts share a key — the first one in the list wins.</p>{/if}
+<p class="muted small">{tr("Click a key, then press the new one (Esc cancels). Digits, arrows, Space, Ctrl+K and Esc stay fixed. Bindings are stored on this device.")}</p>
+{#if clash.size}<p class="warn small">{tr("⚠ Some shortcuts share a key — the first one in the list wins.")}</p>{/if}
 {#each groups as g (g)}
   <h4>{g}</h4>
   <div class="bindings">
@@ -29,17 +30,17 @@
       {@const b = keys.bindings[a.id]}
       <div class="binding row" class:clash={clash.has(a.id)} class:off={b === null}>
         <span class="grow">{a.label}</span>
-        <button class="key" class:capturing={capturing === a.id} onclick={() => (capturing = capturing === a.id ? null : a.id)} title="Press a key">
+        <button class="key" class:capturing={capturing === a.id} onclick={() => (capturing = capturing === a.id ? null : a.id)} title={tr("Press a key")}>
           {capturing === a.id ? 'Press a key…' : bindingLabel(b)}
         </button>
-        <button class="small" disabled={b === null} onclick={() => keys.set(a.id, null)} title="Disable this shortcut">Off</button>
+        <button class="small" disabled={b === null} onclick={() => keys.set(a.id, null)} title={tr("Disable this shortcut")}>{tr("Off")}</button>
         <button class="small" disabled={sameBinding(b, DEFAULT_BINDINGS[a.id])} onclick={() => keys.reset(a.id)} title="Back to {bindingLabel(DEFAULT_BINDINGS[a.id])}">↺</button>
       </div>
     {/each}
   </div>
 {/each}
 <div class="row">
-  <button class="small" disabled={changed === 0} onclick={() => keys.reset()}>Reset all to defaults</button>
+  <button class="small" disabled={changed === 0} onclick={() => keys.reset()}>{tr("Reset all to defaults")}</button>
   <span class="muted small">{changed ? `${changed} changed` : 'All defaults'}</span>
 </div>
 

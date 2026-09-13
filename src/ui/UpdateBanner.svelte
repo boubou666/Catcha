@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { update } from '../state/update.svelte';
   import { game } from '../state/game.svelte';
 
@@ -10,9 +11,9 @@
 
 {#if update.available}
   <div class="banner row" role="status">
-    <span class="grow">🆕 A new version of Catcha is ready.</span>
-    <button class="primary small" onclick={reload}>Reload</button>
-    <button class="small" onclick={() => update.dismiss()} title="Keep playing on this version until next time">Later</button>
+    <span class="grow">{tr("🆕 A new version of Catcha is ready.")}</span>
+    <button class="primary small" onclick={reload}>{tr("Reload")}</button>
+    <button class="small" onclick={() => update.dismiss()} title={tr("Keep playing on this version until next time")}>{tr("Later")}</button>
   </div>
 {/if}
 

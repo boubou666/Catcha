@@ -8,7 +8,7 @@
   import SpawnList from './SpawnList.svelte';
   import { catchPreview, isCatchable } from '../engine/catch';
   import { catchText, pct } from './catchText';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
   import { raidById } from '../data/raids';
   import { ui } from '../state/ui.svelte';
 
@@ -46,12 +46,12 @@
       <PalIcon palId={wild.palId} size={44} lucky={wild.lucky} render />
       <div class="grow info">
         <div class="name">
-          {#if wild.kind === 'alpha'}<span class="tag">ALPHA</span>{/if}
-          {#if wild.kind === 'tower'}<span class="tag">TOWER</span>{/if}
+          {#if wild.kind === 'alpha'}<span class="tag">{tr("ALPHA")}</span>{/if}
+          {#if wild.kind === 'tower'}<span class="tag">{tr("TOWER")}</span>{/if}
           {#if wild.kind === 'dungeon' && run && runDef}<span class="tag realm">W{run.wave + 1}/{runDef.waves}</span>{/if}
-          {#if wild.kind === 'dungeonBoss'}<span class="tag realm">GUARDIAN</span>{/if}
-          {#if wild.kind === 'raid'}<span class="tag raid">RAID</span>{/if}
-          {#if wild.lucky}<span class="tag lucky">LUCKY</span>{/if}
+          {#if wild.kind === 'dungeonBoss'}<span class="tag realm">{tr("GUARDIAN")}</span>{/if}
+          {#if wild.kind === 'raid'}<span class="tag raid">{tr("RAID")}</span>{/if}
+          {#if wild.lucky}<span class="tag lucky">{tr("LUCKY")}</span>{/if}
           {def.name} <span class="muted">Lv {wild.level}</span>
         </div>
         <div class="bar hp"><span style:width="{hpPct}%"></span></div>
@@ -70,12 +70,12 @@
       <PalIcon palId={wild.palId} size={110} lucky={wild.lucky} render />
       <div class="grow">
         <div class="name">
-          {#if wild.kind === 'alpha'}<span class="tag">ALPHA</span>{/if}
-          {#if wild.kind === 'tower'}<span class="tag">TOWER</span>{/if}
-          {#if wild.kind === 'dungeon' && run && runDef}<span class="tag realm">WAVE {run.wave + 1}/{runDef.waves}</span>{/if}
-          {#if wild.kind === 'dungeonBoss'}<span class="tag realm">GUARDIAN</span>{/if}
-          {#if wild.kind === 'raid'}<span class="tag raid">RAID</span>{/if}
-          {#if wild.lucky}<span class="tag lucky">LUCKY</span>{/if}
+          {#if wild.kind === 'alpha'}<span class="tag">{tr("ALPHA")}</span>{/if}
+          {#if wild.kind === 'tower'}<span class="tag">{tr("TOWER")}</span>{/if}
+          {#if wild.kind === 'dungeon' && run && runDef}<span class="tag realm">{tr("WAVE")} {run.wave + 1}/{runDef.waves}</span>{/if}
+          {#if wild.kind === 'dungeonBoss'}<span class="tag realm">{tr("GUARDIAN")}</span>{/if}
+          {#if wild.kind === 'raid'}<span class="tag raid">{tr("RAID")}</span>{/if}
+          {#if wild.lucky}<span class="tag lucky">{tr("LUCKY")}</span>{/if}
           {def.name} <span class="muted">Lv {wild.level}</span>
         </div>
         <div class="muted">{def.elements.join(' / ')} · {def.rarity}</div>

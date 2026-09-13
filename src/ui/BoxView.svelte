@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
   import { PARTY_SIZE } from '../engine/formulas';
@@ -55,34 +56,34 @@
 
 <BoxFilterBar bind:filter>
   {#snippet heading()}
-    <h2 class="grow">Box <span class="muted">{filtering ? `${sorted.length} of ${game.save.box.length}` : game.save.box.length}</span></h2>
+    <h2 class="grow">{tr("Box")} <span class="muted">{filtering ? `${sorted.length} of ${game.save.box.length}` : game.save.box.length}</span></h2>
   {/snippet}
 </BoxFilterBar>
 
 {#if game.save.box.length > 0}
   <div class="row bulkbar" class:on={selecting}>
     {#if !selecting}
-      <button class="small" onclick={() => (selecting = true)}>Select…</button>
-      <span class="muted small">Pick Pals from the list (or select everything the filter shows) to release, send to the base, add to the party or compare in one go.</span>
+      <button class="small" onclick={() => (selecting = true)}>{tr("Select…")}</button>
+      <span class="muted small">{tr("Pick Pals from the list (or select everything the filter shows) to release, send to the base, add to the party or compare in one go.")}</span>
     {:else}
-      <label class="chk"><input type="checkbox" checked={allShownSelected} onchange={(e) => selectShown(e.currentTarget.checked)} /> All {sorted.length} shown</label>
-      <span class="muted small">{selectedShown.length} selected{selected.size > selectedShown.length ? ` (+${selected.size - selectedShown.length} hidden by the filter)` : ''}</span>
+      <label class="chk"><input type="checkbox" checked={allShownSelected} onchange={(e) => selectShown(e.currentTarget.checked)} /> {tr("All")} {sorted.length} {tr("shown")}</label>
+      <span class="muted small">{selectedShown.length} {tr("selected")}{selected.size > selectedShown.length ? ` (+${selected.size - selectedShown.length} hidden by the filter)` : ''}</span>
       <span class="grow"></span>
-      <button class="small" disabled={!selectedShown.length || freeParty <= 0} onclick={() => bulk('party')} title={freeParty > 0 ? `${freeParty} free party slot${freeParty === 1 ? '' : 's'}` : 'The party is full'}>To party</button>
-      <button class="small" disabled={!selectedShown.length || freeSlots <= 0} onclick={() => bulk('base')} title={freeSlots > 0 ? `${freeSlots} free base slot${freeSlots === 1 ? '' : 's'}` : 'The base is full'}>To base</button>
-      <button class="small" disabled={!selectedShown.length || compare.full} onclick={() => bulk('compare')} title="Add to the comparison (up to {MAX_COMPARE})">⚖ Compare</button>
-      <button class="small danger" disabled={!selectedShown.length} onclick={() => bulk('release')} title="Release the selected Pals (Lucky, starred and busy Pals are skipped)">Release</button>
-      <button class="small" onclick={stopSelecting}>Done</button>
+      <button class="small" disabled={!selectedShown.length || freeParty <= 0} onclick={() => bulk('party')} title={freeParty > 0 ? `${freeParty} free party slot${freeParty === 1 ? '' : 's'}` : 'The party is full'}>{tr("To party")}</button>
+      <button class="small" disabled={!selectedShown.length || freeSlots <= 0} onclick={() => bulk('base')} title={freeSlots > 0 ? `${freeSlots} free base slot${freeSlots === 1 ? '' : 's'}` : 'The base is full'}>{tr("To base")}</button>
+      <button class="small" disabled={!selectedShown.length || compare.full} onclick={() => bulk('compare')} title="Add to the comparison (up to {MAX_COMPARE})">{tr("⚖ Compare")}</button>
+      <button class="small danger" disabled={!selectedShown.length} onclick={() => bulk('release')} title={tr("Release the selected Pals (Lucky, starred and busy Pals are skipped)")}>{tr("Release")}</button>
+      <button class="small" onclick={stopSelecting}>{tr("Done")}</button>
     {/if}
   </div>
 {/if}
 
 {#if game.save.box.length === 0}
-  <p class="muted">Nothing here yet. Defeat wild Pals with a Pal Sphere in stock to catch them.</p>
+  <p class="muted">{tr("Nothing here yet. Defeat wild Pals with a Pal Sphere in stock to catch them.")}</p>
 {:else if sorted.length === 0}
-  <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+  <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
 {:else if !hasCondenser}
-  <p class="muted small">Duplicates pile up? The <b>Pal Essence Condenser</b> (Base → Structures) turns them into ★ stars: +10% attack and work each.</p>
+  <p class="muted small">{tr("Duplicates pile up? The")} <b>{tr("Pal Essence Condenser")}</b> {tr("(Base → Structures) turns them into ★ stars: +10% attack and work each.")}</p>
 {/if}
 
 <div class="list">
@@ -93,9 +94,9 @@
     {@const dupes = condenseCandidates(game.save, inst).length}
     <PalCard {inst} showWork>
       {#if selecting}<input type="checkbox" class="sel" checked={selected.has(inst.uid)} onchange={() => toggleSel(inst.uid)} aria-label="Select {palById(inst.palId).name}" />{/if}
-      {#if game.save.base.workers.includes(inst.uid)}<span class="muted small">at base</span>{/if}
-      {#if isBreeding(game.save, inst.uid)}<span class="muted small">breeding</span>{/if}
-      {#if isAway(game.save, inst.uid)}<span class="muted small">on expedition</span>{/if}
+      {#if game.save.base.workers.includes(inst.uid)}<span class="muted small">{tr("at base")}</span>{/if}
+      {#if isBreeding(game.save, inst.uid)}<span class="muted small">{tr("breeding")}</span>{/if}
+      {#if isAway(game.save, inst.uid)}<span class="muted small">{tr("on expedition")}</span>{/if}
       <button class="small" class:cmp-on={compare.has(inst.uid)} disabled={!compare.has(inst.uid) && compare.full} onclick={() => compare.toggle(inst.uid)} title={compare.has(inst.uid) ? 'Remove from comparison' : 'Add to comparison (Compare tab)'}>⚖</button>
       <CatchOdds palId={inst.palId} />
       {#if cost !== null}
@@ -105,11 +106,11 @@
         </button>
       {/if}
       {#if inParty}
-        <button class="small" onclick={() => game.removeFromParty(inst.uid)}>In party ✓</button>
+        <button class="small" onclick={() => game.removeFromParty(inst.uid)}>{tr("In party ✓")}</button>
       {:else}
-        <button class="small" disabled={partyFull} onclick={() => game.addToParty(inst.uid)}>Add</button>
+        <button class="small" disabled={partyFull} onclick={() => game.addToParty(inst.uid)}>{tr("Add")}</button>
       {/if}
-      <button class="small danger" onclick={() => game.release(inst.uid)} title="Release">✕</button>
+      <button class="small danger" onclick={() => game.release(inst.uid)} title={tr("Release")}>✕</button>
     </PalCard>
   {/each}
 </div>

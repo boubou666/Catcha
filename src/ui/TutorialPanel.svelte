@@ -1,6 +1,6 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
-  import { t, tOr } from '../i18n/index.svelte';
+  import { t, tOr, t as tr } from '../i18n/index.svelte';
   import { TUTORIAL } from '../engine/tutorial';
   import TutorialSteps from './TutorialSteps.svelte';
 
@@ -15,7 +15,7 @@
 {#if step}
   <div class="panel tutorial" role="status" aria-live="polite">
     <div class="row head">
-      <span class="label">Tutorial</span>
+      <span class="label">{tr("Tutorial")}</span>
       <span class="dots" role="img" aria-label="Step {index + 1} of {TUTORIAL.length}">
         {#each TUTORIAL as _, i}<span class="dot" class:done={i < index} class:now={i === index}></span>{/each}
       </span>
@@ -26,7 +26,7 @@
     <div class="title">{tOr(`tutorial.${step.id}.title`, step.title)}</div>
     <p class="muted">{tOr(`tutorial.${step.id}.text`, step.text)}</p>
     {#if step.tab && step.tab !== tab}
-      <button class="small primary" onclick={() => go(step.tab!)}>Take me there →</button>
+      <button class="small primary" onclick={() => go(step.tab!)}>{tr("Take me there →")}</button>
     {/if}
     {#if showAll}
       <div class="all"><TutorialSteps {go} /></div>

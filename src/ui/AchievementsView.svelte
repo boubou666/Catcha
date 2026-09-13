@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { ACHIEVEMENTS, categoryLabel, POINT_GOLD_BONUS } from '../data/achievements';
@@ -21,33 +22,33 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Achievements <span class="muted">{unlockedCount} / {ACHIEVEMENTS.length}</span></h2>
-  <span class="points">🏆 {points} / {totalPoints} pts · +{pct(points * POINT_GOLD_BONUS)} gold</span>
+  <h2 class="grow">{tr("Achievements")} <span class="muted">{unlockedCount} / {ACHIEVEMENTS.length}</span></h2>
+  <span class="points">🏆 {points} / {totalPoints} {tr("pts · +")}{pct(points * POINT_GOLD_BONUS)} {tr("gold")}</span>
 </div>
 <div class="row">
-  <input type="search" placeholder="Search achievements…" bind:value={filter.query} aria-label="Search achievements" />
-  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+  <input type="search" placeholder={tr("Search achievements…")} bind:value={filter.query} aria-label={tr("Search achievements")} />
+  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
   {#if filtering}<span class="muted small">{shown.length} of {ACHIEVEMENTS.length}</span>{/if}
 </div>
 {#if open}
   <div class="filters">
-    <select bind:value={filter.category} aria-label="Category">
-      <option value="any">Any category</option>
+    <select bind:value={filter.category} aria-label={tr("Category")}>
+      <option value="any">{tr("Any category")}</option>
       {#each ACH_CATEGORIES as c}<option value={c}>{categoryLabel(c)}</option>{/each}
     </select>
-    <select bind:value={filter.status} aria-label="Status">
-      {#each Object.entries(ACH_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.status} aria-label={tr("Status")}>
+      {#each Object.entries(ACH_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.sort} aria-label="Sort">
-      {#each Object.entries(ACH_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+    <select bind:value={filter.sort} aria-label={tr("Sort")}>
+      {#each Object.entries(ACH_SORT_LABEL) as [k, label]}<option value={k}>{tr("Sort:")} {tr(label)}</option>{/each}
     </select>
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+    {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
 {/if}
-<p class="muted small">Every point is +{POINT_GOLD_BONUS * 100}% gold from defeated Pals, permanently.</p>
+<p class="muted small">{tr("Every point is +")}{POINT_GOLD_BONUS * 100}{tr("% gold from defeated Pals, permanently.")}</p>
 
 {#if shown.length === 0}
-  <p class="muted">No achievement matches. <button class="small" onclick={clear}>Clear filters</button></p>
+  <p class="muted">{tr("No achievement matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
 {/if}
 
 {#each groups as [category, list] (category ?? 'all')}

@@ -1,5 +1,6 @@
 export type NoticeKind = 'info' | 'success' | 'gold' | 'warn';
-export interface Notice { id: number; at: number; text: string; kind: NoticeKind; read: boolean }
+import type { LogMessage } from './logfilter';
+export interface Notice { id: number; at: number; text: string; kind: NoticeKind; read: boolean; msg?: LogMessage }
 
 export const NOTICE_KIND_LABEL: Record<NoticeKind, string> = { info: 'Info', success: 'Success', gold: 'Gold & rewards', warn: 'Warnings & Lucky' };
 export const NOTICE_KINDS = Object.keys(NOTICE_KIND_LABEL) as NoticeKind[];

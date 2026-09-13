@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { PALS, paldeckNumber } from '../data/pals';
   import { REGIONS } from '../data/regions';
@@ -26,45 +27,45 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Paldeck <span class="muted">{caughtCount} / {PALS.length}{filtering ? ` · ${shown.length} shown` : ''}</span></h2>
-  <input type="search" placeholder="Search name, #, element…" bind:value={filter.query} aria-label="Search the Paldeck" />
-  <button class="small" class:active={showFilters || filtering} onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters}>Filters{filtering ? ' •' : ''}</button>
+  <h2 class="grow">{tr("Paldeck")} <span class="muted">{caughtCount} / {PALS.length}{filtering ? ` · ${shown.length} shown` : ''}</span></h2>
+  <input type="search" placeholder={tr("Search name, #, element…")} bind:value={filter.query} aria-label={tr("Search the Paldeck")} />
+  <button class="small" class:active={showFilters || filtering} onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters}>{tr("Filters")}{filtering ? ' •' : ''}</button>
 </div>
 
 {#if showFilters}
   <div class="filters">
-    <select bind:value={filter.status} aria-label="Status">
-      {#each Object.entries(DECK_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.status} aria-label={tr("Status")}>
+      {#each Object.entries(DECK_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.region} aria-label="Region">
-      <option value="any">Any region</option>
+    <select bind:value={filter.region} aria-label={tr("Region")}>
+      <option value="any">{tr("Any region")}</option>
       {#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
     </select>
-    <select bind:value={filter.element} aria-label="Element">
-      <option value="any">Any element</option>
+    <select bind:value={filter.element} aria-label={tr("Element")}>
+      <option value="any">{tr("Any element")}</option>
       {#each ELEMENTS as e}<option value={e}>{e}</option>{/each}
     </select>
-    <select bind:value={filter.work} aria-label="Work suitability">
-      <option value="any">Any work</option>
+    <select bind:value={filter.work} aria-label={tr("Work suitability")}>
+      <option value="any">{tr("Any work")}</option>
       {#each JOBS as j}<option value={j.type}>{j.icon} {j.type}</option>{/each}
     </select>
-    <select bind:value={filter.rarity} aria-label="Rarity">
-      <option value="any">Any rarity</option>
+    <select bind:value={filter.rarity} aria-label={tr("Rarity")}>
+      <option value="any">{tr("Any rarity")}</option>
       {#each RARITIES as r}<option value={r}>{cap(r)}</option>{/each}
     </select>
-    <select bind:value={filter.sort} aria-label="Sort">
-      {#each Object.entries(DECK_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+    <select bind:value={filter.sort} aria-label={tr("Sort")}>
+      {#each Object.entries(DECK_SORT_LABEL) as [k, label]}<option value={k}>{tr("Sort:")} {tr(label)}</option>{/each}
     </select>
-    <label class="chk"><input type="checkbox" bind:checked={filter.subspecies} /> Subspecies only</label>
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+    <label class="chk"><input type="checkbox" bind:checked={filter.subspecies} /> {tr("Subspecies only")}</label>
+    {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
   <p class="muted small">Element, work and rarity only apply to Pals you've seen; region means it can be met on that region's routes, Alphas or tower.</p>
 {:else}
-  <p class="muted small">Click a Pal for its habitat and breeding recipes.</p>
+  <p class="muted small">{tr("Click a Pal for its habitat and breeding recipes.")}</p>
 {/if}
 
 {#if shown.length === 0}
-  <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+  <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
 {/if}
 
 {#if selected !== null}<PalDetail palId={selected} onclose={() => (selected = null)} onselect={(id) => (selected = id)} />{/if}

@@ -8,7 +8,7 @@
   import GlobalSearch from './GlobalSearch.svelte';
   import ItemIcon from './ItemIcon.svelte';
   import { sphereVsWild } from './catchText';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
   import type { TabEntry } from '../engine/globalsearch';
 
   let { tabs, go }: { tabs: TabEntry[]; go: (tab: string) => void } = $props();
@@ -46,18 +46,18 @@
       <div class="muted tiny">{game.region.name} · Lv {player.level}</div>
     </div>
     <div class="bar exp grow" title="{Math.floor(player.exp)} / {expToLevel(player.level + 1)} exp"><span style:width="{expPct}%"></span></div>
-    <button class="small icon" class:active={searchOpen} onclick={() => { searchOpen = !searchOpen; if (searchOpen) ui.focusSearch += 1; }} aria-expanded={searchOpen} title="Search">🔍</button>
+    <button class="small icon" class:active={searchOpen} onclick={() => { searchOpen = !searchOpen; if (searchOpen) ui.focusSearch += 1; }} aria-expanded={searchOpen} title={tr("Search")}>🔍</button>
     <NotificationCenter />
     <button class="small" onclick={() => game.persist()}>{t('header.save')}</button>
   </div>
   <div class="row chips">
     <span class="chip">💰 {fmt(player.gold)}</span>
-    <span class="chip" title="Effigies">🗿 {player.effigies}</span>
-    <span class="chip" title="Tech points">🔬 {player.techPoints}</span>
-    <span class="chip" title="Achievement points">🏆 {achievementPoints(game.save)}</span>
-    {#if game.save.prestige.relics > 0 || game.save.prestige.ascensions > 0}<span class="chip" title="Ancient Relics">🏺 {game.save.prestige.relics}</span>{/if}
+    <span class="chip" title={tr("Effigies")}>🗿 {player.effigies}</span>
+    <span class="chip" title={tr("Tech points")}>🔬 {player.techPoints}</span>
+    <span class="chip" title={tr("Achievement points")}>🏆 {achievementPoints(game.save)}</span>
+    {#if game.save.prestige.relics > 0 || game.save.prestige.ascensions > 0}<span class="chip" title={tr("Ancient Relics")}>🏺 {game.save.prestige.relics}</span>{/if}
     {#each spheres as s}<span class="chip sphere" title="{SPHERES[s.tier].name} — {sphereVsWild(game.save, game.wild, s.tier)}">{SPHERES[s.tier].name.replace(' Sphere', '')} ×{s.n}</span>{/each}
-    {#if spheres.length === 0}<span class="chip muted">no spheres</span>{/if}
+    {#if spheres.length === 0}<span class="chip muted">{tr("no spheres")}</span>{/if}
   </div>
   {#if searchOpen}<div class="row search-row"><GlobalSearch {tabs} {go} /></div>{/if}
 </header>
@@ -71,7 +71,7 @@
   <div class="stat">
     <div class="label">{t('header.level')} {player.level}</div>
     <div class="bar exp"><span style:width="{expPct}%"></span></div>
-    <div class="muted small">{Math.floor(player.exp)} / {expToLevel(player.level + 1)} exp</div>
+    <div class="muted small">{Math.floor(player.exp)} / {expToLevel(player.level + 1)} {tr("exp")}</div>
   </div>
 
   <div class="stat">

@@ -3,8 +3,10 @@
  * map, panel headers, settings, tutorial) — data names (Pals, routes, items) stay as in the wiki, as Palworld
  * itself keeps Pal names across languages. A missing key falls back to English, then to the key.
  */
+import { FR_TEXT } from './fr-text';
+
 export type Locale = 'en' | 'fr';
-export const LOCALES: { id: Locale; label: string }[] = [{ id: 'en', label: 'English' }, { id: 'fr', label: 'Français (partiel)' }];
+export const LOCALES: { id: Locale; label: string }[] = [{ id: 'en', label: 'English' }, { id: 'fr', label: 'Français' }];
 
 export const MESSAGES: Record<Locale, Record<string, string>> = {
   en: {
@@ -35,6 +37,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     'theme.system': 'Follow the system', 'theme.systemDesc': 'Light or dark as your device prefers.',
   },
   fr: {
+    ...FR_TEXT,
     'group.world': 'Monde', 'group.pals': 'Pals', 'group.base': 'Base', 'group.progress': 'Progression',
     'tab.routes': 'Zones', 'tab.bosses': 'Boss', 'tab.log': 'Journal', 'tab.party': 'Équipe', 'tab.box': 'Boîte', 'tab.compare': 'Comparer',
     'tab.paldeck': 'Paldeck', 'tab.breed': 'Élevage', 'tab.base': 'Base', 'tab.craft': 'Artisanat', 'tab.items': 'Objets', 'tab.shop': 'Marchand',

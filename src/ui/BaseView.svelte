@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { itemName } from '../data/items';
   import { JOBS, STRUCTURES, FOOD_ITEM } from '../data/base';
@@ -48,40 +49,40 @@
   const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2));
 </script>
 
-<h2>Base <span class="muted">{workers.length} / {save.base.slots} workers</span></h2>
-{#if partnerLines.length}<p class="partners small" title="Work-flavoured partner skills of the workers, added up">🤝 Partner skills: {partnerLines.join(' · ')}</p>{/if}
+<h2>{tr("Base")} <span class="muted">{workers.length} / {save.base.slots} {tr("workers")}</span></h2>
+{#if partnerLines.length}<p class="partners small" title={tr("Work-flavoured partner skills of the workers, added up")}>{tr("🤝 Partner skills:")} {partnerLines.join(' · ')}</p>{/if}
 
 <div class="status row">
   <span><ItemIcon id={FOOD_ITEM} size={18} /> {itemName(FOOD_ITEM)}: <b>{berries}</b>
-    {#if workers.length > 0}<span class="muted">(−{fmt(rates.foodPerMin)}/min)</span>{/if}</span>
-  <span>Output: <b>×{rates.mult.toFixed(2)}</b></span>
+    {#if workers.length > 0}<span class="muted">(−{fmt(rates.foodPerMin)}{tr("/min)")}</span>{/if}</span>
+  <span>{tr("Output:")} <b>×{rates.mult.toFixed(2)}</b></span>
   {#if workers.length > 0}
-    <span><ItemIcon id={MEDICINE_ITEM} size={18} /> {itemName(MEDICINE_ITEM)}: <b>{medical}</b> <span class="muted">(+{fmt(rates.medicalPerMin)}/min · SAN −{fmt(rates.sanDrainPerMin)}/min each)</span></span>
+    <span><ItemIcon id={MEDICINE_ITEM} size={18} /> {itemName(MEDICINE_ITEM)}: <b>{medical}</b> <span class="muted">(+{fmt(rates.medicalPerMin)}{tr("/min · SAN −")}{fmt(rates.sanDrainPerMin)}{tr("/min each)")}</span></span>
   {/if}
-  {#if sick > 0}<span class="warn">{sick} worker{sick === 1 ? ' is' : 's are'} sick and not working — rest them or stock Medical Supplies.</span>
-  {:else if stressed > 0}<span class="warn">{stressed} worker{stressed === 1 ? '' : 's'} below 50 SAN.</span>{/if}
-  {#if hungry}<span class="warn">Workers are hungry — output halved. Stock Red Berries or build a Berry Plantation.</span>{/if}
+  {#if sick > 0}<span class="warn">{sick} {tr("worker")}{sick === 1 ? ' is' : 's are'} {tr("sick and not working — rest them or stock Medical Supplies.")}</span>
+  {:else if stressed > 0}<span class="warn">{stressed} {tr("worker")}{stressed === 1 ? '' : 's'} {tr("below 50 SAN.")}</span>{/if}
+  {#if hungry}<span class="warn">{tr("Workers are hungry — output halved. Stock Red Berries or build a Berry Plantation.")}</span>{/if}
 </div>
 
 <section>
   {#if workers.length === 0}
-    <h3>Workers</h3>
-    <p class="muted">Nobody's working. Assign Pals from your box below — a Pal can't be in the party and at the base at once.</p>
+    <h3>{tr("Workers")}</h3>
+    <p class="muted">{tr("Nobody's working. Assign Pals from your box below — a Pal can't be in the party and at the base at once.")}</p>
   {:else}
     <BoxFilterBar bind:filter={workerFilter} defaults={WORKER_DEFAULTS} label="Search workers" hideStatus>
       {#snippet heading()}
-        <h3 class="grow">Workers <span class="muted">{workerFiltering ? `${shownWorkers.length} of ${workers.length}` : workers.length}</span></h3>
+        <h3 class="grow">{tr("Workers")} <span class="muted">{workerFiltering ? `${shownWorkers.length} of ${workers.length}` : workers.length}</span></h3>
       {/snippet}
     </BoxFilterBar>
     {#if shownWorkers.length === 0}
-      <p class="muted">No worker matches. <button class="small" onclick={() => (workerFilter = { ...WORKER_DEFAULTS, sort: workerFilter.sort })}>Clear filters</button></p>
+      <p class="muted">{tr("No worker matches.")} <button class="small" onclick={() => (workerFilter = { ...WORKER_DEFAULTS, sort: workerFilter.sort })}>{tr("Clear filters")}</button></p>
     {/if}
   {/if}
   <div class="list">
     {#each shownWorkers as inst (inst.uid)}
       <PalCard {inst} showWork showSan>
         <CatchOdds palId={inst.palId} />
-        <button class="small" onclick={() => game.unassignWorker(inst.uid)}>Dismiss</button>
+        <button class="small" onclick={() => game.unassignWorker(inst.uid)}>{tr("Dismiss")}</button>
       </PalCard>
     {/each}
   </div>
@@ -89,11 +90,11 @@
 
 <section>
   <div class="row">
-    <h3 class="grow">Production <span class="muted">{prodFilter.query.trim() || prodFilter.activeOnly ? `${jobs.length} of ${JOBS.length}` : ''}</span></h3>
-    <input type="search" placeholder="Search jobs…" bind:value={prodFilter.query} aria-label="Search jobs" />
-    <label class="chk"><input type="checkbox" bind:checked={prodFilter.activeOnly} /> Active only</label>
+    <h3 class="grow">{tr("Production")} <span class="muted">{prodFilter.query.trim() || prodFilter.activeOnly ? `${jobs.length} of ${JOBS.length}` : ''}</span></h3>
+    <input type="search" placeholder={tr("Search jobs…")} bind:value={prodFilter.query} aria-label={tr("Search jobs")} />
+    <label class="chk"><input type="checkbox" bind:checked={prodFilter.activeOnly} /> {tr("Active only")}</label>
   </div>
-  {#if jobs.length === 0}<p class="muted small">No job matches.</p>{/if}
+  {#if jobs.length === 0}<p class="muted small">{tr("No job matches.")}</p>{/if}
   <table>
     <tbody>
       {#each jobs as job (job.type)}
@@ -109,24 +110,24 @@
   {#if Object.keys(rates.items).length > 0 || rates.smeltPerMin > 0 || rates.handiworkPerSec > 0}
     <div class="rates row">
       {#each Object.entries(rates.items) as [id, perMin]}
-        <span class="chip"><ItemIcon id={id} size={16} /> {itemName(id)} +{fmt(perMin)}/min</span>
+        <span class="chip"><ItemIcon id={id} size={16} /> {itemName(id)} +{fmt(perMin)}{tr("/min")}</span>
       {/each}
-      {#if rates.smeltPerMin > 0}<span class="chip"><ItemIcon id="ingot" size={16} /> Ingot +{fmt(rates.smeltPerMin)}/min (uses Ore)</span>{/if}
-      {#if rates.handiworkPerSec > 0}<span class="chip">Crafting {fmt(rates.handiworkPerSec)} work/s</span>{/if}
+      {#if rates.smeltPerMin > 0}<span class="chip"><ItemIcon id="ingot" size={16} /> {tr("Ingot +")}{fmt(rates.smeltPerMin)}{tr("/min (uses Ore)")}</span>{/if}
+      {#if rates.handiworkPerSec > 0}<span class="chip">{tr("Crafting")} {fmt(rates.handiworkPerSec)} {tr("work/s")}</span>{/if}
     </div>
   {/if}
 </section>
 
 <section>
   <div class="row">
-    <h3 class="grow">Structures <span class="muted">{structFiltering ? `${structures.length} of ${STRUCTURES.length}` : ''}</span></h3>
-    <input type="search" placeholder="Search structures…" bind:value={structFilter.query} aria-label="Search structures" />
-    <select bind:value={structFilter.status} aria-label="Structure status">
-      {#each Object.entries(STRUCTURE_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <h3 class="grow">{tr("Structures")} <span class="muted">{structFiltering ? `${structures.length} of ${STRUCTURES.length}` : ''}</span></h3>
+    <input type="search" placeholder={tr("Search structures…")} bind:value={structFilter.query} aria-label={tr("Search structures")} />
+    <select bind:value={structFilter.status} aria-label={tr("Structure status")}>
+      {#each Object.entries(STRUCTURE_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    {#if structFiltering}<button class="small" onclick={clearStructs}>Clear</button>{/if}
+    {#if structFiltering}<button class="small" onclick={clearStructs}>{tr("Clear")}</button>{/if}
   </div>
-  {#if structures.length === 0}<p class="muted">No structure matches. <button class="small" onclick={clearStructs}>Clear</button></p>{/if}
+  {#if structures.length === 0}<p class="muted">{tr("No structure matches.")} <button class="small" onclick={clearStructs}>{tr("Clear")}</button></p>{/if}
   <div class="list">
     {#each structures as { def: s, level, cost, status } (s.id)}
       {@const locked = status === 'research'}
@@ -136,7 +137,7 @@
           {#if level > 0}<span class="muted">Lv {level}{cost ? '' : ' (max)'}</span>{/if}
           <div class="muted small">{s.desc}</div>
           {#if cost}<CostLine {cost} />{/if}
-          {#if locked}<div class="muted small">🔒 Research <b>{structureTech(s.id)?.name}</b> (Tech tab)</div>{/if}
+          {#if locked}<div class="muted small">{tr("🔒 Research")} <b>{structureTech(s.id)?.name}</b> {tr("(Tech tab)")}</div>{/if}
         </div>
         {#if cost}
           <button class="small" class:primary={status === 'buildable'} disabled={status !== 'buildable'} onclick={() => game.build(s.id)}>
@@ -151,22 +152,22 @@
 <section>
   <BoxFilterBar bind:filter={pickFilter} defaults={PICK_DEFAULTS} label="Search Pals to assign">
     {#snippet heading()}
-      <h3 class="grow">Assign from the Box <span class="muted">{pickFiltering ? `${candidates.length} of ${others}` : candidates.length}</span></h3>
+      <h3 class="grow">{tr("Assign from the Box")} <span class="muted">{pickFiltering ? `${candidates.length} of ${others}` : candidates.length}</span></h3>
     {/snippet}
   </BoxFilterBar>
-  <p class="muted small">Pick a work type under Filters to sort by that job's level. Assigning a party Pal pulls it out of the party.</p>
-  {#if full}<p class="muted small">All {save.base.slots} slots are taken — dismiss a worker or build a Palbox Expansion.</p>{/if}
+  <p class="muted small">{tr("Pick a work type under Filters to sort by that job's level. Assigning a party Pal pulls it out of the party.")}</p>
+  {#if full}<p class="muted small">{tr("All")} {save.base.slots} {tr("slots are taken — dismiss a worker or build a Palbox Expansion.")}</p>{/if}
   {#if candidates.length === 0 && others > 0}
-    <p class="muted">No Pal matches. <button class="small" onclick={clearPick}>Clear filters</button></p>
+    <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clearPick}>{tr("Clear filters")}</button></p>
   {/if}
   <div class="list scroll">
     {#each candidates as inst (inst.uid)}
       {@const status = statusOf(save, inst.uid)}
       <PalCard {inst} showWork>
-        {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
+        {#if status !== 'idle'}<span class="muted small">{tr(STATUS_LABEL[status]).toLowerCase()}</span>{/if}
         <CatchOdds palId={inst.palId} />
         <button class="small" disabled={full || status === 'expedition'} onclick={() => game.assignWorker(inst.uid)}
-          title={status === 'expedition' ? 'Away until the expedition returns' : status === 'party' ? 'Removes it from the party' : status === 'breeding' ? 'Breaks up the breeding pair' : ''}>Assign</button>
+          title={status === 'expedition' ? 'Away until the expedition returns' : status === 'party' ? 'Removes it from the party' : status === 'breeding' ? 'Breaks up the breeding pair' : ''}>{tr("Assign")}</button>
       </PalCard>
     {/each}
   </div>

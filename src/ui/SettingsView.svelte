@@ -14,7 +14,7 @@
   import { SPHERE_TIERS, type SpherePolicy } from '../data/types';
   import ItemIcon from './ItemIcon.svelte';
   import { prefs } from '../state/prefs.svelte';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
   import { LOCALES } from '../i18n/messages';
   const policies: { value: SpherePolicy; label: string }[] = [
     { value: 'none', label: "Don't throw" },
@@ -44,14 +44,18 @@
     game.setDailyReset(m);
   }
 
-  function doExport() {
-    const str = game.exportString();
-    navigator.clipboard?.writeText(str).catch(() => {});
-    window.prompt('Save string (copied to clipboard):', str);
+  // save code: a compact string shown in a box, copied to the clipboard; paste one to load it
+  let code = $state('');
+  let codeNote = $state('');
+  async function doExport() {
+    code = await game.saveCode();
+    codeNote = `${code.length.toLocaleString()} characters`;
+    try { await navigator.clipboard?.writeText(code); codeNote += ' · copied'; } catch { /* clipboard blocked */ }
   }
-  function doImport() {
-    const str = window.prompt('Paste save string:');
-    if (str && !game.importString(str)) window.alert('Could not read that save.');
+  async function doImport() {
+    const ok = code.trim() ? await game.importCode(code) : false;
+    codeNote = ok ? 'Save loaded.' : 'Could not read that code.';
+    if (ok) code = '';
   }
   function doReset() {
     if (window.confirm('Delete your save and start over? This cannot be undone.')) game.reset();
@@ -72,7 +76,7 @@
 
 <div class="row">
   <h2 class="grow">{t('settings.title')} <span class="muted">{filtering ? `${shown.size} of ${SETTINGS_SECTIONS.length}` : ''}</span></h2>
-  <input type="search" placeholder={t('settings.search')} bind:value={query} aria-label="Search settings" />
+  <input type="search" placeholder={t('settings.search')} bind:value={query} aria-label={tr("Search settings")} />
 </div>
 <nav class="chips">
   <button class="chip" class:on={only === null} onclick={() => (only = null)}>{t('settings.all')}</button>
@@ -81,7 +85,7 @@
   {/each}
 </nav>
 {#if shown.size === 0}
-  <p class="muted">No setting matches. <button class="small" onclick={clear}>Clear</button></p>
+  <p class="muted">{tr("No setting matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>
 {/if}
 
 {#if show('daily')}
@@ -90,11 +94,11 @@
   <div class="options">
     <label class="opt" class:on={mode === 'utc'}>
       <input type="radio" name="reset" checked={mode === 'utc'} onchange={() => pick('utc')} />
-      <span><b>UTC midnight</b><br /><span class="muted small">Same moment for everyone. Next reset in {formatDuration(msUntilRollover(now, 'utc'))}.</span></span>
+      <span><b>{tr("UTC midnight")}</b><br /><span class="muted small">{tr("Same moment for everyone. Next reset in")} {formatDuration(msUntilRollover(now, 'utc'))}.</span></span>
     </label>
     <label class="opt" class:on={mode === 'local'}>
       <input type="radio" name="reset" checked={mode === 'local'} onchange={() => pick('local')} />
-      <span><b>Local midnight</b> <span class="muted small">({tz})</span><br /><span class="muted small">Your own midnight. Next reset in {formatDuration(msUntilRollover(now, 'local'))}.</span></span>
+      <span><b>{tr("Local midnight")}</b> <span class="muted small">({tz})</span><br /><span class="muted small">{tr("Your own midnight. Next reset in")} {formatDuration(msUntilRollover(now, 'local'))}.</span></span>
     </label>
   </div>
 </section>
@@ -107,7 +111,7 @@
     {#each THEMES as th (th.value)}
       <label class="opt" class:on={theme.choice === th.value}>
         <input type="radio" name="theme" checked={theme.choice === th.value} onchange={() => theme.set(th.value)} />
-        <span><b>{t(`theme.${th.key}`)}</b>{#if th.value === 'system'} <span class="muted small">(now {theme.effective})</span>{/if}<br /><span class="muted small">{t(`theme.${th.key}Desc`)}</span></span>
+        <span><b>{t(`theme.${th.key}`)}</b>{#if th.value === 'system'} <span class="muted small">{tr("(now")} {theme.effective})</span>{/if}<br /><span class="muted small">{t(`theme.${th.key}Desc`)}</span></span>
       </label>
     {/each}
   </div>
@@ -118,22 +122,22 @@
 <section>
   <h3>{t('settings.sound')}</h3>
   <div class="row sound">
-    <label class="row"><input type="checkbox" checked={sound.enabled} onchange={(e) => setSound({ enabled: e.currentTarget.checked })} /> Sound effects</label>
-    <label class="row grow"><span class="muted small">Volume</span>
+    <label class="row"><input type="checkbox" checked={sound.enabled} onchange={(e) => setSound({ enabled: e.currentTarget.checked })} /> {tr("Sound effects")}</label>
+    <label class="row grow"><span class="muted small">{tr("Volume")}</span>
       <input type="range" min="0" max="1" step="0.05" value={sound.volume} disabled={!sound.enabled} oninput={(e) => setSound({ volume: Number(e.currentTarget.value) })} /></label>
   </div>
   <div class="row sound">
-    <label class="row"><input type="checkbox" checked={sound.haptics} disabled={!canBuzz} onchange={(e) => setSound({ haptics: e.currentTarget.checked })} /> Vibration</label>
+    <label class="row"><input type="checkbox" checked={sound.haptics} disabled={!canBuzz} onchange={(e) => setSound({ haptics: e.currentTarget.checked })} /> {tr("Vibration")}</label>
     <span class="muted small">{canBuzz ? 'Short buzzes for clicks, catches, level-ups and wins.' : 'Not available on this device (touch screen + browser support needed; iOS Safari has none).'}</span>
   </div>
-  <p class="muted small">Synthesized in the browser — no audio files. Stored on this device.</p>
+  <p class="muted small">{tr("Synthesized in the browser — no audio files. Stored on this device.")}</p>
 </section>
 {/if}
 
 {#if show('catching')}
 <section>
   <h3>{t('settings.catching')}</h3>
-  <p class="muted small">A sphere is thrown automatically when you defeat a wild Pal or an Alpha. Choose which one — or none — for species you haven't caught yet and for ones you already own. If the chosen tier is out of stock, the next lower one is thrown.</p>
+  <p class="muted small">{tr("A sphere is thrown automatically when you defeat a wild Pal or an Alpha. Choose which one — or none — for species you haven't caught yet and for ones you already own. If the chosen tier is out of stock, the next lower one is thrown.")}</p>
   <div class="row policies">
     <label class="grow policy">New species
       <select value={save.settings.sphereForNew} onchange={(e) => game.setSpherePolicy('new', e.currentTarget.value as SpherePolicy)}>
@@ -146,8 +150,8 @@
       </select>
     </label>
   </div>
-  <label class="row"><input type="checkbox" checked={prefs.showOdds} onchange={(e) => prefs.setShowOdds(e.currentTarget.checked)} /> Show 🎯 catch odds in Pal lists, Paldeck cards and spawn tables <span class="muted small">(the arena line and Pal pages always show them; this device only)</span></label>
-  <p class="muted small">Duplicates are what breeding, condensing and the base run on — throwing at them costs spheres, so it starts off. Spheres: {#each SPHERE_TIERS as t}{#if (save.inventory[SPHERES[t].itemId] ?? 0) > 0}<span class="chip"><ItemIcon id={SPHERES[t].itemId} size={14} /> {SPHERES[t].name} ×{save.inventory[SPHERES[t].itemId]}</span>{/if}{/each}{#if SPHERE_TIERS.every((t) => !(save.inventory[SPHERES[t].itemId] ?? 0))}none — buy or craft some{/if}</p>
+  <label class="row"><input type="checkbox" checked={prefs.showOdds} onchange={(e) => prefs.setShowOdds(e.currentTarget.checked)} /> {tr("Show 🎯 catch odds in Pal lists, Paldeck cards and spawn tables")} <span class="muted small">(the arena line and Pal pages always show them; this device only)</span></label>
+  <p class="muted small">{tr("Duplicates are what breeding, condensing and the base run on — throwing at them costs spheres, so it starts off. Spheres:")} {#each SPHERE_TIERS as t}{#if (save.inventory[SPHERES[t].itemId] ?? 0) > 0}<span class="chip"><ItemIcon id={SPHERES[t].itemId} size={14} /> {SPHERES[t].name} ×{save.inventory[SPHERES[t].itemId]}</span>{/if}{/each}{#if SPHERE_TIERS.every((t) => !(save.inventory[SPHERES[t].itemId] ?? 0))}{tr("none — buy or craft some")}{/if}</p>
 </section>
 {/if}
 
@@ -170,7 +174,7 @@
 <section>
   <div class="row">
     <h3 class="grow">{t('settings.keyboard')}</h3>
-    <button class="small" onclick={() => (ui.shortcutsOpen = true)}>Show the list</button>
+    <button class="small" onclick={() => (ui.shortcutsOpen = true)}>{tr("Show the list")}</button>
   </div>
   <KeyBindings />
 </section>
@@ -179,23 +183,25 @@
 {#if show('save')}
 <section>
   <h3>{t('settings.save')}</h3>
-  <p class="muted small">Autosaves every 30 s and when you leave. Saves are per browser — use Export / Import to move between the local copy and the hosted one.</p>
+  <p class="muted small">{tr("Autosaves every 30 s and when you leave. Saves are per browser — use Export / Import to move between the local copy and the hosted one.")}</p>
   <div class="row">
-    <button class="small" onclick={() => game.persist()}>Save now</button>
-    <button class="small" onclick={doExport}>Export</button>
-    <button class="small" onclick={doImport}>Import</button>
+    <button class="small" onclick={() => game.persist()}>{tr("Save now")}</button>
+    <button class="small" onclick={doExport}>{tr("Copy save code")}</button>
+    <button class="small" onclick={doImport} disabled={!code.trim()}>{tr("Load pasted code")}</button>
     <span class="grow"></span>
-    <button class="small danger" onclick={doReset}>Reset game</button>
+    <button class="small danger" onclick={doReset}>{tr("Reset game")}</button>
   </div>
+  <textarea class="code" bind:value={code} rows="3" placeholder={tr("Your save code appears here — or paste one from another device.")} spellcheck="false" aria-label={tr("Save code")}></textarea>
+  {#if codeNote}<div class="muted small">{tr(codeNote)}</div>{/if}
 </section>
 {/if}
 
 {#if show('about')}
 <section>
   <h3>{t('settings.about')}</h3>
-  <p class="muted small">Catcha version <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}. Changelog v{LATEST_VERSION}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
+  <p class="muted small">{tr("Catcha version")} <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}{tr(". Changelog v")}{LATEST_VERSION}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
   <div class="row">
-    <button class="small" onclick={() => whatsNew.showAll()}>What's new</button>
+    <button class="small" onclick={() => whatsNew.showAll()}>{tr("What's new")}</button>
     <button class="small" onclick={() => game.restartTutorial()} disabled={!game.save.tutorial.done}>{game.save.tutorial.done ? 'Replay tutorial' : 'Tutorial in progress'}</button>
     <button class="small" onclick={() => (showSteps = !showSteps)} aria-expanded={showSteps}>{showSteps ? 'Hide steps' : 'How to play'}</button>
   </div>
@@ -219,6 +225,7 @@
   .chip { font-size: 0.8rem; padding: 0.15rem 0.6rem; border-radius: 999px; }
   .chip.on { border-color: var(--accent); color: var(--accent); }
   .policy { display: flex; flex-direction: column; gap: 0.25rem; font-weight: 700; }
+  .code { width: 100%; font-family: ui-monospace, monospace; font-size: 0.75rem; margin-top: 0.4rem; resize: vertical; word-break: break-all; }
   .policies { align-items: flex-start; }
   .steps { margin-top: 0.5rem; }
 </style>

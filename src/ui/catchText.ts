@@ -1,4 +1,5 @@
 import { chanceVsWild, type CatchPreview } from '../engine/catch';
+import { t } from '../i18n/index.svelte';
 
 /** 0.62 → "62%" */
 export const pct = (n: number) => `${Math.round(n * 100)}%`;
@@ -11,7 +12,7 @@ import type { Wild } from '../engine/combat';
 /** "62% on the Lamball in front of you" for a sphere tier, or its multiplier when nothing catchable is out. */
 export function sphereVsWild(save: SaveState, wild: Wild | null | undefined, tier: SphereTier): string {
   const c = chanceVsWild(save, wild, tier);
-  return c === null ? `×${SPHERES[tier].mult} catch rate` : `${pct(c)} on the ${palById(wild!.palId).name} in front of you`;
+  return c === null ? t('×{mult} catch rate', { mult: SPHERES[tier].mult }) : t('{pct} on the {pal} in front of you', { pct: pct(c), pal: palById(wild!.palId).name });
 }
 
 /** "Lamball 62%, Cattiva 62%, ??? 62%" — a spawn table's catch odds under the current policy, unseen names hidden. */
@@ -21,7 +22,7 @@ export function tableOddsText(save: SaveState, spawns: readonly { palId: number;
 
 /** "60% with a Pal Sphere", "no throw — already caught (Catch settings)", "no spheres left" */
 export function catchText(p: CatchPreview): string {
-  if (p.throws) return `${pct(p.chance)} with a ${SPHERES[p.tier].name}`;
-  if (p.reason === 'no-spheres') return 'no spheres left — Merchant';
-  return p.dupe ? 'no throw — already caught (Settings → Catching)' : 'no throw — policy (Settings → Catching)';
+  if (p.throws) return t('{pct} with a {sphere}', { pct: pct(p.chance), sphere: SPHERES[p.tier].name });
+  if (p.reason === 'no-spheres') return t('no spheres left — Merchant');
+  return p.dupe ? t('no throw — already caught (Settings → Catching)') : t('no throw — policy (Settings → Catching)');
 }

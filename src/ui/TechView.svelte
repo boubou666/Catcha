@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { chanceVsWild, chooseSphere } from '../engine/catch';
@@ -31,39 +32,39 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Technology <span class="muted">{filtering ? `${shown.length} of ${TECHS.length}` : `${save.tech.length} / ${TECHS.length}`}</span></h2>
-  <span class="points">{points} tech point{points === 1 ? '' : 's'}</span>
+  <h2 class="grow">{tr("Technology")} <span class="muted">{filtering ? `${shown.length} of ${TECHS.length}` : `${save.tech.length} / ${TECHS.length}`}</span></h2>
+  <span class="points">{points} {tr("tech point")}{points === 1 ? '' : 's'}</span>
 </div>
 <div class="row">
-  <input type="search" placeholder="Search tech, unlock, effect…" bind:value={filter.query} aria-label="Search technology" />
-  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+  <input type="search" placeholder={tr("Search tech, unlock, effect…")} bind:value={filter.query} aria-label={tr("Search technology")} />
+  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
 </div>
 {#if open}
   <div class="filters">
-    <select bind:value={filter.kind} aria-label="Kind">
-      <option value="any">Any kind</option>
-      {#each Object.entries(TECH_KIND_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.kind} aria-label={tr("Kind")}>
+      <option value="any">{tr("Any kind")}</option>
+      {#each Object.entries(TECH_KIND_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.stat} aria-label="Boosts">
-      <option value="any">Any boost</option>
-      {#each Object.entries(TECH_STAT_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.stat} aria-label={tr("Boosts")}>
+      <option value="any">{tr("Any boost")}</option>
+      {#each Object.entries(TECH_STAT_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.status} aria-label="Status">
-      {#each Object.entries(TECH_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.status} aria-label={tr("Status")}>
+      {#each Object.entries(TECH_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <label class="chk"><input type="checkbox" bind:checked={filter.hideFuture} /> Hide levels above mine</label>
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+    <label class="chk"><input type="checkbox" bind:checked={filter.hideFuture} /> {tr("Hide levels above mine")}</label>
+    {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
 {/if}
-<p class="muted small">You gain 2 tech points per level. Structures and recipes must be researched before you can build or craft them.</p>
+<p class="muted small">{tr("You gain 2 tech points per level. Structures and recipes must be researched before you can build or craft them.")}</p>
 
 {#if shown.length === 0}
-  <p class="muted">No tech matches. <button class="small" onclick={clear}>Clear filters</button></p>
+  <p class="muted">{tr("No tech matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
 {/if}
 
 {#each rows as [level, techs] (level)}
   <section class:future={save.player.level < level}>
-    <h3>Level {level}</h3>
+    <h3>{tr("Level")} {level}</h3>
     <div class="grid">
       {#each techs as { tech: t, block } (t.id)}
         <div class="node" class:done={block === 'researched'} class:ready={block === null}>
@@ -77,7 +78,7 @@
             {@const tier = demoTier(game.wild.palId)}
             {@const now = chanceVsWild(game.save, game.wild, tier)}
             {@const after = chanceVsWild(game.save, game.wild, tier, t.effect.mult)}
-            {#if now !== null && after !== null}<div class="small odds">🎯 {palById(game.wild.palId).name} with a {SPHERES[tier].name}: {pct(now)} → {pct(after)}</div>{/if}
+            {#if now !== null && after !== null}<div class="small odds">🎯 {palById(game.wild.palId).name} {tr("with a")} {SPHERES[tier].name}: {pct(now)} → {pct(after)}</div>{/if}
           {/if}
           {#if block !== 'researched'}
             <button class="small" class:primary={block === null} disabled={block !== null} title={block ? BLOCK[block](t) : ''}

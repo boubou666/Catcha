@@ -118,9 +118,14 @@ A few named skills also carry a mechanic (`PartnerSpecial`): scavengers add a 15
 defeat, ranch skills double that Pal's ranch output, senses name unseen species on spawn tables, companions
 give a 25% chance of a sphere refund on a miss, shields add 15% to Alpha and tower clocks.
 
-Language: Settings → Language switches the chrome (tabs, header, arena, routes and map, panel headers,
-settings, tutorial) to French; strings live in `src/i18n/messages.ts` (`t()` / `tOr()` in `src/i18n`), English is
-the fallback, and data names stay as on the wiki. `src/engine/progression.test.ts` plays the whole world by data
+Language: Settings → Language switches the whole UI to French. Chrome keys live in `src/i18n/messages.ts`; the
+views use gettext-style keys (the English string itself, wrapped in `tr("…")`) with French in
+`src/i18n/fr-text.ts`; log lines and toasts carry a template + values (`pushT` / `notifyT`) so they render in
+the current language. English is the fallback; data names stay as on the wiki. A test asserts every `tr()` key
+has a French entry. Save codes (`encodeSaveCode` / `decodeSaveCode`, gzip + base64url, prefix `catcha1.`)
+are the way to move a save between devices; plain export strings still load. The store delegates defeat
+resolution to `src/state/defeat.ts` and boss / realm / raid starts to `src/state/encounters.ts` through the
+`GameCore` interface in `src/state/core.ts`. `src/engine/progression.test.ts` plays the whole world by data
 and asserts every route, Alpha, tower, realm and raid opens in order, every requirement points at something real,
 and every species can be obtained.
 

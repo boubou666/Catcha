@@ -10,7 +10,7 @@
   import { routeById } from '../data/regions';
   import { tableOddsText } from './catchText';
   import { prefs } from '../state/prefs.svelte';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
 
   const regions = $derived(worldMap(game.save));
   const byId = $derived(new Map(regions.map((r) => [r.id, r])));
@@ -95,7 +95,7 @@
     <button class="small" onclick={() => prefs.setRoutesView('list')} title={t('routes.backToList')}>☰ {t('routes.list')}</button>
   </div>
 
-  <svg {viewBox} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the Palpagos Islands" style:aspect-ratio="{view.w} / {view.h}">
+  <svg {viewBox} preserveAspectRatio="xMidYMid meet" role="img" aria-label={tr("Map of the Palpagos Islands")} style:aspect-ratio="{view.w} / {view.h}">
     <image {href} x="0" y="0" width={MAP_SIZE} height={MAP_SIZE} />
 
     {#if !zoom}
@@ -119,7 +119,7 @@
       {@const sel = selected?.kind === p.kind && selected?.id === p.id}
       {@const r = p.kind === 'route' ? pinR : pinR + 2}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <g class="pin {p.kind} {p.status}" class:current={p.current} class:sel class:fighting={isFighting(p)} transform="translate({p.x},{p.y})" role="button" tabindex="0" aria-label="{p.name}, level {p.level}, {p.status}"
+      <g class="pin {p.kind} {p.status}" class:current={p.current} class:sel class:fighting={isFighting(p)} transform="translate({p.x},{p.y})" role="button" tabindex="0" aria-label="{p.name}{tr(", level")} {p.level}, {p.status}"
         onclick={(e) => { e.stopPropagation(); tap(p); }} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(p); } }}>
         {#if p.current || isFighting(p)}<circle class="pulse" r={r + 8} />{/if}
         <circle {r} />

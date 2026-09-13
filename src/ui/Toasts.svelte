@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
 </script>
 
 <div class="toasts" aria-live="polite">
   {#each game.toasts as t (t.id)}
-    <button class="toast {t.kind}" onclick={() => game.dismissToast(t.id)} title="Dismiss">{t.text}</button>
+    <button class="toast {t.kind}" onclick={() => game.dismissToast(t.id)} title={tr("Dismiss")}>{t.msg ? tr(t.msg.key, t.msg.vars) : t.text}</button>
   {/each}
 </div>
 

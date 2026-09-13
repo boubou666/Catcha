@@ -1,7 +1,7 @@
 <script lang="ts">
   import { pct } from './catchText';
   import { game } from '../state/game.svelte';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
   import { catchSummary, DEFAULT_LOG_FILTER, filterLog, isLogFiltering, LOG_KIND_LABEL, LOG_KINDS, type LogFilter } from '../engine/logfilter';
 
   const COMPACT = 12;
@@ -20,23 +20,23 @@
 <div class="panel log">
   <div class="row head">
     <h3 class="grow">{t('panel.log')} <span class="muted">{filtering ? `${matches.length} of ${game.log.length}` : game.log.length}</span></h3>
-    <input type="search" placeholder="Search log…" bind:value={filter.query} aria-label="Search the log" />
-    <select bind:value={filter.kind} aria-label="Log category">
-      <option value="any">All</option>
-      {#each LOG_KINDS as k}<option value={k}>{LOG_KIND_LABEL[k]}</option>{/each}
+    <input type="search" placeholder={tr("Search log…")} bind:value={filter.query} aria-label={tr("Search the log")} />
+    <select bind:value={filter.kind} aria-label={tr("Log category")}>
+      <option value="any">{tr("All")}</option>
+      {#each LOG_KINDS as k}<option value={k}>{tr(LOG_KIND_LABEL[k])}</option>{/each}
     </select>
   </div>
   {#if shown.length === 0}
-    <div class="muted">{filtering ? 'No entry matches.' : 'Nothing yet.'} {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}</div>
+    <div class="muted">{filtering ? 'No entry matches.' : 'Nothing yet.'} {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}</div>
   {/if}
   {#if summary}
-    <div class="summary small" title="Throws in the entries shown: how many landed, against the average odds they were thrown at">🎯 {summary.caught} of {summary.throws} throw{summary.throws === 1 ? '' : 's'} landed (<b>{pct(summary.rate)}</b>) · average odds {pct(summary.expected)}</div>
+    <div class="summary small" title={tr("Throws in the entries shown: how many landed, against the average odds they were thrown at")}>🎯 {summary.caught} of {summary.throws} {tr("throw")}{summary.throws === 1 ? '' : 's'} {tr("landed (")}<b>{pct(summary.rate)}</b>{tr(") · average odds")} {pct(summary.expected)}</div>
   {:else if filter.kind === 'catch'}
-    <div class="muted small">No throws logged yet.</div>
+    <div class="muted small">{tr("No throws logged yet.")}</div>
   {/if}
   <div class="lines" class:tall={filtering || expanded}>
     {#each shown as e, i (e.at + e.text + i)}
-      <div class="line" class:latest={i === 0 && !filtering}><span class="t muted">{time(e.at)}</span> <span class="k muted">{LOG_KIND_LABEL[e.kind]}</span> {e.text}{#if e.chance !== undefined} <span class="odds" class:hit={e.landed === true} class:miss={e.landed === false} title={e.landed === undefined ? 'Catch odds with the sphere your policy picks' : e.landed ? 'Landed at these odds' : 'Missed at these odds'}>🎯 {pct(e.chance)}</span>{/if}</div>
+      <div class="line" class:latest={i === 0 && !filtering}><span class="t muted">{time(e.at)}</span> <span class="k muted">{tr(LOG_KIND_LABEL[e.kind])}</span> {e.msg ? tr(e.msg.key, e.msg.vars) : e.text}{#if e.chance !== undefined} <span class="odds" class:hit={e.landed === true} class:miss={e.landed === false} title={e.landed === undefined ? 'Catch odds with the sphere your policy picks' : e.landed ? 'Landed at these odds' : 'Missed at these odds'}>🎯 {pct(e.chance)}</span>{/if}</div>
     {/each}
   </div>
   {#if !filtering && game.log.length > COMPACT}

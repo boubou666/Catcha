@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { defeatsByElement, DEFAULT_STATS_FILTER, filterStats, fmtInt, isStatsFiltering, statsReport, type StatsFilter } from '../engine/stats';
   import { ELEMENT_COLORS } from '../data/elements';
@@ -28,21 +29,21 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Statistics <span class="muted">{filtering ? `${rowCount(sections)} of ${rowCount(all)}` : ''}</span></h2>
-  <span class="muted small">Lifetime, carried through Ascension</span>
+  <h2 class="grow">{tr("Statistics")} <span class="muted">{filtering ? `${rowCount(sections)} of ${rowCount(all)}` : ''}</span></h2>
+  <span class="muted small">{tr("Lifetime, carried through Ascension")}</span>
 </div>
 <div class="row">
-  <input type="search" placeholder="Search stats…" bind:value={filter.query} aria-label="Search statistics" />
-  <select bind:value={filter.section} aria-label="Section">
-    <option value="any">All sections</option>
+  <input type="search" placeholder={tr("Search stats…")} bind:value={filter.query} aria-label={tr("Search statistics")} />
+  <select bind:value={filter.section} aria-label={tr("Section")}>
+    <option value="any">{tr("All sections")}</option>
     {#each all as sec (sec.title)}<option value={sec.title}>{sec.title}</option>{/each}
-    <option value="Defeats by element">Defeats by element</option>
+    <option value="Defeats by element">{tr("Defeats by element")}</option>
   </select>
-  <label class="chk"><input type="checkbox" bind:checked={filter.nonZero} /> Hide zeros</label>
-  {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+  <label class="chk"><input type="checkbox" bind:checked={filter.nonZero} /> {tr("Hide zeros")}</label>
+  {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
 </div>
 {#if sections.length === 0 && !showChart}
-  <p class="muted">No statistic matches. <button class="small" onclick={clear}>Clear</button></p>
+  <p class="muted">{tr("No statistic matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>
 {/if}
 
 <div class="grid">
@@ -62,9 +63,9 @@
 
   {#if showChart}
   <section class="card">
-    <h3>Defeats by element</h3>
+    <h3>{tr("Defeats by element")}</h3>
     {#if elements.length === 0}
-      <p class="muted">Nothing defeated yet.</p>
+      <p class="muted">{tr("Nothing defeated yet.")}</p>
     {:else}
       <ul class="bars">
         {#each elements as e (e.element)}

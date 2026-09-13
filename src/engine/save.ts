@@ -203,3 +203,42 @@ export function importSave(encoded: string): SaveState | null {
     return null;
   }
 }
+
+// ---- save codes: a compact string to paste between devices -------------------------------------
+
+const CODE_PREFIX = 'catcha1.';   // gzip + base64url; a code without it is a plain export string
+
+function toBase64Url(bytes: Uint8Array): string {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+}
+function fromBase64Url(s: string): Uint8Array {
+  const b64 = s.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - (s.length % 4)) % 4);
+  return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+}
+async function pipe(bytes: Uint8Array, stream: { readable: ReadableStream; writable: WritableStream }): Promise<Uint8Array> {
+  const w = stream.writable.getWriter();
+  void w.write(bytes); void w.close();
+  return new Uint8Array(await new Response(stream.readable).arrayBuffer());
+}
+
+/** A short shareable code for this save: gzip + base64url, prefixed. Falls back to the plain export string where compression is unavailable. */
+export async function encodeSaveCode(save: SaveState): Promise<string> {
+  const json = serialize(save);
+  if (typeof CompressionStream === 'undefined') return exportSave(save);
+  const gz = await pipe(new TextEncoder().encode(json), new CompressionStream('gzip'));
+  return CODE_PREFIX + toBase64Url(gz);
+}
+
+/** Reads a save code (or a plain export string). Null when it cannot be read. */
+export async function decodeSaveCode(code: string): Promise<SaveState | null> {
+  const s = code.trim();
+  if (!s.startsWith(CODE_PREFIX)) return importSave(s);
+  try {
+    const bytes = await pipe(fromBase64Url(s.slice(CODE_PREFIX.length)), new DecompressionStream('gzip'));
+    return deserialize(new TextDecoder().decode(bytes));
+  } catch {
+    return null;
+  }
+}

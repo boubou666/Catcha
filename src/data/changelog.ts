@@ -10,13 +10,21 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.12.0', date: '2026-09-14', title: 'En français',
+    items: [
+      'The whole game in French: Settings → Language. Menus, every view, filters, the log, toasts and the tutorial; Pal, route and item names keep their wiki names, as Palworld itself does. Missing strings fall back to English.',
+      'Log lines and toasts now travel as templates with their values, so they render in the current language (and the Log filter works on data rather than wording).',
+      'Save codes: Settings → Save shows a compact code (gzip, about a fifth of the old string) with Copy, and a box to paste one from another device. Old export strings still load.',
+      'Under the hood: defeat resolution and encounter starters moved out of the store into their own modules.',
+    ],
+  },
+  {
     version: '0.11.0', date: '2026-09-14', title: 'The map',
     items: [
       'The Routes panel is now a map: the official Palpagos map (from the wiki, like the Pal art) with a pin for every route, tower, Alpha and Sealed Realm, plus your base and the Summoning Altar. Tap a pin for its status and odds, tap again to travel, fight, enter — or summon a raid from the altar. Zoom from the whole archipelago to a region; locked regions say what opens them; the fight you are in glows red.',
       '🗺 buttons on a Pal’s habitat lines open the map on that spot. J switches map ⇄ list, Shift+J folds the panel to one line; ☰ List and ▴ do the same by mouse. A tutorial step introduces it.',
       'Partner skills now do something. Every Pal’s skill (shown on its page and when hovering its name) gives +3–12% by rarity while it is in the party: damage for party members of its element for fighting skills, exp for mounts and gliders, gold for diggers and anglers, catch odds for senses and glares — and base output for helper-type skills while the Pal works at the base. Party and Base show the totals.',
       'Some partner skills have a trick of their own: diggers and anglers (Gold Digger, Dig Here!, Master Night Angler…) add a 15% chance of an extra drop per defeat; Egg Layer, Milk Maker and the wool skills double that Pal’s ranch output; Sixth Sense, Hawk Eye and Ultrasonic Sensor name species you have never met on spawn tables; Travel Companion and Happy-Go-Lucky Bunny give a 25% chance to get a sphere back when a throw fails; Fluffy Shield and the armour skills add 15% to Alpha and tower clocks. Stackable; the Party tab lists them.',
-      'Settings → Language: Français (partiel) — menus, tabs, header, arena, map and the tutorial; Pal, route and item names keep their wiki names, as in Palworld.',
       'Bellanoir Libero has 2.3M HP instead of 2.8M: the balance model had a party from Feybreak finishing it with 25 seconds to spare, where the other raids leave about two minutes.',
       'A deploy no longer throws away the cached Pal and item art, and a few accessibility nits from Lighthouse are fixed.',
     ],

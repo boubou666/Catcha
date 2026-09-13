@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
@@ -59,15 +60,15 @@
   };
 </script>
 
-<h2>Expeditions <span class="muted">{save.base.expeditions.length} / {slots} out</span></h2>
+<h2>{tr("Expeditions")} <span class="muted">{save.base.expeditions.length} / {slots} {tr("out")}</span></h2>
 
 {#if slots === 0}
-  <p class="muted">Build the <b>Expedition Post</b> at your base (Base → Structures) to send idle Pals on trips. Each level adds a concurrent expedition.</p>
+  <p class="muted">{tr("Build the")} <b>{tr("Expedition Post")}</b> {tr("at your base (Base → Structures) to send idle Pals on trips. Each level adds a concurrent expedition.")}</p>
 {/if}
 
 {#if save.base.expeditions.length > 0}
   <section>
-    <h3>Underway</h3>
+    <h3>{tr("Underway")}</h3>
     <div class="list">
       {#each save.base.expeditions as ex (ex.defId + ex.members.join())}
         {@const e = expeditionById(ex.defId)}
@@ -86,12 +87,12 @@
 
 <section>
   <div class="row">
-    <h3 class="grow">Destination <span class="muted">{destinations.length < EXPEDITIONS.length ? `${destinations.length} of ${EXPEDITIONS.length}` : EXPEDITIONS.length}</span></h3>
-    <input type="search" placeholder="Search destination, loot…" bind:value={dest.query} aria-label="Search destinations" />
-    <label class="chk"><input type="checkbox" bind:checked={dest.hideLocked} /> Hide locked</label>
+    <h3 class="grow">{tr("Destination")} <span class="muted">{destinations.length < EXPEDITIONS.length ? `${destinations.length} of ${EXPEDITIONS.length}` : EXPEDITIONS.length}</span></h3>
+    <input type="search" placeholder={tr("Search destination, loot…")} bind:value={dest.query} aria-label={tr("Search destinations")} />
+    <label class="chk"><input type="checkbox" bind:checked={dest.hideLocked} /> {tr("Hide locked")}</label>
   </div>
   {#if destinations.length === 0}
-    <p class="muted">No destination matches. <button class="small" onclick={() => (dest = { ...DEFAULT_DESTINATION_FILTER })}>Clear</button></p>
+    <p class="muted">{tr("No destination matches.")} <button class="small" onclick={() => (dest = { ...DEFAULT_DESTINATION_FILTER })}>{tr("Clear")}</button></p>
   {/if}
   <div class="dests">
     {#each destinations as e (e.id)}
@@ -103,26 +104,26 @@
       </button>
     {/each}
   </div>
-  <p class="muted small">Loot: {lootText(defId)}. Each member gains {def.exp.toLocaleString()} exp (half on failure).</p>
+  <p class="muted small">{tr("Loot:")} {lootText(defId)}{tr(". Each member gains")} {def.exp.toLocaleString()} {tr("exp (half on failure).")}</p>
 </section>
 
 <section>
   <div class="row">
-    <h3 class="grow">Party <span class="muted">{picked.length} / {def.size}</span></h3>
-    <span class="chance" class:good={chance >= 0.75} class:bad={chance > 0 && chance < 0.4}>Success {pct(chance)}</span>
-    <button class="small" disabled={candidates.length === 0} onclick={pickBest} title="Fill the party with the strongest Pals in the list below">Pick best</button>
-    {#if picked.length}<button class="small" onclick={() => (picked = [])}>Clear picks</button>{/if}
-    <button class="primary small" disabled={!!block} title={block ? BLOCK[block] : ''} onclick={sendNow}>Send</button>
+    <h3 class="grow">{tr("Party")} <span class="muted">{picked.length} / {def.size}</span></h3>
+    <span class="chance" class:good={chance >= 0.75} class:bad={chance > 0 && chance < 0.4}>{tr("Success")} {pct(chance)}</span>
+    <button class="small" disabled={candidates.length === 0} onclick={pickBest} title={tr("Fill the party with the strongest Pals in the list below")}>{tr("Pick best")}</button>
+    {#if picked.length}<button class="small" onclick={() => (picked = [])}>{tr("Clear picks")}</button>{/if}
+    <button class="primary small" disabled={!!block} title={block ? BLOCK[block] : ''} onclick={sendNow}>{tr("Send")}</button>
   </div>
   {#if block && picked.length > 0}<div class="warn small">{BLOCK[block]}</div>{/if}
-  <p class="muted small">Chance is judged against a full party at Lv {def.level}. Stars and attack passives count. Members are unavailable until they return.</p>
+  <p class="muted small">{tr("Chance is judged against a full party at Lv")} {def.level}{tr(". Stars and attack passives count. Members are unavailable until they return.")}</p>
   <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search idle Pals" hideStatus>
     {#snippet heading()}
-      <span class="grow muted small">Idle Pals {filtering ? `${candidates.length} of ${idle.length}` : idle.length}</span>
+      <span class="grow muted small">{tr("Idle Pals")} {filtering ? `${candidates.length} of ${idle.length}` : idle.length}</span>
     {/snippet}
   </BoxFilterBar>
   {#if idle.length > 0 && candidates.length === 0}
-    <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+    <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
   {/if}
   <div class="list scroll">
     {#each candidates as p (p.uid)}
@@ -135,22 +136,22 @@
         <CatchOdds palId={p.palId} />
       </label>
     {/each}
-    {#if idle.length === 0}<p class="muted small">No idle Pals — everyone is in the party, working, breeding or already away.</p>{/if}
+    {#if idle.length === 0}<p class="muted small">{tr("No idle Pals — everyone is in the party, working, breeding or already away.")}</p>{/if}
   </div>
 </section>
 
 {#if save.base.reports.length > 0}
   <section>
     <div class="row">
-      <h3 class="grow">Reports</h3>
-      <button class="small" onclick={() => game.clearReports()}>Clear</button>
+      <h3 class="grow">{tr("Reports")}</h3>
+      <button class="small" onclick={() => game.clearReports()}>{tr("Clear")}</button>
     </div>
-    {#if reports.length === 0}<p class="muted small">No report matches the search.</p>{/if}
+    {#if reports.length === 0}<p class="muted small">{tr("No report matches the search.")}</p>{/if}
     <div class="list">
       {#each reports as r (r.at + r.defId)}
         <div class="report row" class:fail={!r.success}>
           <span class="grow"><b>{expeditionById(r.defId).name}</b> — {r.success ? 'success' : 'failed'}</span>
-          <span class="muted small">+{r.gold.toLocaleString()} gold{Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}</span>
+          <span class="muted small">+{r.gold.toLocaleString()} {tr("gold")}{Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}</span>
         </div>
       {/each}
     </div>

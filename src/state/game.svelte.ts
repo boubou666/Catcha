@@ -1,36 +1,35 @@
 import type { DailyReset, RouteDef, SaveState, SpherePolicy, SphereTier } from '../data/types';
 import { palById } from '../data/pals';
-import { ALPHA_TIME_LIMIT_SEC, alphaById, regionById, REGIONS, routeById, towerById } from '../data/regions';
+import { regionById, REGIONS, routeById } from '../data/regions';
 import { SPHERES } from '../data/spheres';
-import { clearSave, exportSave, importSave, loadState, newState, persist } from '../engine/save';
-import { applyDefeat, partyDps, spawnBoss, spawnWild, type Wild } from '../engine/combat';
-import { catchPreview, tryCatch } from '../engine/catch';
-import { clockMult } from '../engine/partner';
+import { clearSave, decodeSaveCode, encodeSaveCode, exportSave, importSave, loadState, newState, persist } from '../engine/save';
+import { partyDps, spawnWild, type Wild } from '../engine/combat';
+import { catchPreview } from '../engine/catch';
 import { isUnlocked } from '../engine/progress';
 import { addToParty, release, removeFromParty } from '../engine/party';
-import { clickDamage, wildHp } from '../engine/formulas';
+import { clickDamage } from '../engine/formulas';
 import { assignWorker, build, cancelCraft, cancelCraftAll, enqueue, unassignWorker } from '../engine/base';
 import { tickWorld } from '../engine/tick';
 import { clearPair, setPair } from '../engine/breeding';
 import { research, techMult } from '../engine/tech';
-import { bossName, completeRun, describeChest, dungeonUnlocked, isBossWave, spawnFor, startRun, type DungeonRun } from '../engine/dungeon';
+import { type DungeonRun } from '../engine/dungeon';
 import { dungeonById, dungeonsOf } from '../data/dungeons';
 import { itemName } from '../data/items';
 import { clearReports, send } from '../engine/expedition';
 import { expeditionById } from '../data/expeditions';
-import { completeRaid, describeRaidChest, summon, summonBlocker } from '../engine/raid';
 import { raidById, RAIDS } from '../data/raids';
 import { checkAchievements } from '../engine/achievements';
 import { claimAll, claimBonus, claimQuest, rollDaily, describeQuest, BONUS_EFFIGIES } from '../engine/daily';
 import { buyUpgrade, relicsFor } from '../engine/prestige';
 import { ascend } from '../engine/ascend';
 import { prestigeUpgradeById } from '../data/prestige';
-import { earnGold } from '../engine/inventory';
 import { techById } from '../data/tech';
 import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
 import { buy, sell } from '../engine/shop';
-import { classifyLog, type LogEntry } from '../engine/logfilter';
+import { classifyLog, fillTemplate, type LogMessage, type LogEntry } from '../engine/logfilter';
+import { resolveDefeat } from './defeat';
+import { canEnter, canSummon, endRun, enterDungeon, flee, startAlpha, startTower, summonRaid } from './encounters';
 import { applyLoadout, deleteLoadout, renameLoadout, saveLoadout, updateLoadout } from '../engine/loadouts';
 import { bulkAssign, bulkParty, bulkRelease, describeBulk, type BulkResult } from '../engine/bulk';
 import { loadToastPref, NOTICE_CAP, TOAST_PREF_KEY, type Notice, type NoticeKind, type ToastPref } from '../engine/notices';
@@ -59,16 +58,16 @@ export class Game {
   log = $state<LogEntry[]>([]);
 
   /** Transient notifications shown by the Toasts component. */
-  toasts = $state<{ id: number; text: string; kind: ToastKind }[]>([]);
+  toasts = $state<{ id: number; text: string; kind: ToastKind; msg?: LogMessage }[]>([]);
   private toastSeq = 0;
   /** Every notice is kept in the history; only kinds enabled in the toast preference pop up. */
   notices = $state<Notice[]>([]);
   toastPref = $state<ToastPref>(loadToastPref(typeof localStorage === 'undefined' ? null : localStorage));
-  notify(text: string, kind: ToastKind = 'info', ms = 4000) {
+  notify(text: string, kind: ToastKind = 'info', ms = 4000, msg?: LogMessage) {
     const id = ++this.toastSeq;
-    this.notices = [{ id, at: Date.now(), text, kind, read: false }, ...this.notices].slice(0, NOTICE_CAP);
+    this.notices = [{ id, at: Date.now(), text, kind, read: false, ...(msg ? { msg } : {}) }, ...this.notices].slice(0, NOTICE_CAP);
     if (!this.toastPref[kind]) return;
-    this.toasts = [...this.toasts, { id, text, kind }].slice(-4);
+    this.toasts = [...this.toasts, { id, text, kind, ...(msg ? { msg } : {}) }].slice(-4);
     setTimeout(() => this.dismissToast(id), ms);
   }
   dismissToast(id: number) { this.toasts = this.toasts.filter((t) => t.id !== id); }
@@ -83,7 +82,7 @@ export class Game {
   /** Game events for the UI layer (sounds, toasts). Handlers must not throw. */
   private listeners = new Set<(e: GameEvent) => void>();
   on(fn: (e: GameEvent) => void): () => void { this.listeners.add(fn); return () => this.listeners.delete(fn); }
-  private emit(e: GameEvent) { for (const fn of this.listeners) { try { fn(e); } catch { /* ignore */ } } }
+  emit(e: GameEvent) { for (const fn of this.listeners) { try { fn(e); } catch { /* ignore */ } } }
   offline = $state<OfflineReport | null>(null);   // "while you were away" summary, until dismissed
   run = $state<DungeonRun | null>(null);           // active Sealed Realm run
   private sinceSave = 0;
@@ -93,10 +92,10 @@ export class Game {
     const loaded = loadState();
     if (loaded) {
       this.save = loaded;
-      this.push('Save loaded.');
+      this.pushT('Save loaded.');
       this.catchUp(Date.now() - loaded.lastSavedAt);
     } else {
-      this.push('Welcome to the Palpagos Islands. Attack a Pal to begin.');
+      this.pushT('Welcome to the Palpagos Islands. Attack a Pal to begin.');
     }
     rollDaily(this.save);
     this.spawn();
@@ -159,8 +158,8 @@ export class Game {
     if (w) {
       if (w.deadlineAt && Date.now() > w.deadlineAt) {
         if (this.run) this.endRun('Time ran out');
-        else if (w.kind === 'raid') { this.push(`${palById(w.palId).name} withdrew — the slab is spent.`); this.spawn(); }
-        else { this.push(`Time's up — ${palById(w.palId).name} retreats.`); this.spawn(); }
+        else if (w.kind === 'raid') { this.pushT('{pal} withdrew — the slab is spent.', { pal: palById(w.palId).name }); this.spawn(); }
+        else { this.pushT("Time's up — {pal} retreats.", { pal: palById(w.palId).name }); this.spawn(); }
       } else {
         this.hit((this.dps * dtMs) / 1000);
       }
@@ -175,12 +174,12 @@ export class Game {
         const next = currentStep(this.save);
         if (next) this.notify(`📖 Next: ${next.title}`, 'success');
       }
-      if (rollDaily(this.save)) { this.push('A new day — fresh daily quests are up.'); this.notify('📅 New daily quests are up', 'info'); }
+      if (rollDaily(this.save)) { this.pushT('A new day — fresh daily quests are up.'); this.notifyT('📅 New daily quests are up', {}, 'info'); }
     }
     const queued = this.save.base.queue.length;
     const world = tickWorld(this.save, dtMs / 1000);
     if (this.save.base.queue.length < queued) this.emit('craftDone');
-    for (const palId of world.hatched) { this.push(`An egg hatched: ${palById(palId).name}!`); this.emit('hatched'); this.notify(`🥚 ${palById(palId).name} hatched!`, 'success'); }
+    for (const palId of world.hatched) { this.pushT('An egg hatched: {pal}!', { pal: palById(palId).name }); this.emit('hatched'); this.notifyT('🥚 {pal} hatched!', { pal: palById(palId).name }, 'success'); }
     for (const r of world.returned) this.notify(`${r.success ? '✅' : '❌'} ${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} (+${r.gold.toLocaleString()} gold)`, r.success ? 'gold' : 'warn');
     for (const r of world.returned) this.push(`${expeditionById(r.defId).name}: ${r.success ? 'success' : 'failed'} — +${r.gold.toLocaleString()} gold${Object.keys(r.items).length ? ', ' + Object.entries(r.items).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') : ''}.`);
     this.sinceSave += dtMs;
@@ -219,7 +218,7 @@ export class Game {
     const r = claimAll(this.save);
     if (r.quests.length === 0 && !r.bonus) { this.notify('No finished quest to claim', 'info', 2000); return; }
     for (const q of r.quests) this.push(`Quest complete: ${describeQuest(q, (id) => routeById(id).name)} (+${q.reward.gold.toLocaleString()} gold).`);
-    if (r.bonus) this.push(`Daily bonus claimed: +${BONUS_EFFIGIES} Effigy.`);
+    if (r.bonus) this.pushT('Daily bonus claimed: +{n} Effigy.', { n: BONUS_EFFIGIES });
     this.emit('questClaimed');
     this.notify(`✅ Claimed ${r.quests.length} quest${r.quests.length === 1 ? '' : 's'}${r.bonus ? ' + the daily bonus' : ''}`, 'gold', 3500);
   }
@@ -233,7 +232,7 @@ export class Game {
   get nextRaid(): string | null { return RAIDS.find((r) => this.canSummon(r.id))?.id ?? null; }
 
   claimBonus() {
-    if (claimBonus(this.save)) this.push(`Daily bonus claimed: +${BONUS_EFFIGIES} Effigy.`);
+    if (claimBonus(this.save)) this.pushT('Daily bonus claimed: +{n} Effigy.', { n: BONUS_EFFIGIES });
   }
 
   private unlockAchievements() {
@@ -247,77 +246,11 @@ export class Game {
     if (w.hp <= 0) this.defeat(w, byClick);
   }
 
-  private defeat(w: Wild, byClick = false) {
-    const def = palById(w.palId);
-    const save = this.save;
-    const levelBefore = save.player.level;
-    const reward = applyDefeat(save, w);
-    if (byClick) this.emit('defeat');   // idle kills stay silent — otherwise it's a thud every few seconds forever
-    if (save.player.level > levelBefore) { this.emit('levelUp'); this.notify(`Level ${save.player.level}!`, 'success'); }
-
-    if (w.kind === 'alpha') {
-      // Alphas can be caught, at a reduced rate; the throw uses the same sphere policy
-      const res = tryCatch(save, w);
-      if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name}!`, { chance: res.chance, landed: true }); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
-      else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free${res.refunded ? ' — the sphere came back' : ''}.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
-      else this.push(`No sphere thrown at Alpha ${def.name} — see Settings → Catching.`);
-    }
-    if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
-      if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
-      const res = tryCatch(save, w);
-      const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
-      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`, { chance: res.chance, landed: true }); this.emit('caught'); this.notify(`Caught ${label}`, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
-      else if (res.outcome === 'failed') { this.push(`${label} broke free${res.refunded ? ' — the sphere came back' : ''}.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
-      else if (w.lucky) this.push(`A Lucky ${def.name} got away — no sphere thrown.`);
-      if (this.run && w.kind !== 'wild') {
-        this.run.gold += reward.gold;
-        for (const [id, n] of Object.entries(reward.drops)) this.run.items[id] = (this.run.items[id] ?? 0) + n;
-        if (w.kind === 'dungeonBoss') {
-          const chest = completeRun(save, dungeonById(this.run.id));
-          this.emit('realmClear');
-          this.notify(`🗝 ${dungeonById(this.run.id).name} cleared!`, 'gold', 5000);
-          this.push(`${dungeonById(this.run.id).name} cleared! Chest: ${describeChest(chest, itemName)}.`);
-          this.run = null;
-          this.spawn();
-        } else {
-          this.run.wave += 1;
-          this.wild = spawnFor(this.run);
-          if (isBossWave(this.run)) { const pv = catchPreview(this.save, this.wild.palId); this.push(`The realm's guardian ${bossName(this.run.id)} appears!`, pv.throws ? { chance: pv.chance } : {}); }
-          else this.push(`Wave ${this.run.wave + 1} / ${dungeonById(this.run.id).waves}`);
-        }
-        return;
-      }
-    } else if (w.kind === 'alpha' && w.refId) {
-      const alpha = alphaById(w.refId);
-      if (!save.progress.alphas.includes(w.refId)) {
-        save.progress.alphas.push(w.refId);
-        earnGold(save, alpha.reward.gold);
-        save.player.effigies += alpha.reward.effigies ?? 0;
-        this.push(`Alpha ${def.name} defeated! +${alpha.reward.gold} gold, +${alpha.reward.effigies ?? 0} effigies.`);
-        this.emit('bossWin');
-        this.notify(`Alpha ${def.name} defeated! +${alpha.reward.gold.toLocaleString()} gold`, 'gold', 5000);
-      } else {
-        this.push(`Alpha ${def.name} defeated again. +${reward.gold} gold.`);
-      }
-    } else if (w.kind === 'tower' && w.refId) {
-      const tower = towerById(w.refId);
-      if (!save.progress.towers.includes(w.refId)) save.progress.towers.push(w.refId);
-      this.push(`${tower.boss} defeated — ${tower.name} cleared!`);
-      this.emit('towerWin');
-      this.notify(`🏰 ${tower.name} cleared!`, 'gold', 6000);
-    } else if (w.kind === 'raid' && w.refId) {
-      const raid = raidById(w.refId);
-      const chest = completeRaid(save, raid);
-      this.push(`${raid.name} defeated! ${describeRaidChest(chest, raid.name, itemName)}.`);
-      this.emit('towerWin');
-      this.notify(`🔮 ${raid.name} defeated — egg in the incubator`, 'gold', 6000);
-    }
-    this.spawn();
-  }
+  private defeat(w: Wild, byClick = false) { resolveDefeat(this, w, byClick); }
 
   spawn() {
     this.wild = spawnWild(this.route);
-    if (this.wild.lucky) { this.emit('luckySpawn'); this.notify(`✨ A Lucky ${palById(this.wild.palId).name} appeared!`, 'warn', 5000); }
+    if (this.wild.lucky) { this.emit('luckySpawn'); this.notifyT('✨ A Lucky {pal} appeared!', { pal: palById(this.wild.palId).name }, 'warn', 5000); }
     else if (this.watched.has(this.wild.palId)) { const pv = catchPreview(this.save, this.wild.palId, this.wild.lucky, this.wild.kind === 'alpha'); this.notify(`👀 ${palById(this.wild.palId).name} is here!${pv.throws ? ` 🎯 ${Math.round(pv.chance * 100)}%` : ''}`, 'info', 3000); }
   }
 
@@ -350,70 +283,27 @@ export class Game {
     this.spawn();
   }
 
-  startAlpha(id: string) {
-    const a = alphaById(id);
-    if (!isUnlocked(this.save, a.unlock)) return;
-    this.wild = spawnBoss(a.palId, a.level, wildHp(a.level) * a.hpMult, 'alpha', id, Date.now() + ALPHA_TIME_LIMIT_SEC * 1000 * clockMult(this.save));
-    { const pv = catchPreview(this.save, a.palId, false, true); this.push(`Alpha ${palById(a.palId).name} appears — ${ALPHA_TIME_LIMIT_SEC / 60} minutes on the clock.`, pv.throws ? { chance: pv.chance } : {}); }
-  }
-
-  startTower(id: string) {
-    const t = towerById(id);
-    if (!isUnlocked(this.save, t.unlock)) return;
-    this.wild = spawnBoss(t.palId, t.level, t.hp, 'tower', id, Date.now() + t.timeLimitSec * 1000 * clockMult(this.save));
-    this.push(`${t.boss} — ${t.timeLimitSec / 60} minutes on the clock.`);
-  }
-
-  flee() {
-    if (this.run) { this.endRun('Retreated'); return; }
-    if (this.wild?.kind === 'raid') { this.push(`Retreated from ${palById(this.wild.palId).name} — the slab is spent.`); this.spawn(); return; }
-    this.push('Retreated.');
-    this.spawn();
-  }
+  startAlpha(id: string) { startAlpha(this, id); }
+  startTower(id: string) { startTower(this, id); }
+  flee() { flee(this); }
 
   // ---- expeditions -------------------------------------------------------
 
   sendExpedition(defId: string, uids: string[]): boolean {
     const ok = send(this.save, defId, uids);
-    if (ok) this.push(`${uids.length} Pal${uids.length === 1 ? '' : 's'} left for ${expeditionById(defId).name}.`);
+    if (ok) this.pushT('{n} Pal(s) left for {expedition}.', { n: uids.length, expedition: expeditionById(defId).name });
     return ok;
   }
 
   clearReports() { clearReports(this.save); }
 
-  // ---- raids -------------------------------------------------------------
+  // ---- raids / realms (see encounters.ts) --------------------------------
 
-  canSummon(raidId: string): boolean { return !this.run && !this.inBossFight && summonBlocker(this.save, raidId) === null; }
-
-  summonRaid(raidId: string) {
-    if (!this.canSummon(raidId)) return;
-    const boss = summon(this.save, raidId);
-    if (!boss) return;
-    this.wild = boss;
-    const def = raidById(raidId);
-    this.push(`${def.name} answers the altar — ${(def.hp / 1000).toLocaleString()}k HP, ${def.timeLimitSec / 60} minutes.`);
-    this.emit('summon');
-  }
-
-  // ---- dungeons ----------------------------------------------------------
-
-  canEnter(dungeonId: string): boolean { return !this.run && !this.inBossFight && dungeonUnlocked(this.save, dungeonId); }
-
-  enterDungeon(dungeonId: string) {
-    if (!this.canEnter(dungeonId)) return;
-    this.run = startRun(dungeonId);
-    this.wild = spawnFor(this.run);
-    const def = dungeonById(dungeonId);
-    this.push(`Entered ${def.name} — ${def.waves} waves and ${bossName(dungeonId)} in ${def.timeLimitSec / 60} minutes.`);
-  }
-
-  private endRun(why: string) {
-    const run = this.run!;
-    const earned = run.gold > 0 || Object.keys(run.items).length > 0;
-    this.push(`${why} — left ${dungeonById(run.id).name}${earned ? ` with ${run.gold} gold and ${Object.values(run.items).reduce((a, b) => a + b, 0)} items` : ''}.`);
-    this.run = null;
-    this.spawn();
-  }
+  canSummon(raidId: string): boolean { return canSummon(this, raidId); }
+  summonRaid(raidId: string) { summonRaid(this, raidId); }
+  canEnter(dungeonId: string): boolean { return canEnter(this, dungeonId); }
+  enterDungeon(dungeonId: string) { enterDungeon(this, dungeonId); }
+  private endRun(why: string) { endRun(this, why); }
 
   // ---- party / box -------------------------------------------------------
 
@@ -458,12 +348,12 @@ export class Game {
   build(id: string) {
     if (!build(this.save, id)) return;
     const level = this.save.base.structures[id];
-    this.push(`Built ${structureById(id).name}${level > 1 ? ` Lv ${level}` : ''}.`);
+    if (level > 1) this.pushT('Built {structure} Lv {level}.', { structure: structureById(id).name, level }); else this.pushT('Built {structure}.', { structure: structureById(id).name });
   }
 
   craft(recipeId: string, n: number) {
     const queued = enqueue(this.save, recipeId, n);
-    if (queued > 0) this.push(`Queued ${queued}× ${recipeById(recipeId).name}.`);
+    if (queued > 0) this.pushT('Queued {n}× {recipe}.', { n: queued, recipe: recipeById(recipeId).name });
   }
 
   cancelCraft(index: number) { cancelCraft(this.save, index); }
@@ -475,14 +365,14 @@ export class Game {
   setPair(aUid: string, bUid: string) {
     if (setPair(this.save, aUid, bUid)) {
       const a = instanceByUid(this.save, aUid)!; const b = instanceByUid(this.save, bUid)!;
-      this.push(`${palById(a.palId).name} and ${palById(b.palId).name} moved to the Breeding Farm.`);
+      this.pushT('{a} and {b} moved to the Breeding Farm.', { a: palById(a.palId).name, b: palById(b.palId).name });
     }
   }
 
   clearPair() { clearPair(this.save); }
 
   research(techId: string) {
-    if (research(this.save, techId)) this.push(`Researched ${techById(techId).name}.`);
+    if (research(this.save, techId)) this.pushT('Researched {tech}.', { tech: techById(techId).name });
   }
 
   condense(uid: string) {
@@ -505,19 +395,19 @@ export class Game {
 
   buyItem(itemId: string, n = 1): boolean {
     const got = buy(this.save, itemId, n);
-    if (got > 0) this.push(`Bought ${got} ${itemName(itemId)}.`);
+    if (got > 0) this.pushT('Bought {n} {item}.', { n: got, item: itemName(itemId) });
     return got > 0;
   }
 
   sellItem(itemId: string, n = 1): boolean {
     const gold = sell(this.save, itemId, n);
-    if (gold > 0) { this.push(`Sold ${itemName(itemId)} for ${gold.toLocaleString()} gold.`); this.notify(`💰 +${gold.toLocaleString()} gold`, 'gold', 2500); }
+    if (gold > 0) { this.pushT('Sold {item} for {gold} gold.', { item: itemName(itemId), gold: gold.toLocaleString() }); this.notifyT('💰 +{gold} gold', { gold: gold.toLocaleString() }, 'gold', 2500); }
     return gold > 0;
   }
 
   setDailyReset(mode: DailyReset) {
     this.save.settings.dailyReset = mode;
-    if (rollDaily(this.save)) this.push('Daily quests re-rolled for the new reset time.');
+    if (rollDaily(this.save)) this.pushT('Daily quests re-rolled for the new reset time.');
   }
 
   setSpherePolicy(kind: 'new' | 'dupe', policy: SpherePolicy) {
@@ -533,6 +423,18 @@ export class Game {
   }
 
   exportString(): string { return exportSave(this.save); }
+  /** Compact code for pasting into another device; see decodeSaveCode. */
+  saveCode(): Promise<string> { return encodeSaveCode(this.save); }
+  async importCode(code: string): Promise<boolean> {
+    const s = await decodeSaveCode(code);
+    if (!s) return false;
+    this.save = s;
+    this.run = null;
+    this.spawn();
+    this.persist();
+    this.pushT('Save imported.');
+    return true;
+  }
 
   importString(encoded: string): boolean {
     const s = importSave(encoded);
@@ -540,7 +442,7 @@ export class Game {
     this.save = s;
     this.spawn();
     this.persist();
-    this.push('Save imported.');
+    this.pushT('Save imported.');
     return true;
   }
 
@@ -549,11 +451,18 @@ export class Game {
     this.save = newState();
     this.log = [];
     this.spawn();
-    this.push('New game.');
+    this.pushT('New game.');
   }
 
-  private push(text: string, extra: { chance?: number; landed?: boolean } = {}) {
-    this.log = [{ at: Date.now(), kind: classifyLog(text), text, ...extra }, ...this.log].slice(0, LOG_LINES);
+  push(text: string, extra: { chance?: number; landed?: boolean } = {}, msg?: LogMessage) {
+    this.log = [{ at: Date.now(), kind: classifyLog(text), text, ...extra, ...(msg ? { msg } : {}) }, ...this.log].slice(0, LOG_LINES);
+  }
+  notifyT(key: string, vars: Record<string, string | number> = {}, kind: ToastKind = 'info', ms = 4000) {
+    this.notify(fillTemplate(key, vars), kind, ms, { key, vars });
+  }
+  /** push() from a template: the English text is built here, the template travels with the entry for translation. */
+  pushT(key: string, vars: Record<string, string | number> = {}, extra: { chance?: number; landed?: boolean } = {}) {
+    this.push(fillTemplate(key, vars), extra, { key, vars });
   }
 }
 

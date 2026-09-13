@@ -4,7 +4,7 @@
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { catchPreview } from '../engine/catch';
   import { ui } from '../state/ui.svelte';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
   import { spawnTable } from '../engine/arenafilter';
   import { catchText, pct } from './catchText';
   import { describeRequirement, isUnlocked } from '../engine/progress';
@@ -50,27 +50,27 @@
 <div class="panel">
   <div class="row head">
     <h3 class="grow">{filtering ? `${t('panel.bosses')} — ${rows.length} / ${total}` : t('panel.bosses')}</h3>
-    <input type="search" placeholder="Search bosses…" bind:value={filter.query} aria-label="Search bosses" />
-    <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+    <input type="search" placeholder={tr("Search bosses…")} bind:value={filter.query} aria-label={tr("Search bosses")} />
+    <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
   </div>
   {#if open}
     <div class="filters">
-      <select bind:value={filter.kind} aria-label="Boss kind">
-        <option value="any">Any kind</option>
-        {#each Object.entries(BOSS_KIND_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+      <select bind:value={filter.kind} aria-label={tr("Boss kind")}>
+        <option value="any">{tr("Any kind")}</option>
+        {#each Object.entries(BOSS_KIND_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
       </select>
-      <select bind:value={filter.status} aria-label="Boss status">
-        {#each Object.entries(BOSS_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+      <select bind:value={filter.status} aria-label={tr("Boss status")}>
+        {#each Object.entries(BOSS_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
       </select>
-      <select bind:value={filter.element} aria-label="Boss element">
-        <option value="any">Any element</option>
+      <select bind:value={filter.element} aria-label={tr("Boss element")}>
+        <option value="any">{tr("Any element")}</option>
         {#each ELEMENTS as e}<option value={e}>{e}</option>{/each}
       </select>
-      {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+      {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
     </div>
   {/if}
   {#if filtering}
-    {#if rows.length === 0}<p class="muted small">No boss matches. <button class="small" onclick={clear}>Clear</button></p>{/if}
+    {#if rows.length === 0}<p class="muted small">{tr("No boss matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>{/if}
     {#each grouped as [regionName, list] (regionName)}
       <div class="muted small region-title">{regionName}</div>
       <div class="found">
@@ -96,7 +96,7 @@
     <button class:primary={towerUnlocked && !towerDone}
       disabled={!towerUnlocked || game.inBossFight} onclick={() => game.startTower(tower.id)}
       title={towerUnlocked ? `Tower boss — a human and their Pal, so nothing to catch. Clears the tower${towerDone ? ' (already cleared)' : ''}.` : describeRequirement(tower.unlock)}>
-      {tower.boss}{towerDone ? ' ✓' : ''}{#if towerUnlocked} <span class="odds no">🎯 no catch</span>{/if}
+      {tower.boss}{towerDone ? ' ✓' : ''}{#if towerUnlocked} <span class="odds no">{tr("🎯 no catch")}</span>{/if}
     </button>
   </div>
   {#if hasAltar}
@@ -107,7 +107,7 @@
         {@const slabs = countOf(game.save, r.slabItemId)}
         <button class="raid-btn" class:primary={!block && wins === 0} disabled={!game.canSummon(r.id)} onclick={() => game.summonRaid(r.id)}
           title={block === 'locked' ? describeRequirement(r.unlock) : block ? RAID_BLOCK[block] : `${(r.hp / 1000).toLocaleString()}k HP in ${r.timeLimitSec / 60} minutes. Win: ${r.reward.gold.toLocaleString()} gold, loot, and a ${r.name} egg that inherits passives from your party (${pct(r.luckyChance)} Lucky).`}>
-          🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} <ItemIcon id={r.slabItemId} size={14} /> {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>{#if block !== 'locked'} <span class="odds egg" title="No sphere: winning gives a {r.name} egg, {pct(r.luckyChance)} Lucky">🥚 egg · ✨ {pct(r.luckyChance)}</span>{/if}
+          🔮 {r.name} <span class="muted">Lv {r.level} · {slabs} <ItemIcon id={r.slabItemId} size={14} /> {itemName(r.slabItemId)}{slabs === 1 ? '' : 's'}{wins ? ` · won ×${wins}` : ''}</span>{#if block !== 'locked'} <span class="odds egg" title="No sphere: winning gives a {r.name} {tr("egg,")} {pct(r.luckyChance)} Lucky">{tr("🥚 egg · ✨")} {pct(r.luckyChance)}</span>{/if}
         </button>
       {/each}
     </div>

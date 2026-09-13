@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { ELEMENTS } from '../data/types';
   import { DEFAULT_SPAWN_FILTER, filterSpawns, isSpawnFiltering, spawnTable, SPAWN_STATUS_LABEL, type SpawnFilter, type SpawnTable } from '../engine/arenafilter';
@@ -20,25 +21,25 @@
 </script>
 
 <div class="row head">
-  <span class="grow muted small">{where ?? `On ${game.route.name}`} <b>{filtering ? `${rows.length} of ${all.length}` : all.length}</b> species</span>
-  <input type="search" placeholder="Search…" bind:value={filter.query} aria-label="Search spawns" />
-  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+  <span class="grow muted small">{where ?? `On ${game.route.name}`} <b>{filtering ? `${rows.length} of ${all.length}` : all.length}</b> {tr("species")}</span>
+  <input type="search" placeholder={tr("Search…")} bind:value={filter.query} aria-label={tr("Search spawns")} />
+  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
 </div>
 {#if open}
   <div class="filters">
-    <select bind:value={filter.status} aria-label="Spawn status">
-      {#each Object.entries(SPAWN_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.status} aria-label={tr("Spawn status")}>
+      {#each Object.entries(SPAWN_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.element} aria-label="Spawn element">
-      <option value="any">Any element</option>
+    <select bind:value={filter.element} aria-label={tr("Spawn element")}>
+      <option value="any">{tr("Any element")}</option>
       {#each ELEMENTS as e}<option value={e}>{e}</option>{/each}
     </select>
-    <label class="chk"><input type="checkbox" bind:checked={filter.watchedOnly} /> 👀 Watched</label>
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+    <label class="chk"><input type="checkbox" bind:checked={filter.watchedOnly} /> {tr("👀 Watched")}</label>
+    {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
 {/if}
 {#if rows.length === 0}
-  <p class="muted small">No species matches. <button class="small" onclick={clear}>Clear</button></p>
+  <p class="muted small">{tr("No species matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>
 {/if}
 <div class="spawns">
   {#each rows as r (r.palId)}
@@ -55,12 +56,12 @@
   {#if guardian !== undefined && guardianPv}
     <div class="spawn row guardian" class:here={game.wild?.palId === guardian && game.wild?.kind === 'dungeonBoss'}>
       <PalIcon palId={guardian} size={28} />
-      <span class="grow"><b>{palById(guardian).name}</b> <span class="muted small">· guardian, after the last wave</span></span>
+      <span class="grow"><b>{palById(guardian).name}</b> <span class="muted small">{tr("· guardian, after the last wave")}</span></span>
       <span class="small chance odds" class:no={!guardianPv.throws} title={`Catch: ${catchText(guardianPv)}`}>🎯 {guardianPv.throws ? pct(guardianPv.chance) : '—'}</span>
     </div>
   {/if}
 </div>
-<p class="muted tiny">{prefs.showOdds ? 'First number: each species\' share of the spawn table. 🎯: catch odds with the sphere your policy picks (Settings → Catching).' : 'Odds are each species\' share of the spawn table.'} Watched Pals pop a toast when they appear (this device only).</p>
+<p class="muted tiny">{prefs.showOdds ? 'First number: each species\' share of the spawn table. 🎯: catch odds with the sphere your policy picks (Settings → Catching).' : 'Odds are each species\' share of the spawn table.'} {tr("Watched Pals pop a toast when they appear (this device only).")}</p>
 
 <style>
   .head { margin-bottom: 0.3rem; }

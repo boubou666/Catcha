@@ -8,7 +8,7 @@
   import { prefs } from '../state/prefs.svelte';
   import { ui } from '../state/ui.svelte';
   import WorldMap from './WorldMap.svelte';
-  import { t } from '../i18n/index.svelte';
+  import { t, t as tr } from '../i18n/index.svelte';
 
   let filter = $state<RouteFilter>({ ...DEFAULT_ROUTE_FILTER });
   let open = $state(false);
@@ -31,13 +31,13 @@
   {#if folded}
     <div class="row head">
       <h3 class="grow">📍 {game.route.name} <span class="muted">Lv {game.route.level} · {game.region.name} · {routeKills(game.save, game.route.id)} / {routeQuota(game.save, game.route)}</span></h3>
-      <input type="search" placeholder={t('routes.search')} bind:value={filter.query} aria-label="Search routes" />
+      <input type="search" placeholder={t('routes.search')} bind:value={filter.query} aria-label={tr("Search routes")} />
       <button class="small fold" onclick={() => prefs.setRoutesOpen(true)} title={prefs.routesView === 'map' ? t('routes.showMap') : t('routes.showRoutes')} aria-expanded="false">▾</button>
     </div>
   {:else if prefs.routesView === 'map' && !filtering}
     <div class="row head">
       <h3 class="grow">{t('routes.map')} — {game.region.name}</h3>
-      <input type="search" placeholder={t('routes.search')} bind:value={filter.query} aria-label="Search routes" />
+      <input type="search" placeholder={t('routes.search')} bind:value={filter.query} aria-label={tr("Search routes")} />
       <button class="small fold" onclick={() => prefs.setRoutesOpen(false)} title={t('routes.minimizeMap')} aria-expanded="true">▴</button>
     </div>
     <WorldMap />
@@ -51,26 +51,26 @@
   {/if}
   <div class="row head">
     <h3 class="grow">{filtering ? `${t('routes.routes')} — ${rows.length} / ${total}` : `${t('routes.routes')} — ${game.region.name}`}</h3>
-    <input type="search" placeholder={t('routes.search')} bind:value={filter.query} aria-label="Search routes" />
+    <input type="search" placeholder={t('routes.search')} bind:value={filter.query} aria-label={tr("Search routes")} />
     <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{t('routes.filters')}{filtering ? ' •' : ''}</button>
     {#if !filtering}<button class="small" onclick={() => prefs.setRoutesView('map')} title={t('routes.showMap')}>🗺 {t('routes.map')}</button><button class="small fold" onclick={() => prefs.setRoutesOpen(false)} title={t('routes.minimizeRoutes')} aria-expanded="true">▴</button>{/if}
   </div>
   {#if open}
     <div class="filters">
-      <select bind:value={filter.status} aria-label="Route status">
-        {#each Object.entries(ROUTE_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+      <select bind:value={filter.status} aria-label={tr("Route status")}>
+        {#each Object.entries(ROUTE_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
       </select>
-      <select bind:value={filter.element} aria-label="Element">
-        <option value="any">Any element</option>
+      <select bind:value={filter.element} aria-label={tr("Element")}>
+        <option value="any">{tr("Any element")}</option>
         {#each ELEMENTS as e}<option value={e}>{e}</option>{/each}
       </select>
-      {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+      {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
     </div>
   {/if}
 
   {#if filtering}
     {#if rows.length === 0}
-      <p class="muted small">No route matches. <button class="small" onclick={clear}>Clear</button></p>
+      <p class="muted small">{tr("No route matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>
     {/if}
     {#each grouped as group (group[0].region.id)}
       {#if game.regions.length > 1}<div class="muted small region-title">{group[0].region.name}</div>{/if}

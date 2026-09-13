@@ -6,6 +6,16 @@ export interface LogEntry {
   text: string;
   chance?: number;             // catch odds attached to this line (a throw's, or a boss's on arrival)
   landed?: boolean;            // for a throw: did it catch
+  msg?: LogMessage;            // the same line as a template + values, for translation
+}
+
+export interface LogMessage { key: string; vars?: Record<string, string | number> }
+
+/** Fill a template's {name} slots. */
+export function fillTemplate(key: string, vars?: Record<string, string | number>): string {
+  let s = key;
+  if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
+  return s;
 }
 
 /** Realized vs expected odds over the throws among these entries (lines with a chance and a landed flag). */

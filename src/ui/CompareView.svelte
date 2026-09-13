@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { compare } from '../state/compare.svelte';
   import { palById } from '../data/pals';
@@ -28,24 +29,24 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Compare <span class="muted">{insts.length} / {MAX_COMPARE}</span></h2>
-  {#if insts.length}<button class="small" onclick={() => compare.clear()}>Clear</button>{/if}
+  <h2 class="grow">{tr("Compare")} <span class="muted">{insts.length} / {MAX_COMPARE}</span></h2>
+  {#if insts.length}<button class="small" onclick={() => compare.clear()}>{tr("Clear")}</button>{/if}
 </div>
-<p class="muted small">Pick up to {MAX_COMPARE} Pals here or with the ⚖ button in the Box. Best value per row is highlighted; work rows are effective output after stars, passives and sanity.</p>
+<p class="muted small">{tr("Pick up to")} {MAX_COMPARE} Pals here or with the ⚖ button in the Box. Best value per row is highlighted; work rows are effective output after stars, passives and sanity.</p>
 
 {#if insts.length === 0}
-  <p class="muted">Nothing selected yet — add Pals from the list below.</p>
+  <p class="muted">{tr("Nothing selected yet — add Pals from the list below.")}</p>
 {:else}
   <div class="row rowbar">
-    <input type="search" placeholder="Search rows…" bind:value={rowFilter.query} aria-label="Search comparison rows" />
-    <select bind:value={rowFilter.group} aria-label="Row group">
-      {#each Object.entries(ROW_GROUP_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <input type="search" placeholder={tr("Search rows…")} bind:value={rowFilter.query} aria-label={tr("Search comparison rows")} />
+    <select bind:value={rowFilter.group} aria-label={tr("Row group")}>
+      {#each Object.entries(ROW_GROUP_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <label class="chk"><input type="checkbox" bind:checked={rowFilter.differencesOnly} /> Differences only</label>
+    <label class="chk"><input type="checkbox" bind:checked={rowFilter.differencesOnly} /> {tr("Differences only")}</label>
     <span class="muted small">{rowFiltering ? `${rows.length} of ${allRows.length} rows` : `${allRows.length} rows`}</span>
-    {#if rowFiltering}<button class="small" onclick={clearRows}>Clear</button>{/if}
+    {#if rowFiltering}<button class="small" onclick={clearRows}>{tr("Clear")}</button>{/if}
   </div>
-  {#if rows.length === 0}<p class="muted small">No row matches.</p>{/if}
+  {#if rows.length === 0}<p class="muted small">{tr("No row matches.")}</p>{/if}
   <div class="scroll">
     <table>
       <thead>
@@ -56,7 +57,7 @@
               <PalIcon palId={p.palId} size={40} lucky={p.lucky} />
               <div class="small"><b>{palById(p.palId).name}</b></div>
               <PassiveChips ids={p.passives} />
-              <button class="tiny" title="Remove" onclick={() => compare.remove(p.uid)}>✕</button>
+              <button class="tiny" title={tr("Remove")} onclick={() => compare.remove(p.uid)}>✕</button>
             </th>
           {/each}
         </tr>
@@ -79,20 +80,20 @@
   <div class="picker">
     <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search Pals to compare">
       {#snippet heading()}
-        <h3 class="grow">Add to comparison <span class="muted">{filtering ? `${candidates.length} of ${others}` : candidates.length}</span></h3>
+        <h3 class="grow">{tr("Add to comparison")} <span class="muted">{filtering ? `${candidates.length} of ${others}` : candidates.length}</span></h3>
       {/snippet}
     </BoxFilterBar>
-    {#if compare.full}<p class="muted small">Selection is full — remove one above to add another.</p>{/if}
+    {#if compare.full}<p class="muted small">{tr("Selection is full — remove one above to add another.")}</p>{/if}
     {#if candidates.length === 0}
-      <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+      <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
     {/if}
     <div class="list">
       {#each candidates as p (p.uid)}
         {@const status = statusOf(save, p.uid)}
         <PalCard inst={p} showWork>
-          {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
+          {#if status !== 'idle'}<span class="muted small">{tr(STATUS_LABEL[status]).toLowerCase()}</span>{/if}
           <CatchOdds palId={p.palId} />
-          <button class="small" disabled={compare.full} onclick={() => compare.toggle(p.uid)}>⚖ Add</button>
+          <button class="small" disabled={compare.full} onclick={() => compare.toggle(p.uid)}>{tr("⚖ Add")}</button>
         </PalCard>
       {/each}
     </div>

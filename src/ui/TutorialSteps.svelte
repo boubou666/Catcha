@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { DEFAULT_TUTORIAL_FILTER, filterTutorial, STEP_STATUS_LABEL, TUTORIAL, type TutorialFilter } from '../engine/tutorial';
 
@@ -12,22 +13,22 @@
 </script>
 
 <div class="row">
-  <input type="search" placeholder="Search steps…" bind:value={filter.query} aria-label="Search tutorial steps" />
-  <select bind:value={filter.status} aria-label="Step status">
-    {#each Object.entries(STEP_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+  <input type="search" placeholder={tr("Search steps…")} bind:value={filter.query} aria-label={tr("Search tutorial steps")} />
+  <select bind:value={filter.status} aria-label={tr("Step status")}>
+    {#each Object.entries(STEP_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
   </select>
   <span class="muted small">{filtering ? `${rows.length} of ${TUTORIAL.length}` : `${TUTORIAL.length} steps`}</span>
-  {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+  {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
 </div>
 {#if rows.length === 0}
-  <p class="muted small">No step matches. <button class="small" onclick={clear}>Clear</button></p>
+  <p class="muted small">{tr("No step matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>
 {/if}
 <ol class="steps">
   {#each rows as r (r.step.id)}
     <li class={r.status}>
       <span class="mark">{MARK[r.status]}</span>
       <div class="grow">
-        <div><b>{r.index + 1}. {r.step.title}</b> <span class="muted small">{STEP_STATUS_LABEL[r.status]}</span></div>
+        <div><b>{r.index + 1}. {r.step.title}</b> <span class="muted small">{tr(STEP_STATUS_LABEL[r.status])}</span></div>
         <div class="muted small">{r.step.text}</div>
       </div>
       {#if r.step.tab && go}<button class="small" onclick={() => go!(r.step.tab!)}>Go →</button>{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import type { Snippet } from 'svelte';
   import { DEFAULT_FILTER, isFiltering, SORT_LABEL, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
   import { ELEMENTS } from '../data/types';
@@ -15,32 +16,32 @@
 
 <div class="row">
   {@render heading()}
-  <input type="search" placeholder="Search name, #, element, passive…" bind:value={filter.query} aria-label={label} />
-  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+  <input type="search" placeholder={tr("Search name, #, element, passive…")} bind:value={filter.query} aria-label={label} />
+  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
 </div>
 
 {#if open}
   <div class="filters">
-    <select bind:value={filter.element} aria-label="Element">
-      <option value="any">Any element</option>
+    <select bind:value={filter.element} aria-label={tr("Element")}>
+      <option value="any">{tr("Any element")}</option>
       {#each ELEMENTS as e}<option value={e}>{e}</option>{/each}
     </select>
-    <select bind:value={filter.work} aria-label="Work suitability">
-      <option value="any">Any work</option>
+    <select bind:value={filter.work} aria-label={tr("Work suitability")}>
+      <option value="any">{tr("Any work")}</option>
       {#each JOBS as j}<option value={j.type}>{j.icon} {j.type}</option>{/each}
     </select>
     {#if !hideStatus}
-      <select bind:value={filter.status} aria-label="Status">
+      <select bind:value={filter.status} aria-label={tr("Status")}>
         {#each Object.entries(STATUS_LABEL) as [k, text]}<option value={k}>{text}</option>{/each}
       </select>
     {/if}
-    <select bind:value={filter.sort} aria-label="Sort">
-      {#each Object.entries(SORT_LABEL) as [k, text]}<option value={k}>Sort: {text}</option>{/each}
+    <select bind:value={filter.sort} aria-label={tr("Sort")}>
+      {#each Object.entries(SORT_LABEL) as [k, text]}<option value={k}>{tr("Sort:")} {text}</option>{/each}
     </select>
-    <label class="chk"><input type="checkbox" bind:checked={filter.lucky} /> ✨ Lucky</label>
-    <label class="chk"><input type="checkbox" bind:checked={filter.starred} /> ★ Starred</label>
-    <label class="chk"><input type="checkbox" bind:checked={filter.dupes} /> Duplicates</label>
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+    <label class="chk"><input type="checkbox" bind:checked={filter.lucky} /> {tr("✨ Lucky")}</label>
+    <label class="chk"><input type="checkbox" bind:checked={filter.starred} /> {tr("★ Starred")}</label>
+    <label class="chk"><input type="checkbox" bind:checked={filter.dupes} /> {tr("Duplicates")}</label>
+    {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
 {/if}
 

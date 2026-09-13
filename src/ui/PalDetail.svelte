@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { palById, paldeckNumber } from '../data/pals';
   import { itemName } from '../data/items';
@@ -55,11 +56,11 @@
         <div class="muted small">{paldeckNumber(def)}{def.variantOf ? ` · subspecies of ${name(def.variantOf)}` : ''}</div>
         <h2 id="pal-title">{seen ? def.name : '???'}</h2>
         <div class="muted">{seen ? `${def.elements.join(' / ')} · ${def.rarity}` : 'Unknown element'}</div>
-        {#if seen && def.partnerSkill}<div class="small partner" title="Partner skill">🤝 {describePartner(def)}</div>{/if}
+        {#if seen && def.partnerSkill}<div class="small partner" title={tr("Partner skill")}>🤝 {describePartner(def)}</div>{/if}
         {#if owned.count > 0}
-          <div class="small">Owned ×{owned.count}{owned.best ? ` · best Lv ${owned.best.level}${owned.best.stars ? ' ' + '★'.repeat(owned.best.stars) : ''}` : ''}</div>
-        {:else if seen}<div class="muted small">Seen, not yet caught</div>
-        {:else}<div class="muted small">Not yet encountered</div>{/if}
+          <div class="small">{tr("Owned ×")}{owned.count}{owned.best ? ` · best Lv ${owned.best.level}${owned.best.stars ? ' ' + '★'.repeat(owned.best.stars) : ''}` : ''}</div>
+        {:else if seen}<div class="muted small">{tr("Seen, not yet caught")}</div>
+        {:else}<div class="muted small">{tr("Not yet encountered")}</div>{/if}
       </div>
       <button class="small" onclick={onclose}>✕</button>
     </div>
@@ -67,80 +68,80 @@
     {#if seen}
       <section class="cols">
         <div>
-          <h3>Stats</h3>
-          <div class="small">HP {def.baseHp} · ATK {def.baseAttack} · DEF {def.baseDefense}<br />Breeding rank {def.breedPower}</div>
+          <h3>{tr("Stats")}</h3>
+          <div class="small">HP {def.baseHp} {tr("· ATK")} {def.baseAttack} {tr("· DEF")} {def.baseDefense}<br />{tr("Breeding rank")} {def.breedPower}</div>
         </div>
         <div>
-          <h3>Work</h3>
-          <div class="small">{#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}{#if work.length === 0}<span class="muted">none</span>{/if}
-            {#if def.farmDrop}<div class="muted">Ranch: <ItemIcon id={def.farmDrop.itemId} size={16} label /></div>{/if}</div>
+          <h3>{tr("Work")}</h3>
+          <div class="small">{#each work as [job, lvl]}<span class="job" title={job}>{JOB_ICON[job]}{lvl}</span>{/each}{#if work.length === 0}<span class="muted">{tr("none")}</span>{/if}
+            {#if def.farmDrop}<div class="muted">{tr("Ranch:")} <ItemIcon id={def.farmDrop.itemId} size={16} label /></div>{/if}</div>
         </div>
         <div>
-          <h3>Drops</h3>
-          <div class="small drops">{#if caught}{#each def.drops as d (d.itemId)}<span class="drop"><ItemIcon id={d.itemId} size={16} label />{#if d.chance < 1}<span class="muted"> ({pct(d.chance)})</span>{/if}</span>{/each}{:else}<span class="muted">catch one to learn</span>{/if}</div>
+          <h3>{tr("Drops")}</h3>
+          <div class="small drops">{#if caught}{#each def.drops as d (d.itemId)}<span class="drop"><ItemIcon id={d.itemId} size={16} label />{#if d.chance < 1}<span class="muted"> ({pct(d.chance)})</span>{/if}</span>{/each}{:else}<span class="muted">{tr("catch one to learn")}</span>{/if}</div>
         </div>
       </section>
       <section>
-        <h3>Catching</h3>
+        <h3>{tr("Catching")}</h3>
         <div class="small">
-          <button class="link catchline" class:no={!preview.throws} onclick={() => { ui.requestTab = 'settings'; onclose(); }} title="Catch settings">🎯 Right now: {catchText(preview)}</button>
+          <button class="link catchline" class:no={!preview.throws} onclick={() => { ui.requestTab = 'settings'; onclose(); }} title={tr("Catch settings")}>{tr("🎯 Right now:")} {catchText(preview)}</button>
           <div class="tiers">
             {#each table as t (t.tier)}
-              <span class="tier" class:none={t.stock === 0} title={`${SPHERES[t.tier].name} — ${t.stock} in the bag`}><ItemIcon id={SPHERES[t.tier].itemId} size={16} /> {pct(t.chance)}{#if isAlpha}<span class="muted"> · Alpha {pct(t.alpha)}</span>{/if}</span>
+              <span class="tier" class:none={t.stock === 0} title={`${SPHERES[t.tier].name} — ${t.stock} in the bag`}><ItemIcon id={SPHERES[t.tier].itemId} size={16} /> {pct(t.chance)}{#if isAlpha}<span class="muted"> {tr("· Alpha")} {pct(t.alpha)}</span>{/if}</span>
             {/each}
           </div>
-          <div class="muted tiny">Per sphere, on a wild one at your Effigy and tech bonuses{isAlpha ? '; the Alpha figure includes the boss penalty' : ''}. Lucky Pals are caught at ×{LUCKY_CATCH_PENALTY}. Greyed spheres are out of stock.</div>
+          <div class="muted tiny">{tr("Per sphere, on a wild one at your Effigy and tech bonuses")}{isAlpha ? '; the Alpha figure includes the boss penalty' : ''}{tr(". Lucky Pals are caught at ×")}{LUCKY_CATCH_PENALTY}{tr(". Greyed spheres are out of stock.")}</div>
         </div>
       </section>
     {/if}
 
     {#if showControls}
       <div class="row controls">
-        <input type="search" placeholder="Search places, partners…" bind:value={filter.query} aria-label="Search habitat and breeding" />
-        <label class="chk"><input type="checkbox" bind:checked={filter.unlockedOnly} /> Reachable only</label>
-        <select bind:value={filter.pairs} aria-label="Pair kind">
-          {#each Object.entries(PAIR_KIND_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+        <input type="search" placeholder={tr("Search places, partners…")} bind:value={filter.query} aria-label={tr("Search habitat and breeding")} />
+        <label class="chk"><input type="checkbox" bind:checked={filter.unlockedOnly} /> {tr("Reachable only")}</label>
+        <select bind:value={filter.pairs} aria-label={tr("Pair kind")}>
+          {#each Object.entries(PAIR_KIND_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
         </select>
-        {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+        {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
       </div>
     {/if}
 
     <section>
-      <h3>Habitat {#if filtering}<span class="muted small">{places(habitat)} of {places(allHabitat)}</span>{/if}</h3>
-      {#if place}<div class="small best">🎯 Best place: <b>{place.routeName}</b> <span class="muted">({place.regionName}) · {pct(place.share)} of spawns × {pct(place.odds)} odds → about 1 catch per {Math.max(1, Math.round(1 / place.perDefeat))} defeat{Math.round(1 / place.perDefeat) === 1 ? '' : 's'}</span>{#if !game.inBossFight && game.route.id !== place.routeId}<button class="tiny" onclick={() => { game.travel(place.routeId); onclose(); }}>Go</button>{/if}</div>{/if}
+      <h3>{tr("Habitat")} {#if filtering}<span class="muted small">{places(habitat)} of {places(allHabitat)}</span>{/if}</h3>
+      {#if place}<div class="small best">{tr("🎯 Best place:")} <b>{place.routeName}</b> <span class="muted">({place.regionName}) · {pct(place.share)} {tr("of spawns ×")} {pct(place.odds)} {tr("odds → about 1 catch per")} {Math.max(1, Math.round(1 / place.perDefeat))} {tr("defeat")}{Math.round(1 / place.perDefeat) === 1 ? '' : 's'}</span>{#if !game.inBossFight && game.route.id !== place.routeId}<button class="tiny" onclick={() => { game.travel(place.routeId); onclose(); }}>Go</button>{/if}</div>{/if}
       {#if places(allHabitat) === 0}
-        <div class="muted small">Not found in the wild.</div>
+        <div class="muted small">{tr("Not found in the wild.")}</div>
       {:else if places(habitat) === 0}
-        <div class="muted small">No place matches.</div>
+        <div class="muted small">{tr("No place matches.")}</div>
       {/if}
       <ul class="small">
         {#each habitat.routes as r}
           {@const open = isUnlocked(save, routeById(r.routeId).unlock)}
-          <li class:locked={!open}>{r.routeName} <span class="muted">({r.regionName}, Lv {r.level}) · {pct(r.chance)} of spawns{open ? '' : ` · 🔒 ${describeRequirement(routeById(r.routeId).unlock)}`}</span>
+          <li class:locked={!open}>{r.routeName} <span class="muted">({r.regionName}, Lv {r.level}) · {pct(r.chance)} {tr("of spawns")}{open ? '' : ` · 🔒 ${describeRequirement(routeById(r.routeId).unlock)}`}</span>
             {#if open && !game.inBossFight && game.route.id !== r.routeId}<button class="tiny" onclick={() => { game.travel(r.routeId); onclose(); }}>Go</button>{/if}
-            <button class="tiny" onclick={() => { ui.showOnMap('route', r.routeId); onclose(); }} title="Show on the map">🗺</button></li>
+            <button class="tiny" onclick={() => { ui.showOnMap('route', r.routeId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>
         {/each}
-        {#each habitat.alphas as a}<li>Alpha in {a.regionName} <span class="muted">(Lv {a.level})</span> <span class="odds" class:no={!alphaPreview.throws} title={`Catch: ${catchText(alphaPreview)}`}>🎯 {alphaPreview.throws ? pct(alphaPreview.chance) : '—'}</span> <button class="tiny" onclick={() => { ui.showOnMap('alpha', a.alphaId); onclose(); }} title="Show on the map">🗺</button></li>{/each}
-        {#each habitat.towers as t}<li>{t.boss} — {t.name} <span class="muted">(tower boss, not catchable)</span> <button class="tiny" onclick={() => { ui.showOnMap('tower', t.towerId); onclose(); }} title="Show on the map">🗺</button></li>{/each}
-        {#each habitat.realms as d}<li>{d.name} <span class="muted">({d.role === 'guardian' ? 'guardian' : `${pct(d.chance)} of waves`}{isUnlocked(save, dungeonById(d.dungeonId).unlock) ? '' : ` · 🔒 ${describeRequirement(dungeonById(d.dungeonId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('realm', d.dungeonId); onclose(); }} title="Show on the map">🗺</button></li>{/each}
-        {#each habitat.raids as r}<li>{r.name} raid <span class="muted">(egg on victory{isUnlocked(save, raidById(r.raidId).unlock) ? '' : ` · 🔒 ${describeRequirement(raidById(r.raidId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('altar', 'altar'); onclose(); }} title="Show the altar on the map">🗺</button></li>{/each}
+        {#each habitat.alphas as a}<li>{tr("Alpha in")} {a.regionName} <span class="muted">(Lv {a.level})</span> <span class="odds" class:no={!alphaPreview.throws} title={`Catch: ${catchText(alphaPreview)}`}>🎯 {alphaPreview.throws ? pct(alphaPreview.chance) : '—'}</span> <button class="tiny" onclick={() => { ui.showOnMap('alpha', a.alphaId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>{/each}
+        {#each habitat.towers as t}<li>{t.boss} — {t.name} <span class="muted">{tr("(tower boss, not catchable)")}</span> <button class="tiny" onclick={() => { ui.showOnMap('tower', t.towerId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>{/each}
+        {#each habitat.realms as d}<li>{d.name} <span class="muted">({d.role === 'guardian' ? 'guardian' : `${pct(d.chance)} of waves`}{isUnlocked(save, dungeonById(d.dungeonId).unlock) ? '' : ` · 🔒 ${describeRequirement(dungeonById(d.dungeonId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('realm', d.dungeonId); onclose(); }} title={tr("Show on the map")}>🗺</button></li>{/each}
+        {#each habitat.raids as r}<li>{r.name} {tr("raid")} <span class="muted">{tr("(egg on victory")}{isUnlocked(save, raidById(r.raidId).unlock) ? '' : ` · 🔒 ${describeRequirement(raidById(r.raidId).unlock)}`})</span> <button class="tiny" onclick={() => { ui.showOnMap('altar', 'altar'); onclose(); }} title={tr("Show the altar on the map")}>🗺</button></li>{/each}
       </ul>
     </section>
 
     <section>
-      <h3>Breeding {#if filtering}<span class="muted small">{pairs(breeding)} of {pairs(allBreeding)}</span>{/if}</h3>
+      <h3>{tr("Breeding")} {#if filtering}<span class="muted small">{pairs(breeding)} of {pairs(allBreeding)}</span>{/if}</h3>
       <ul class="small">
-        {#if !filtering}<li>{seen ? def.name : 'It'} × {seen ? def.name : 'itself'} → {seen ? def.name : 'itself'} <span class="muted">(same species breeds true)</span></li>{/if}
-        {#if filtering && pairs(breeding) === 0}<li class="muted">No pair matches.</li>{/if}
+        {#if !filtering}<li>{seen ? def.name : 'It'} × {seen ? def.name : 'itself'} → {seen ? def.name : 'itself'} <span class="muted">{tr("(same species breeds true)")}</span></li>{/if}
+        {#if filtering && pairs(breeding) === 0}<li class="muted">{tr("No pair matches.")}</li>{/if}
         {#each breeding.producedBy as p}
           <li><button class="link" onclick={() => onselect(p.a)}>{name(p.a)}</button> × <button class="link" onclick={() => onselect(p.b)}>{name(p.b)}</button> → {seen ? def.name : '???'}
             <span class="muted">{p.special ? '(special combo)' : '(by breeding rank, from species you own)'}</span></li>
         {/each}
         {#each breeding.parentOf as p}
-          <li>{seen ? def.name : '???'} × <button class="link" onclick={() => onselect(p.partner)}>{name(p.partner)}</button> → <button class="link" onclick={() => onselect(p.child)}>{name(p.child)}</button> <span class="muted">(special combo)</span></li>
+          <li>{seen ? def.name : '???'} × <button class="link" onclick={() => onselect(p.partner)}>{name(p.partner)}</button> → <button class="link" onclick={() => onselect(p.child)}>{name(p.child)}</button> <span class="muted">{tr("(special combo)")}</span></li>
         {/each}
         {#if !filtering && allBreeding.producedBy.length === 0 && !def.variantOf}
-          <li class="muted">No owned pair lands on this rank yet — catch more species and check back.</li>
+          <li class="muted">{tr("No owned pair lands on this rank yet — catch more species and check back.")}</li>
         {/if}
       </ul>
     </section>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { DEFAULT_OFFLINE_FILTER, filterOfflineRows, isOfflineFiltering, OFFLINE_CAP_MS, OFFLINE_SHOW_LABEL, OFFLINE_SORT_LABEL, offlineRows, type OfflineFilter } from '../engine/offline';
   import { formatDuration } from './format';
@@ -19,29 +20,29 @@
 {#if report}
   <div class="backdrop">
     <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="offline-title">
-      <h2 id="offline-title">Welcome back</h2>
+      <h2 id="offline-title">{tr("Welcome back")}</h2>
       <p class="muted">
         Your base kept working for <b>{formatDuration(report.elapsedMs)}</b>{#if report.capped}
-          <span class="cap"> (capped at {formatDuration(OFFLINE_CAP_MS)})</span>{/if}.
+          <span class="cap"> {tr("(capped at")} {formatDuration(OFFLINE_CAP_MS)})</span>{/if}.
         Wild Pals don't fight while you're away.
       </p>
 
       {#if showControls}
         <div class="row controls">
-          <input type="search" placeholder="Search…" bind:value={filter.query} aria-label="Search the summary" />
-          <select bind:value={filter.show} aria-label="Show">
-            {#each Object.entries(OFFLINE_SHOW_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+          <input type="search" placeholder={tr("Search…")} bind:value={filter.query} aria-label={tr("Search the summary")} />
+          <select bind:value={filter.show} aria-label={tr("Show")}>
+            {#each Object.entries(OFFLINE_SHOW_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
           </select>
-          <select bind:value={filter.sort} aria-label="Sort">
-            {#each Object.entries(OFFLINE_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+          <select bind:value={filter.sort} aria-label={tr("Sort")}>
+            {#each Object.entries(OFFLINE_SORT_LABEL) as [k, label]}<option value={k}>{tr("Sort:")} {tr(label)}</option>{/each}
           </select>
           <span class="muted small">{filtering ? `${rows.length} of ${all.length}` : all.length}</span>
-          {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+          {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
         </div>
       {/if}
 
       {#if rows.length === 0}
-        <p class="muted small">Nothing matches. <button class="small" onclick={clear}>Clear</button></p>
+        <p class="muted small">{tr("Nothing matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>
       {/if}
       <table>
         <tbody>
@@ -51,7 +52,7 @@
         </tbody>
       </table>
 
-      <button class="primary" onclick={() => game.dismissOffline()}>Continue</button>
+      <button class="primary" onclick={() => game.dismissOffline()}>{tr("Continue")}</button>
     </div>
   </div>
 {/if}

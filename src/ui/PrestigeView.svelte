@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
@@ -55,25 +56,25 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Ascension <span class="muted">{save.prestige.ascensions} so far</span></h2>
-  <span class="relics">🏺 {relics} Ancient Relic{relics === 1 ? '' : 's'}</span>
+  <h2 class="grow">{tr("Ascension")} <span class="muted">{save.prestige.ascensions} {tr("so far")}</span></h2>
+  <span class="relics">🏺 {relics} {tr("Ancient Relic")}{relics === 1 ? '' : 's'}</span>
 </div>
 <p class="muted small">
   Start the map over for Ancient Relics and spend them on permanent upgrades. You keep your Paldeck records, achievements,
-  stats, daily quests and up to {slots} Pal{slots === 1 ? '' : 's'} of your choice (with levels, stars and passives). Everything else — routes,
+  stats, daily quests and up to {slots} {tr("Pal")}{slots === 1 ? '' : 's'} of your choice (with levels, stars and passives). Everything else — routes,
   towers, base, items, tech, level — resets.
 </p>
 
 <section>
   <div class="row">
-    <h3 class="grow">Ancient upgrades <span class="muted">{upFiltering ? `${upgrades.length} of ${PRESTIGE_UPGRADES.length}` : PRESTIGE_UPGRADES.length}</span></h3>
-    <input type="search" placeholder="Search upgrades…" bind:value={upFilter.query} aria-label="Search upgrades" />
-    <select bind:value={upFilter.status} aria-label="Upgrade status">
-      {#each Object.entries(UPGRADE_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <h3 class="grow">{tr("Ancient upgrades")} <span class="muted">{upFiltering ? `${upgrades.length} of ${PRESTIGE_UPGRADES.length}` : PRESTIGE_UPGRADES.length}</span></h3>
+    <input type="search" placeholder={tr("Search upgrades…")} bind:value={upFilter.query} aria-label={tr("Search upgrades")} />
+    <select bind:value={upFilter.status} aria-label={tr("Upgrade status")}>
+      {#each Object.entries(UPGRADE_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
   </div>
   {#if upgrades.length === 0}
-    <p class="muted">No upgrade matches. <button class="small" onclick={() => (upFilter = { ...DEFAULT_UPGRADE_FILTER })}>Clear</button></p>
+    <p class="muted">{tr("No upgrade matches.")} <button class="small" onclick={() => (upFilter = { ...DEFAULT_UPGRADE_FILTER })}>{tr("Clear")}</button></p>
   {/if}
   <div class="grid">
     {#each upgrades as { def: u, level: lv, cost } (u.id)}
@@ -82,32 +83,32 @@
         <div class="muted small">{u.desc} <span class="now">({effect(u.id)})</span></div>
         {#if cost !== null}
           <button class="small" class:primary={relics >= cost} disabled={relics < cost} onclick={() => game.buyUpgrade(u.id)}>🏺 {cost}</button>
-        {:else}<span class="small maxed-label">Maxed</span>{/if}
+        {:else}<span class="small maxed-label">{tr("Maxed")}</span>{/if}
       </div>
     {/each}
   </div>
 </section>
 
 <section>
-  <h3>Ascend</h3>
+  <h3>{tr("Ascend")}</h3>
   {#if !canAscend(save)}
-    <p class="muted small">Clear at least one tower first. Relics come from towers (1–7 each by region), every 10 species owned, and every 10 levels.</p>
+    <p class="muted small">{tr("Clear at least one tower first. Relics come from towers (1–7 each by region), every 10 species owned, and every 10 levels.")}</p>
   {:else}
-    <p class="small">This run is worth <b class="relics">🏺 {worth}</b> — {towersCleared} tower{towersCleared === 1 ? '' : 's'}, {Object.values(save.paldeck).filter((e) => e.caught > 0).length} species, level {save.player.level}.
-      {#each REGIONS as r, i}{#if !save.progress.towers.includes(r.tower.id)} <span class="muted">Next tower: +{i + 1}.</span>{/if}{/each}
+    <p class="small">{tr("This run is worth")} <b class="relics">🏺 {worth}</b> — {towersCleared} {tr("tower")}{towersCleared === 1 ? '' : 's'}, {Object.values(save.paldeck).filter((e) => e.caught > 0).length} {tr("species, level")} {save.player.level}.
+      {#each REGIONS as r, i}{#if !save.progress.towers.includes(r.tower.id)} <span class="muted">{tr("Next tower: +")}{i + 1}.</span>{/if}{/each}
     </p>
     <div class="row">
-      <h3 class="grow">Choose up to {slots} to carry <span class="muted">{keep.length} / {slots}</span></h3>
-      <button class="small" disabled={candidates.length === 0} onclick={pickBest} title="Fill the Ark with the strongest Pals in the list below">Pick best</button>
-      {#if keep.length}<button class="small" onclick={() => (keep = [])}>Clear picks</button>{/if}
+      <h3 class="grow">{tr("Choose up to")} {slots} {tr("to carry")} <span class="muted">{keep.length} / {slots}</span></h3>
+      <button class="small" disabled={candidates.length === 0} onclick={pickBest} title={tr("Fill the Ark with the strongest Pals in the list below")}>{tr("Pick best")}</button>
+      {#if keep.length}<button class="small" onclick={() => (keep = [])}>{tr("Clear picks")}</button>{/if}
     </div>
     <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search Pals to carry">
       {#snippet heading()}
-        <span class="grow muted small">Eligible {filtering ? `${candidates.length} of ${eligible.size}` : eligible.size}</span>
+        <span class="grow muted small">{tr("Eligible")} {filtering ? `${candidates.length} of ${eligible.size}` : eligible.size}</span>
       {/snippet}
     </BoxFilterBar>
     {#if eligible.size > 0 && candidates.length === 0}
-      <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+      <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
     {/if}
     <div class="list scroll">
       {#each candidates as p (p.uid)}
@@ -116,19 +117,19 @@
         <label class="pick row" class:on>
           <input type="checkbox" checked={on} disabled={!on && keep.length >= slots} onchange={() => toggle(p.uid)} />
           <PalIcon palId={p.palId} size={32} lucky={p.lucky} />
-          <span class="grow"><b>{palById(p.palId).name}</b> <span class="muted">Lv {p.level}{p.stars ? ' ' + '★'.repeat(p.stars) : ''}{p.lucky ? ' ✨' : ''} · ATK {instanceAttack(p).toFixed(1)}</span> <PassiveChips ids={p.passives} /></span>
-          {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
+          <span class="grow"><b>{palById(p.palId).name}</b> <span class="muted">Lv {p.level}{p.stars ? ' ' + '★'.repeat(p.stars) : ''}{p.lucky ? ' ✨' : ''} {tr("· ATK")} {instanceAttack(p).toFixed(1)}</span> <PassiveChips ids={p.passives} /></span>
+          {#if status !== 'idle'}<span class="muted small">{tr(STATUS_LABEL[status]).toLowerCase()}</span>{/if}
         </label>
       {/each}
     </div>
     {#if !confirming}
-      <button class="primary ascend" onclick={() => (confirming = true)}>Ascend for 🏺 {worth}</button>
+      <button class="primary ascend" onclick={() => (confirming = true)}>{tr("Ascend for 🏺")} {worth}</button>
     {:else}
       <div class="confirm">
-        <p><b>Are you sure?</b> Everything except your records, upgrades and the {keep.length} chosen Pal{keep.length === 1 ? '' : 's'} will be gone. The Merchant, your base and your inventory reset to a fresh start.</p>
+        <p><b>{tr("Are you sure?")}</b> {tr("Everything except your records, upgrades and the")} {keep.length} {tr("chosen Pal")}{keep.length === 1 ? '' : 's'} {tr("will be gone. The Merchant, your base and your inventory reset to a fresh start.")}</p>
         <div class="row">
-          <button class="danger" onclick={doAscend}>Yes, ascend</button>
-          <button onclick={() => (confirming = false)}>Not yet</button>
+          <button class="danger" onclick={doAscend}>{tr("Yes, ascend")}</button>
+          <button onclick={() => (confirming = false)}>{tr("Not yet")}</button>
         </div>
       </div>
     {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { routeById } from '../data/regions';
   import { itemName } from '../data/items';
@@ -33,31 +34,31 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Daily Quests <span class="muted">{claimedCount} / {daily?.quests.length ?? 0}</span></h2>
-  <span class="muted small">Resets in {untilReset} ({mode === 'utc' ? 'UTC' : 'local'} midnight · Settings) · tier {tier}</span>
+  <h2 class="grow">{tr("Daily Quests")} <span class="muted">{claimedCount} / {daily?.quests.length ?? 0}</span></h2>
+  <span class="muted small">{tr("Resets in")} {untilReset} ({mode === 'utc' ? 'UTC' : 'local'} {tr("midnight · Settings) · tier")} {tier}</span>
 </div>
 <p class="muted small">Three quests a day, scaled to how far you've come. Progress counts from the moment the quest appeared; unclaimed quests vanish at reset.</p>
 
 {#if daily}
   <div class="row">
-    <input type="search" placeholder="Search quests…" bind:value={filter.query} aria-label="Search quests" />
-    <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+    <input type="search" placeholder={tr("Search quests…")} bind:value={filter.query} aria-label={tr("Search quests")} />
+    <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
     {#if filtering}<span class="muted small">{shown.length} of {daily.quests.length}</span>{/if}
   </div>
   {#if open}
     <div class="filters">
-      <select bind:value={filter.status} aria-label="Status">
-        {#each Object.entries(QUEST_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+      <select bind:value={filter.status} aria-label={tr("Status")}>
+        {#each Object.entries(QUEST_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
       </select>
-      <select bind:value={filter.kind} aria-label="Kind">
-        <option value="any">Any kind</option>
-        {#each Object.entries(QUEST_KIND_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+      <select bind:value={filter.kind} aria-label={tr("Kind")}>
+        <option value="any">{tr("Any kind")}</option>
+        {#each Object.entries(QUEST_KIND_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
       </select>
-      {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+      {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
     </div>
   {/if}
   {#if shown.length === 0}
-    <p class="muted">No quest matches. <button class="small" onclick={clear}>Clear filters</button></p>
+    <p class="muted">{tr("No quest matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
   {/if}
   <div class="list">
     {#each shown as q (q.id)}
@@ -66,48 +67,48 @@
       <div class="quest" class:done={q.claimed} class:ready={done && !q.claimed}>
         <div class="row">
           <b class="grow">{describeQuest(q, (id) => routeById(id).name)}</b>
-          {#if q.claimed}<span class="claimed">✓ claimed</span>
+          {#if q.claimed}<span class="claimed">{tr("✓ claimed")}</span>
           {:else}<button class="small" class:primary={done} disabled={!done} onclick={() => game.claimQuest(q.id)}>{done ? 'Claim' : `${fmt(value)} / ${fmt(q.target)}`}</button>{/if}
         </div>
         <div class="bar"><span style:width="{(value / q.target) * 100}%"></span></div>
-        <div class="muted small">Reward: {fmt(q.reward.gold)} gold{Object.entries(q.reward.items).map(([id, n]) => `, ${n} ${itemName(id)}`).join('')}</div>
+        <div class="muted small">{tr("Reward:")} {fmt(q.reward.gold)} {tr("gold")}{Object.entries(q.reward.items).map(([id, n]) => `, ${n} ${itemName(id)}`).join('')}</div>
       </div>
     {/each}
   </div>
 
   <div class="bonus row" class:ready={bonusReady(save)}>
-    <span class="grow">Daily bonus — claim all three for <b>+{BONUS_EFFIGIES} Effigy</b> (permanent capture power)</span>
-    {#if daily.bonusClaimed}<span class="claimed">✓ claimed</span>
-    {:else}<button class="small" class:primary={bonusReady(save)} disabled={!bonusReady(save)} onclick={() => game.claimBonus()}>Claim</button>{/if}
+    <span class="grow">{tr("Daily bonus — claim all three for")} <b>+{BONUS_EFFIGIES} {tr("Effigy")}</b> {tr("(permanent capture power)")}</span>
+    {#if daily.bonusClaimed}<span class="claimed">{tr("✓ claimed")}</span>
+    {:else}<button class="small" class:primary={bonusReady(save)} disabled={!bonusReady(save)} onclick={() => game.claimBonus()}>{tr("Claim")}</button>{/if}
   </div>
 {:else}
-  <p class="muted">Quests appear once the game has run for a second.</p>
+  <p class="muted">{tr("Quests appear once the game has run for a second.")}</p>
 {/if}
 
 <section class="history">
   <div class="row">
-    <h3 class="grow">History <span class="muted">{save.dailyHistory.length} day{save.dailyHistory.length === 1 ? '' : 's'}</span></h3>
+    <h3 class="grow">{tr("History")} <span class="muted">{save.dailyHistory.length} {tr("day")}{save.dailyHistory.length === 1 ? '' : 's'}</span></h3>
     {#if save.dailyHistory.length}<button class="small" onclick={() => (showHistory = !showHistory)}>{showHistory ? 'Hide' : 'Show'}</button>{/if}
   </div>
   <div class="summary row">
-    <span>🔥 Streak <b>{summary.streak}</b> day{summary.streak === 1 ? '' : 's'}</span>
-    <span>Quests claimed <b>{summary.claimed}</b> / {summary.total}{#if summary.total} <span class="muted">({pct(summary.claimed, summary.total)}%)</span>{/if}</span>
-    <span>Bonuses <b>{summary.bonuses}</b> / {summary.days}</span>
-    <span>Gold from quests <b>{fmt(summary.gold)}</b></span>
+    <span>{tr("🔥 Streak")} <b>{summary.streak}</b> {tr("day")}{summary.streak === 1 ? '' : 's'}</span>
+    <span>{tr("Quests claimed")} <b>{summary.claimed}</b> / {summary.total}{#if summary.total} <span class="muted">({pct(summary.claimed, summary.total)}%)</span>{/if}</span>
+    <span>{tr("Bonuses")} <b>{summary.bonuses}</b> / {summary.days}</span>
+    <span>{tr("Gold from quests")} <b>{fmt(summary.gold)}</b></span>
   </div>
   <p class="muted small">A streak counts consecutive days with all three quests claimed. The last 90 days are kept; the search and filters above apply here too (missed = not claimed before reset).</p>
   {#if save.dailyHistory.length === 0}
-    <p class="muted">Nothing yet — past days appear here after the first reset.</p>
+    <p class="muted">{tr("Nothing yet — past days appear here after the first reset.")}</p>
   {:else if showHistory}
     {#if history.length === 0}
-      <p class="muted">No past quest matches. <button class="small" onclick={clear}>Clear filters</button></p>
+      <p class="muted">{tr("No past quest matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
     {/if}
     <div class="days">
       {#each history as day (day.date)}
         <div class="day" class:full={day.bonusClaimed}>
           <div class="row">
             <b class="grow">{fmtDate(day.date)}</b>
-            <span class="muted small">{day.quests.filter((q) => q.claimed).length} / {day.quests.length} claimed{day.bonusClaimed ? ' · bonus ✓' : ''}</span>
+            <span class="muted small">{day.quests.filter((q) => q.claimed).length} / {day.quests.length} {tr("claimed")}{day.bonusClaimed ? ' · bonus ✓' : ''}</span>
           </div>
           {#each day.quests as q}
             <div class="past row" class:claimed={q.claimed}>

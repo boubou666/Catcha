@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { RECIPES, recipeById } from '../data/base';
   import { CRAFT_SORT_LABEL, CRAFT_STATUS_LABEL, DEFAULT_CRAFT_FILTER, filterRecipes, isCraftFiltering, KIND_LABEL, type CraftFilter } from '../engine/craftfilter';
@@ -40,38 +41,38 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Crafting <span class="muted">{filtering ? `${shown.length} of ${RECIPES.length}` : RECIPES.length}</span></h2>
-  <input type="search" placeholder="Search recipe, ingredient…" bind:value={filter.query} aria-label="Search recipes" />
-  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+  <h2 class="grow">{tr("Crafting")} <span class="muted">{filtering ? `${shown.length} of ${RECIPES.length}` : RECIPES.length}</span></h2>
+  <input type="search" placeholder={tr("Search recipe, ingredient…")} bind:value={filter.query} aria-label={tr("Search recipes")} />
+  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
 </div>
 
 {#if open}
   <div class="filters">
-    <select bind:value={filter.kind} aria-label="Kind">
-      <option value="any">Any kind</option>
-      {#each Object.entries(KIND_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.kind} aria-label={tr("Kind")}>
+      <option value="any">{tr("Any kind")}</option>
+      {#each Object.entries(KIND_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.status} aria-label="Status">
-      {#each Object.entries(CRAFT_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.status} aria-label={tr("Status")}>
+      {#each Object.entries(CRAFT_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.sort} aria-label="Sort">
-      {#each Object.entries(CRAFT_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+    <select bind:value={filter.sort} aria-label={tr("Sort")}>
+      {#each Object.entries(CRAFT_SORT_LABEL) as [k, label]}<option value={k}>{tr("Sort:")} {tr(label)}</option>{/each}
     </select>
-    <label class="chk"><input type="checkbox" bind:checked={filter.hideOwned} /> Hide owned weapons</label>
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+    <label class="chk"><input type="checkbox" bind:checked={filter.hideOwned} /> {tr("Hide owned weapons")}</label>
+    {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
 {/if}
 
 {#if !hasBench}
-  <p class="muted">Build the Primitive Workbench at your base first (10 Wood).</p>
+  <p class="muted">{tr("Build the Primitive Workbench at your base first (10 Wood).")}</p>
 {:else if speed === 0}
-  <p class="warn">No Handiwork at the base — the queue won't move. Assign a 🔨 Pal.</p>
+  <p class="warn">{tr("No Handiwork at the base — the queue won't move. Assign a 🔨 Pal.")}</p>
 {:else}
-  <p class="muted">{speed.toFixed(2)} work/s · queue clears in {eta(queuedWork)}</p>
+  <p class="muted">{speed.toFixed(2)} {tr("work/s · queue clears in")} {eta(queuedWork)}</p>
 {/if}
 
 {#if shown.length === 0}
-  <p class="muted">No recipe matches. <button class="small" onclick={clear}>Clear filters</button></p>
+  <p class="muted">{tr("No recipe matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
 {/if}
 
 <div class="list">
@@ -84,11 +85,11 @@
       {#if r.output.kind === 'item'}<ItemIcon id={r.output.itemId} size={34} />{:else}<span class="weapon">🗡</span>{/if}
       <div class="grow">
         {#if r.output.kind === 'item' && r.output.itemId.startsWith('sphere_')}<div class="small odds">🎯 {sphereVsWild(game.save, game.wild, r.output.itemId.slice(7) as SphereTier)}</div>{/if}
-        <b>{r.name}</b> <span class="muted small">{r.work} work · {eta(r.work)} each</span>
-        {#if owned}<span class="muted small">· owned</span>{/if}
+        <b>{r.name}</b> <span class="muted small">{r.work} {tr("work ·")} {eta(r.work)} {tr("each")}</span>
+        {#if owned}<span class="muted small">{tr("· owned")}</span>{/if}
         <div class="muted small">{outputLabel(r.id)}</div>
         {#if unlocked}<CostLine cost={r.inputs} />
-        {:else if !researched}<div class="muted small">🔒 Research <b>{recipeTech(r.id)?.name}</b> (Tech tab)</div>
+        {:else if !researched}<div class="muted small">{tr("🔒 Research")} <b>{recipeTech(r.id)?.name}</b> {tr("(Tech tab)")}</div>
         {:else}<div class="muted small">🔒 {describeRequirement(r.unlock)}</div>{/if}
       </div>
       {#if unlocked && !owned}
@@ -103,12 +104,12 @@
 
 {#if queue.length > 0}
   <div class="row queue-head">
-    <h3 class="queue-title grow">Queue <span class="muted">{queueFiltering ? `${matchIdx.size} of ${queue.length}` : queue.length}</span></h3>
-    <input type="search" placeholder="Search queue…" bind:value={queueQuery} aria-label="Search the queue" />
-    <button class="small" class:active={isGrouped} onclick={() => (grouped = !isGrouped)} title="Group jobs by recipe">{isGrouped ? 'Grouped' : 'Group'}</button>
-    <button class="small danger" onclick={() => { if (window.confirm(`Cancel all ${queue.length} queued crafts and refund the materials?`)) game.cancelCraftAll(); }}>Cancel all</button>
+    <h3 class="queue-title grow">{tr("Queue")} <span class="muted">{queueFiltering ? `${matchIdx.size} of ${queue.length}` : queue.length}</span></h3>
+    <input type="search" placeholder={tr("Search queue…")} bind:value={queueQuery} aria-label={tr("Search the queue")} />
+    <button class="small" class:active={isGrouped} onclick={() => (grouped = !isGrouped)} title={tr("Group jobs by recipe")}>{isGrouped ? 'Grouped' : 'Group'}</button>
+    <button class="small danger" onclick={() => { if (window.confirm(`Cancel all ${queue.length} queued crafts and refund the materials?`)) game.cancelCraftAll(); }}>{tr("Cancel all")}</button>
   </div>
-  {#if matchIdx.size === 0}<p class="muted small">No queued craft matches.</p>{/if}
+  {#if matchIdx.size === 0}<p class="muted small">{tr("No queued craft matches.")}</p>{/if}
   <div class="list">
     {#if isGrouped}
       {#each groups as g (g.recipeId)}
@@ -118,7 +119,7 @@
             <div class="bar grow"><span style:width="{(1 - queue[0].remaining / recipeById(g.recipeId).work) * 100}%"></span></div>
           {/if}
           <span class="muted small">{eta(g.remaining)}</span>
-          <button class="small danger" title="Cancel every {g.name} and refund" onclick={() => game.cancelCraftAll(g.recipeId)}>✕ all</button>
+          <button class="small danger" title="Cancel every {g.name} and refund" onclick={() => game.cancelCraftAll(g.recipeId)}>{tr("✕ all")}</button>
         </div>
       {/each}
     {:else}
@@ -131,7 +132,7 @@
           <div class="bar grow"><span style:width="{(1 - job.remaining / r.work) * 100}%"></span></div>
         {/if}
         <span class="muted small">{eta(job.remaining)}</span>
-        <button class="small danger" title="Cancel and refund" onclick={() => game.cancelCraft(i)}>✕</button>
+        <button class="small danger" title={tr("Cancel and refund")} onclick={() => game.cancelCraft(i)}>✕</button>
       </div>
       {/if}
     {/each}

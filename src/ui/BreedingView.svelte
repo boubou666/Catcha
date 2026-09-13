@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { pct } from './catchText';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
@@ -67,10 +68,10 @@
   });
 </script>
 
-<h2>Breeding Farm</h2>
+<h2>{tr("Breeding Farm")}</h2>
 
 {#if !hasFarm}
-  <p class="muted">Build the <b>Breeding Farm</b> at your base (Base → Structures). Each egg costs one Cake, baked at the Workbench.</p>
+  <p class="muted">{tr("Build the")} <b>{tr("Breeding Farm")}</b> {tr("at your base (Base → Structures). Each egg costs one Cake, baked at the Workbench.")}</p>
 {:else if parents}
   <div class="pair panel-2">
     <div class="row parents">
@@ -79,22 +80,22 @@
       <PalCard inst={parents[1]}><CatchOdds palId={parents[1].palId} /></PalCard>
     </div>
     <div class="row child">
-      <span class="muted">Offspring:</span>
+      <span class="muted">{tr("Offspring:")}</span>
       {#if activeChild !== null}<PalIcon palId={activeChild} size={28} /> <b>{palById(activeChild).name}</b>{/if}
-      <span class="muted small">· incubates {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)} · ✨ {pctFine(activeLucky)} Lucky</span>
-      {#if activeChild !== null}<span class="muted small">· or in the wild</span> <CatchOdds palId={activeChild} prefix={`Catching a wild ${palById(activeChild).name} instead`} />{/if}
+      <span class="muted small">{tr("· incubates")} {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)} · ✨ {pctFine(activeLucky)} {tr("Lucky")}</span>
+      {#if activeChild !== null}<span class="muted small">{tr("· or in the wild")}</span> <CatchOdds palId={activeChild} prefix={`Catching a wild ${palById(activeChild).name} instead`} />{/if}
     </div>
     <div class="row child muted small">
-      <span>Passives it can inherit:</span>
-      {#if activePool.length}<PassiveChips ids={activePool} />{:else}<span>none — {pct(MUTATION_CHANCE)} chance of a random one per slot</span>{/if}
+      <span>{tr("Passives it can inherit:")}</span>
+      {#if activePool.length}<PassiveChips ids={activePool} />{:else}<span>{tr("none —")} {pct(MUTATION_CHANCE)} {tr("chance of a random one per slot")}</span>{/if}
     </div>
     {#if pair?.progress !== null && pair}
       <div class="bar grow"><span style:width="{pair.progress * 100}%"></span></div>
-      <div class="muted small">Egg in {eggEta((1 - pair.progress) * BREED_SEC)} · {cakes} {itemName(CAKE)} left</div>
+      <div class="muted small">{tr("Egg in")} {eggEta((1 - pair.progress) * BREED_SEC)} · {cakes} {itemName(CAKE)} {tr("left")}</div>
     {:else}
-      <div class="warn small">Waiting for a Cake ({cakes} in stock). Bake one under Craft.</div>
+      <div class="warn small">{tr("Waiting for a Cake (")}{cakes} {tr("in stock). Bake one under Craft.")}</div>
     {/if}
-    <button class="small" onclick={() => game.clearPair()}>Separate pair</button>
+    <button class="small" onclick={() => game.clearPair()}>{tr("Separate pair")}</button>
   </div>
 {:else}
   <p class="muted small">Pick two idle Pals — not in the party, not working. Same species breeds true; otherwise the child is the species closest to the parents' average breeding power.</p>
@@ -104,9 +105,9 @@
         {#if uid && inst(uid)}
           <PalIcon palId={inst(uid)!.palId} size={32} lucky={inst(uid)!.lucky} />
           <span class="grow">{label(uid)}</span>
-          <button class="small" onclick={() => { if (i === 0) aUid = ''; else bUid = ''; }} title="Remove">✕</button>
+          <button class="small" onclick={() => { if (i === 0) aUid = ''; else bUid = ''; }} title={tr("Remove")}>✕</button>
         {:else}
-          <span class="muted">Parent {which} — pick from the list below</span>
+          <span class="muted">{tr("Parent")} {which} {tr("— pick from the list below")}</span>
         {/if}
       </div>
       {#if i === 0}<span class="heart">♥</span>{/if}
@@ -114,29 +115,29 @@
   </div>
   <div class="row child">
     {#if preview !== null}
-      <span class="muted">Offspring:</span> <PalIcon palId={preview} size={28} /> <b>{palById(preview).name}</b>
-      {#if previewPool.length}<span class="muted small">· may inherit</span> <PassiveChips ids={previewPool} />{/if}
-      <span class="muted small">· ✨ {pctFine(previewLucky)} Lucky</span>
-      <span class="muted small">· or in the wild</span> <CatchOdds palId={preview} prefix={`Catching a wild ${palById(preview).name} instead`} />
+      <span class="muted">{tr("Offspring:")}</span> <PalIcon palId={preview} size={28} /> <b>{palById(preview).name}</b>
+      {#if previewPool.length}<span class="muted small">{tr("· may inherit")}</span> <PassiveChips ids={previewPool} />{/if}
+      <span class="muted small">· ✨ {pctFine(previewLucky)} {tr("Lucky")}</span>
+      <span class="muted small">{tr("· or in the wild")}</span> <CatchOdds palId={preview} prefix={`Catching a wild ${palById(preview).name} instead`} />
     {/if}
     <span class="grow"></span>
     <button class="primary small" disabled={!aUid || !bUid || !!block} title={block ? BLOCK_TEXT[block] : ''}
-      onclick={() => { game.setPair(aUid, bUid); aUid = ''; bUid = ''; }}>Start breeding</button>
+      onclick={() => { game.setPair(aUid, bUid); aUid = ''; bUid = ''; }}>{tr("Start breeding")}</button>
   </div>
   {#if block}<div class="warn small">{BLOCK_TEXT[block]}</div>{/if}
-  <p class="muted small">{cakes} {itemName(CAKE)} in stock · one per egg · {formatDuration(BREED_SEC * 1000)} per egg</p>
+  <p class="muted small">{cakes} {itemName(CAKE)} {tr("in stock · one per egg ·")} {formatDuration(BREED_SEC * 1000)} {tr("per egg")}</p>
 
   <div class="picker">
     <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search parents" hideStatus>
       {#snippet heading()}
-        <h3 class="grow">Idle Pals <span class="muted">{filtering ? `${candidates.length} of ${idle.length}` : candidates.length}</span></h3>
+        <h3 class="grow">{tr("Idle Pals")} <span class="muted">{filtering ? `${candidates.length} of ${idle.length}` : candidates.length}</span></h3>
       {/snippet}
     </BoxFilterBar>
-    {#if picked}<p class="muted small">Searching also matches the offspring each partner would give — try the species you want.</p>{/if}
+    {#if picked}<p class="muted small">{tr("Searching also matches the offspring each partner would give — try the species you want.")}</p>{/if}
     {#if idle.length === 0}
-      <p class="muted">No idle Pals — everyone is in the party, working or away.</p>
+      <p class="muted">{tr("No idle Pals — everyone is in the party, working or away.")}</p>
     {:else if candidates.length === 0}
-      <p class="muted">No Pal matches. <button class="small" onclick={clear}>Clear filters</button></p>
+      <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
     {/if}
     <div class="list scroll">
       {#each candidates as p (p.uid)}
@@ -151,26 +152,26 @@
 {/if}
 
 <div class="row eggs-head">
-  <h3 class="eggs-title grow">Incubator <span class="muted">{eggFiltering ? `${eggs.length} of ${save.base.eggs.length}` : save.base.eggs.length}</span></h3>
+  <h3 class="eggs-title grow">{tr("Incubator")} <span class="muted">{eggFiltering ? `${eggs.length} of ${save.base.eggs.length}` : save.base.eggs.length}</span></h3>
   {#if save.base.eggs.length > 1}
-    <input type="search" placeholder="Search eggs…" bind:value={eggFilter.query} aria-label="Search eggs" />
-    <label class="chk"><input type="checkbox" bind:checked={eggFilter.luckyOnly} /> ✨ Lucky</label>
-    <select bind:value={eggFilter.sort} aria-label="Egg sort">
-      {#each Object.entries(EGG_SORT_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <input type="search" placeholder={tr("Search eggs…")} bind:value={eggFilter.query} aria-label={tr("Search eggs")} />
+    <label class="chk"><input type="checkbox" bind:checked={eggFilter.luckyOnly} /> {tr("✨ Lucky")}</label>
+    <select bind:value={eggFilter.sort} aria-label={tr("Egg sort")}>
+      {#each Object.entries(EGG_SORT_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
   {/if}
 </div>
 {#if save.base.eggs.length === 0}
-  <p class="muted small">No eggs. Hatched Pals arrive in your box at level 1.</p>
+  <p class="muted small">{tr("No eggs. Hatched Pals arrive in your box at level 1.")}</p>
 {:else if eggs.length === 0}
-  <p class="muted small">No egg matches.</p>
+  <p class="muted small">{tr("No egg matches.")}</p>
 {:else}
   <div class="eggs">
     {#each eggs as { egg, index: i } (i)}
       {@const total = INCUBATION_SEC[palById(egg.palId).rarity]}
       <div class="egg row">
         <PalIcon palId={egg.palId} size={32} />
-        <span class="grow">{#if egg.lucky}<span class="lucky-tag">✨ Lucky</span> {/if}{palById(egg.palId).name} egg{#if egg.passives.length} <PassiveChips ids={egg.passives} />{/if}</span>
+        <span class="grow">{#if egg.lucky}<span class="lucky-tag">{tr("✨ Lucky")}</span> {/if}{palById(egg.palId).name} {tr("egg")}{#if egg.passives.length} <PassiveChips ids={egg.passives} />{/if}</span>
         <div class="bar egg-bar"><span style:width="{(1 - Math.max(0, egg.remaining) / total) * 100}%"></span></div>
         <CatchOdds palId={egg.palId} prefix={`Catching a wild ${palById(egg.palId).name}`} />
         <span class="muted small eta">{eggEta(egg.remaining)}</span>

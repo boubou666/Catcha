@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { SPHERES } from '../data/spheres';
   import { sphereVsWild, pct } from './catchText';
@@ -24,77 +25,77 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Wandering Merchant</h2>
+  <h2 class="grow">{tr("Wandering Merchant")}</h2>
   <span class="gold">💰 {fmt(gold)}</span>
 </div>
 <p class="muted small">Spheres and supplies for gold; drops and produce sold back. Stock opens up as you progress.</p>
 
 <div class="row">
   <nav class="sides">
-    <button class:active={side === 'buy'} onclick={() => (side = 'buy')}>Buy <span class="muted">{filtering && side === 'buy' ? `${stock.length} of ${STOCK.length}` : STOCK.length}</span></button>
-    <button class:active={side === 'sell'} onclick={() => (side = 'sell')}>Sell <span class="muted">{filtering && side === 'sell' ? `${sellable.length} of ${sellableTotal}` : sellableTotal}</span></button>
+    <button class:active={side === 'buy'} onclick={() => (side = 'buy')}>{tr("Buy")} <span class="muted">{filtering && side === 'buy' ? `${stock.length} of ${STOCK.length}` : STOCK.length}</span></button>
+    <button class:active={side === 'sell'} onclick={() => (side = 'sell')}>{tr("Sell")} <span class="muted">{filtering && side === 'sell' ? `${sellable.length} of ${sellableTotal}` : sellableTotal}</span></button>
   </nav>
-  <input type="search" placeholder="Search items…" bind:value={filter.query} aria-label="Search the merchant" />
-  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+  <input type="search" placeholder={tr("Search items…")} bind:value={filter.query} aria-label={tr("Search the merchant")} />
+  <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>{tr("Filters")}{filtering ? ' •' : ''}</button>
 </div>
 {#if open}
   <div class="filters">
-    <select bind:value={filter.category} aria-label="Category">
-      <option value="any">Any category</option>
-      {#each Object.entries(CATEGORY_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+    <select bind:value={filter.category} aria-label={tr("Category")}>
+      <option value="any">{tr("Any category")}</option>
+      {#each Object.entries(CATEGORY_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
     </select>
-    <select bind:value={filter.sort} aria-label="Sort">
-      {#each Object.entries(SHOP_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+    <select bind:value={filter.sort} aria-label={tr("Sort")}>
+      {#each Object.entries(SHOP_SORT_LABEL) as [k, label]}<option value={k}>{tr("Sort:")} {tr(label)}</option>{/each}
     </select>
     {#if side === 'buy'}
-      <label class="chk"><input type="checkbox" bind:checked={filter.affordable} /> Affordable now</label>
-      <label class="chk"><input type="checkbox" bind:checked={filter.hideLocked} /> Hide locked</label>
+      <label class="chk"><input type="checkbox" bind:checked={filter.affordable} /> {tr("Affordable now")}</label>
+      <label class="chk"><input type="checkbox" bind:checked={filter.hideLocked} /> {tr("Hide locked")}</label>
     {/if}
-    {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+    {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
 {/if}
 
 {#if side === 'buy'}
-  {#if stock.length === 0}<p class="muted">Nothing matches. <button class="small" onclick={clear}>Clear filters</button></p>{/if}
+  {#if stock.length === 0}<p class="muted">{tr("Nothing matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>{/if}
   <div class="list">
     {#each stock as it (it.itemId)}
       <div class="row item" class:locked={!it.unlocked}>
         <ItemIcon id={it.itemId} size={34} />
         <div class="grow">
-          <b>{it.name}</b> <span class="muted small">{CATEGORY_LABEL[it.category]}{it.owned ? ` · you have ${fmt(it.owned)}` : ''}</span>
-          {#if it.itemId.startsWith('sphere_')}{@const tier = it.itemId.slice(7) as typeof SPHERE_TIERS[number]}<span class="muted small">· ×{SPHERES[tier].mult} catch rate</span> <span class="odds small">🎯 {sphereVsWild(game.save, game.wild, tier)}</span>{/if}
+          <b>{it.name}</b> <span class="muted small">{tr(CATEGORY_LABEL[it.category])}{it.owned ? ` · you have ${fmt(it.owned)}` : ''}</span>
+          {#if it.itemId.startsWith('sphere_')}{@const tier = it.itemId.slice(7) as typeof SPHERE_TIERS[number]}<span class="muted small">· ×{SPHERES[tier].mult} {tr("catch rate")}</span> <span class="odds small">🎯 {sphereVsWild(game.save, game.wild, tier)}</span>{/if}
           {#if !it.unlocked}<div class="muted small">🔒 {describeRequirement(it.unlock)}</div>{/if}
         </div>
         <span class="price">{fmt(it.price)} 💰</span>
-        <button class="small" disabled={!it.unlocked || gold < it.price} onclick={() => game.buyItem(it.itemId, 1)}>Buy 1</button>
-        <button class="small" disabled={!it.unlocked || gold < it.price * 10} onclick={() => game.buyItem(it.itemId, 10)}>Buy 10</button>
+        <button class="small" disabled={!it.unlocked || gold < it.price} onclick={() => game.buyItem(it.itemId, 1)}>{tr("Buy 1")}</button>
+        <button class="small" disabled={!it.unlocked || gold < it.price * 10} onclick={() => game.buyItem(it.itemId, 10)}>{tr("Buy 10")}</button>
       </div>
     {/each}
   </div>
 {:else}
-  <p class="muted small">The merchant pays {pct(SELL_SHARE)} of the buy price for stocked goods and fixed rates for drops. Spheres, slabs and keys aren't taken.</p>
+  <p class="muted small">{tr("The merchant pays")} {pct(SELL_SHARE)} {tr("of the buy price for stocked goods and fixed rates for drops. Spheres, slabs and keys aren't taken.")}</p>
   {#if sellableTotal === 0}
-    <p class="muted">Nothing to sell yet — defeat Pals for drops or put Farming Pals on a Ranch.</p>
+    <p class="muted">{tr("Nothing to sell yet — defeat Pals for drops or put Farming Pals on a Ranch.")}</p>
   {:else if sellable.length === 0}
-    <p class="muted">Nothing matches. <button class="small" onclick={clear}>Clear filters</button></p>
+    <p class="muted">{tr("Nothing matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
   {/if}
   <div class="list">
     {#each sellable as it (it.itemId)}
       <div class="row item">
         <ItemIcon id={it.itemId} size={34} />
         <div class="grow">
-          <b>{it.name}</b> <span class="muted small">{CATEGORY_LABEL[it.category]} · you have {fmt(it.owned)}</span>
+          <b>{it.name}</b> <span class="muted small">{tr(CATEGORY_LABEL[it.category])} {tr("· you have")} {fmt(it.owned)}</span>
         </div>
-        <span class="price">{fmt(it.price)} 💰 <span class="muted small">each</span></span>
-        <button class="small" onclick={() => game.sellItem(it.itemId, 1)}>Sell 1</button>
-        <button class="small" disabled={it.owned < 10} onclick={() => game.sellItem(it.itemId, 10)}>Sell 10</button>
-        <button class="small" onclick={() => game.sellItem(it.itemId, it.owned)} title="Sell everything: +{fmt(it.price * it.owned)} gold">All</button>
+        <span class="price">{fmt(it.price)} 💰 <span class="muted small">{tr("each")}</span></span>
+        <button class="small" onclick={() => game.sellItem(it.itemId, 1)}>{tr("Sell 1")}</button>
+        <button class="small" disabled={it.owned < 10} onclick={() => game.sellItem(it.itemId, 10)}>{tr("Sell 10")}</button>
+        <button class="small" onclick={() => game.sellItem(it.itemId, it.owned)} title="Sell everything: +{fmt(it.price * it.owned)} gold">{tr("All")}</button>
       </div>
     {/each}
   </div>
 {/if}
 
-<p class="muted small">Which sphere gets thrown, and whether to throw at species you already own, is under <b>Settings → Catching</b>.</p>
+<p class="muted small">{tr("Which sphere gets thrown, and whether to throw at species you already own, is under")} <b>{tr("Settings → Catching")}</b>.</p>
 
 <style>
   .gold { font-weight: 600; color: var(--accent); }

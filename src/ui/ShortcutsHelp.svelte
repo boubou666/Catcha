@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { shortcutDocs } from '../engine/shortcuts';
   import { keys } from '../state/keys.svelte';
   const docs = $derived(shortcutDocs(keys.bindings));
@@ -9,10 +10,10 @@
   <div class="backdrop" onclick={() => (open = false)} role="presentation"></div>
   <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="keys-title">
     <div class="row">
-      <h2 id="keys-title" class="grow">Keyboard shortcuts</h2>
+      <h2 id="keys-title" class="grow">{tr("Keyboard shortcuts")}</h2>
       <button class="small" onclick={() => (open = false)}>✕</button>
     </div>
-    <p class="muted small">Shortcuts pause while you type in a field. Digits follow the physical keys, so they work on AZERTY and QWERTZ too. Change them under Settings → Keyboard.</p>
+    <p class="muted small">{tr("Shortcuts pause while you type in a field. Digits follow the physical keys, so they work on AZERTY and QWERTZ too. Change them under Settings → Keyboard.")}</p>
     <table>
       <tbody>
         {#each docs as d (d.does)}
@@ -20,7 +21,7 @@
         {/each}
       </tbody>
     </table>
-    <button class="primary" onclick={() => (open = false)}>Got it</button>
+    <button class="primary" onclick={() => (open = false)}>{tr("Got it")}</button>
   </div>
 {/if}
 

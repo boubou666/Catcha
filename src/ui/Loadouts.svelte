@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
   import { palById } from '../data/pals';
   import { DEFAULT_LOADOUT_FILTER, filterLoadouts, isLoadoutFiltering, LOADOUT_SORT_LABEL, LOADOUT_STATUS_LABEL, loadoutReadiness, MAX_LOADOUTS, MAX_LOADOUT_NAME, MEMBER_STATE_LABEL, memberState, type LoadoutFilter } from '../engine/loadouts';
@@ -27,29 +28,29 @@
 
 <section class="loadouts">
   <div class="row head">
-    <h3 class="grow">Loadouts <span class="muted">{filtering ? `${shown.length} of ${save.loadouts.length}` : `${save.loadouts.length} / ${MAX_LOADOUTS}`}</span></h3>
+    <h3 class="grow">{tr("Loadouts")} <span class="muted">{filtering ? `${shown.length} of ${save.loadouts.length}` : `${save.loadouts.length} / ${MAX_LOADOUTS}`}</span></h3>
     {#if save.loadouts.length}<button class="small" onclick={() => (open = !open)} aria-expanded={open}>{open ? 'Hide' : 'Show'}</button>{/if}
   </div>
   <div class="row">
-    <input type="text" placeholder="Name this party…" maxlength={MAX_LOADOUT_NAME} bind:value={name} aria-label="Loadout name" onkeydown={(e) => { if (e.key === 'Enter' && canSave) saveNow(); }} />
-    <button class="small primary" disabled={!canSave} onclick={saveNow} title={full ? `At most ${MAX_LOADOUTS} loadouts` : save.party.length === 0 ? 'The party is empty' : 'Save the current party'}>Save party</button>
+    <input type="text" placeholder={tr("Name this party…")} maxlength={MAX_LOADOUT_NAME} bind:value={name} aria-label={tr("Loadout name")} onkeydown={(e) => { if (e.key === 'Enter' && canSave) saveNow(); }} />
+    <button class="small primary" disabled={!canSave} onclick={saveNow} title={full ? `At most ${MAX_LOADOUTS} loadouts` : save.party.length === 0 ? 'The party is empty' : 'Save the current party'}>{tr("Save party")}</button>
   </div>
   {#if save.loadouts.length > 0}
     <div class="row tools">
-      <input type="search" placeholder="Search loadouts…" bind:value={filter.query} aria-label="Search loadouts" />
-      <select bind:value={filter.status} aria-label="Loadout status">
-        {#each Object.entries(LOADOUT_STATUS_LABEL) as [k, label]}<option value={k}>{label}</option>{/each}
+      <input type="search" placeholder={tr("Search loadouts…")} bind:value={filter.query} aria-label={tr("Search loadouts")} />
+      <select bind:value={filter.status} aria-label={tr("Loadout status")}>
+        {#each Object.entries(LOADOUT_STATUS_LABEL) as [k, label]}<option value={k}>{tr(label)}</option>{/each}
       </select>
-      <select bind:value={filter.sort} aria-label="Loadout sort">
-        {#each Object.entries(LOADOUT_SORT_LABEL) as [k, label]}<option value={k}>Sort: {label}</option>{/each}
+      <select bind:value={filter.sort} aria-label={tr("Loadout sort")}>
+        {#each Object.entries(LOADOUT_SORT_LABEL) as [k, label]}<option value={k}>{tr("Sort:")} {tr(label)}</option>{/each}
       </select>
-      {#if filtering}<button class="small" onclick={clear}>Clear</button>{/if}
+      {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
     </div>
   {/if}
   {#if save.loadouts.length === 0}
-    <p class="muted small">Save the current party under a name to swap teams in one click — a Water team for Fire routes, a grinding crew for the base.</p>
+    <p class="muted small">{tr("Save the current party under a name to swap teams in one click — a Water team for Fire routes, a grinding crew for the base.")}</p>
   {:else if open}
-    {#if shown.length === 0}<p class="muted small">No loadout matches. <button class="small" onclick={clear}>Clear</button></p>{/if}
+    {#if shown.length === 0}<p class="muted small">{tr("No loadout matches.")} <button class="small" onclick={clear}>{tr("Clear")}</button></p>{/if}
     <div class="list">
       {#each shown as lo (lo.id)}
         {@const r = loadoutReadiness(save, lo)}
@@ -57,20 +58,20 @@
         <div class="lo" class:current>
           <div class="row top">
             <b class="grow">{lo.name}</b>
-            <span class="muted small">{r.ready} / {r.total} available{current ? ' · active' : ''}</span>
-            <button class="small primary" disabled={r.ready === 0 || current || game.inBossFight} onclick={() => game.applyLoadout(lo.id)} title={game.inBossFight ? 'Finish the fight first' : current ? 'This is your current party' : 'Swap the party for this loadout'}>Load</button>
-            <button class="small" disabled={save.party.length === 0} onclick={() => game.updateLoadout(lo.id)} title="Overwrite with the current party">Update</button>
-            <button class="small" onclick={() => rename(lo.id, lo.name)} title="Rename">✎</button>
-            <button class="small danger" onclick={() => remove(lo.id, lo.name)} title="Delete">✕</button>
+            <span class="muted small">{r.ready} / {r.total} {tr("available")}{current ? ' · active' : ''}</span>
+            <button class="small primary" disabled={r.ready === 0 || current || game.inBossFight} onclick={() => game.applyLoadout(lo.id)} title={game.inBossFight ? 'Finish the fight first' : current ? 'This is your current party' : 'Swap the party for this loadout'}>{tr("Load")}</button>
+            <button class="small" disabled={save.party.length === 0} onclick={() => game.updateLoadout(lo.id)} title={tr("Overwrite with the current party")}>{tr("Update")}</button>
+            <button class="small" onclick={() => rename(lo.id, lo.name)} title={tr("Rename")}>✎</button>
+            <button class="small danger" onclick={() => remove(lo.id, lo.name)} title={tr("Delete")}>✕</button>
           </div>
           <div class="row members">
             {#each lo.uids as uid (uid)}
               {@const st = memberState(save, uid)}
               {@const p = instanceByUid(save, uid)}
-              <span class="member" class:off={st === 'away' || st === 'gone'} title={MEMBER_STATE_LABEL[st]}>
+              <span class="member" class:off={st === 'away' || st === 'gone'} title={tr(MEMBER_STATE_LABEL[st])}>
                 {#if p}<PalIcon palId={p.palId} size={22} lucky={p.lucky} />{:else}<span class="ghost">?</span>{/if}
                 <span class="small">{memberLabel(uid)}</span>
-                {#if st !== 'idle' && st !== 'party'}<span class="muted tiny">{MEMBER_STATE_LABEL[st]}</span>{/if}
+                {#if st !== 'idle' && st !== 'party'}<span class="muted tiny">{tr(MEMBER_STATE_LABEL[st])}</span>{/if}
               </span>
             {/each}
           </div>
