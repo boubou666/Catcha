@@ -14,6 +14,7 @@ export type WorkType =
   | 'Lumbering' | 'Mining' | 'Medicine' | 'Cooling' | 'Transporting' | 'Farming';
 
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 export type WildKind = 'wild' | 'alpha' | 'tower' | 'dungeon' | 'dungeonBoss' | 'raid';
 export type SphereTier = 'pal' | 'mega' | 'giga' | 'hyper' | 'ultra' | 'legendary';
@@ -194,6 +195,8 @@ export interface SaveState {
     hatched: number; luckyHatched: number; crafted: number; expeditions: number;
     goldEarned: number; goldSpent: number; playSeconds: number;
     throws: number; condensed: number; luckyDefeated: number;
+    chanceSum: number;                   // sum of the odds each throw was made at (expected catches)
+    ratedThrows: number;                 // throws counted in chanceSum (older saves started mid-way)
     defeatedByElement: Partial<Record<Element, number>>;
     defeatedByKind: Partial<Record<WildKind, number>>;
     throwsByTier: Partial<Record<SphereTier, number>>;

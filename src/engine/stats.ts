@@ -5,7 +5,11 @@ import { REGIONS } from '../data/regions';
 import { DUNGEONS } from '../data/dungeons';
 import { RAIDS } from '../data/raids';
 import { TECHS } from '../data/tech';
-import { SPHERES } from '../data/spheres';
+import { ALPHA_CATCH_PENALTY, EFFIGY_CAPTURE_BONUS, LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
+import { RARITIES } from '../data/types';
+import { catchChance } from './catch';
+import { techMult } from './tech';
+import { prestigeMult } from './prestige';
 import { instanceAttack } from './formulas';
 import { achievementPoints, totalPoints } from './achievements';
 import { ACHIEVEMENTS } from '../data/achievements';
@@ -64,6 +68,15 @@ export function defeatsByKind(save: SaveState): { kind: WildKind; label: string;
     .filter((r) => r.n > 0);
 }
 
+/** The multipliers on every throw right now, and the sphere the "new species" policy would use (a Pal Sphere when it says none). */
+export function catchBonus(save: SaveState): { total: number; effigies: number; tech: number; mastery: number; tier: SphereTier } {
+  const effigies = 1 + EFFIGY_CAPTURE_BONUS * save.player.effigies;
+  const tech = techMult(save, 'catch');
+  const mastery = prestigeMult(save, 'catch');
+  const tier: SphereTier = save.settings.sphereForNew === 'none' ? 'pal' : save.settings.sphereForNew;
+  return { total: effigies * tech * mastery, effigies, tech, mastery, tier };
+}
+
 /** Everything the Stats tab shows, as labelled sections; `live` carries values only the running game knows. */
 export function statsReport(save: SaveState, live: { dps: number; clickDmg: number }): StatSection[] {
   const st = save.stats;
@@ -77,6 +90,13 @@ export function statsReport(save: SaveState, live: { dps: number; clickDmg: numb
   const structures = Object.values(save.base.structures).reduce((n, lvl) => n + lvl, 0);
   const realmClears = Object.values(save.progress.dungeons).reduce((n, c) => n + c, 0);
   const raidWins = Object.values(save.progress.raids).reduce((n, c) => n + c, 0);
+  const bonus = catchBonus(save);
+  const bonusParts = [
+    save.player.effigies ? `Effigies +${Math.round((bonus.effigies - 1) * 100)}%` : '',
+    bonus.tech !== 1 ? `Capture Technique ×${bonus.tech.toFixed(2)}` : '',
+    bonus.mastery !== 1 ? `Sphere Mastery ×${bonus.mastery.toFixed(2)}` : '',
+  ].filter(Boolean);
+  const byRarity = RARITIES.map((r) => `${r} ${fmtPct(catchChance(r, bonus.tier, save.player.effigies, false, bonus.tech * bonus.mastery))}`).join(' · ');
   const palName = (p: PalInstance | null, extra?: (p: PalInstance) => string) => (p ? `${palById(p.palId).name} Lv ${p.level}${p.lucky ? ' ✨' : ''}${p.stars ? ' ★' + p.stars : ''}${extra ? ' — ' + extra(p) : ''}` : '—');
 
   return [
@@ -98,8 +118,10 @@ export function statsReport(save: SaveState, live: { dps: number; clickDmg: numb
     ] },
     { title: 'Catching', rows: [
       { label: 'Pals caught', value: fmtInt(st.caught), hint: st.luckyCaught ? `${st.luckyCaught} Lucky` : undefined },
-      { label: 'Spheres thrown', value: fmtInt(st.throws), hint: st.throws ? `${fmtPct(st.caught / st.throws)} landed` : undefined },
+      { label: 'Spheres thrown', value: fmtInt(st.throws), hint: st.throws ? `${fmtPct(st.caught / st.throws)} landed${st.ratedThrows ? ` · ${fmtPct(st.chanceSum / st.ratedThrows)} expected from the odds` : ''}` : undefined },
       ...catchByTier(save).map((r) => ({ label: `  ${r.name}`, value: `${fmtInt(r.caught)} / ${fmtInt(r.throws)}`, hint: fmtPct(r.rate) })),
+      { label: 'Catch bonus', value: `×${bonus.total.toFixed(2)}`, hint: bonusParts.length ? bonusParts.join(' · ') : 'Effigies, Capture Technique and Sphere Mastery multiply every throw.' },
+      { label: 'Odds by rarity', value: byRarity, hint: `With a ${SPHERES[bonus.tier].name} on a wild Pal · Lucky ×${LUCKY_CATCH_PENALTY} · Alpha ×${ALPHA_CATCH_PENALTY}` },
       { label: 'Paldeck', value: `${caughtSpecies} caught · ${seen} seen`, hint: `of ${PALS.length} species` },
       { label: 'Pals in the Box', value: fmtInt(save.box.length), hint: `${save.party.length} in the party, ${save.base.workers.length} at the base` },
       { label: 'Strongest Pal', value: palName(strongest, (p) => `${instanceAttack(p).toFixed(1)} attack`) },

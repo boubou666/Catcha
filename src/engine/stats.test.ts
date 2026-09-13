@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newState, migrate, SAVE_VERSION } from './save';
-import { catchByTier, defeatsByElement, defeatsByKind, DEFAULT_STATS_FILTER, filterStats, fmtDuration, highestLevelPal, isStatsFiltering, statsReport, strongestPal, type StatsFilter, type StatSection } from './stats';
+import { catchBonus, catchByTier, defeatsByElement, defeatsByKind, DEFAULT_STATS_FILTER, filterStats, fmtDuration, highestLevelPal, isStatsFiltering, statsReport, strongestPal, type StatsFilter, type StatSection } from './stats';
 import { applyDefeat } from './combat';
 import { tryCatch } from './catch';
 import { spend } from './inventory';
@@ -28,6 +28,8 @@ describe('stat counters', () => {
     expect(tryCatch(s, wild({ palId: 4 }), () => 0.99).outcome).toBe('failed');
     expect(tryCatch(s, wild({ palId: 4 }), () => 0).outcome).toBe('caught');
     expect(s.stats.throws).toBe(3);
+    expect(s.stats.chanceSum).toBeCloseTo(0.6 * 3);        // three commons with a Pal Sphere
+    expect(s.stats.ratedThrows).toBe(3);
     expect(s.stats.throwsByTier).toEqual({ pal: 3 });
     expect(s.stats.caughtByTier).toEqual({ pal: 2 });
     expect(catchByTier(s)).toEqual([{ tier: 'pal', name: 'Pal Sphere', throws: 3, caught: 2, rate: 2 / 3 }]);
@@ -99,7 +101,7 @@ describe('stats report', () => {
     expect(combat.find((r) => r.label === '  Tower bosses')?.value).toBe('1');
     expect(combat.find((r) => r.label === 'Pals defeated')?.hint).toBe('1 per hour played');
     expect(catching.find((r) => r.label === '  Pal Sphere')).toEqual({ label: '  Pal Sphere', value: '1 / 1', hint: '100%' });
-    expect(catching.find((r) => r.label === 'Spheres thrown')?.hint).toBe('100% landed');
+    expect(catching.find((r) => r.label === 'Spheres thrown')?.hint).toBe('100% landed · 60% expected from the odds');
   });
 });
 
@@ -138,5 +140,22 @@ describe('stats filter', () => {
     expect(labels({ section: 'World' })).toEqual(['World: Towers cleared, Raid wins']);
     expect(labels({ nonZero: true })).toEqual(['Combat: Pals defeated, Wild Pals, Alphas', 'World: Raid wins']);
     expect(labels({ section: 'Combat', nonZero: true, query: 'lucky' })).toEqual([]);
+  });
+});
+
+describe('catch odds in the report', () => {
+  it('reports the bonus in force and the odds by rarity with the policy sphere', () => {
+    const s = newState();
+    expect(catchBonus(s)).toMatchObject({ total: 1, tier: 'pal' });
+    s.player.effigies = 5;
+    s.settings.sphereForNew = 'mega';
+    const b = catchBonus(s);
+    expect(b.effigies).toBeCloseTo(1.1);
+    expect(b.tier).toBe('mega');
+    const rows = statsReport(s, { dps: 0, clickDmg: 0 }).find((sec) => sec.title === 'Catching')!.rows;
+    expect(rows.find((r) => r.label === 'Catch bonus')!.value).toBe('×1.10');
+    const odds = rows.find((r) => r.label === 'Odds by rarity')!;
+    expect(odds.value).toMatch(/^common 99% · uncommon 58% · rare 25% · epic 9.9% · legendary 3.3%$/);
+    expect(odds.hint).toContain('Mega Sphere');
   });
 });
