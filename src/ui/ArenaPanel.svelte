@@ -94,6 +94,7 @@
 
     <div class="row muted small">
       <span>{t('arena.partyDps')}: <b>{game.dps.toFixed(1)}</b></span>
+      {#if game.save.base.raid}<button class="tiny raidlink" onclick={() => (ui.requestTab = 'base')} title={tr("A wild Pal is attacking the base — open the Base tab to rally the party")}>🚨 {tr("Base raid")}{game.save.base.raid.rallied ? '' : ` · ${tr("Rally")}`}</button>{/if}
       {#if wild.kind === 'wild'}
         <span>· {t('arena.routeProgress')}: <b>{Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}</b></span>
         {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? t('arena.hide') : t('arena.whoLivesHere')}</button>{/if}
@@ -120,6 +121,8 @@
   .catch { color: var(--accent-2); margin-top: 0.15rem; font-size: 0.85rem; background: none; border: none; padding: 0; clip-path: none; text-align: left; cursor: pointer; font-weight: 700; }
   .catch:hover { text-decoration: underline; background: none; }
   .catch.no { color: var(--muted); }
+  .raidlink { color: #fff; background: var(--danger); border-color: var(--danger); font-weight: 800; animation: blink 1.2s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: 0.55; } }
   .catch.egg { color: var(--accent); cursor: default; }
   .catch.egg:hover { text-decoration: none; }
   .bar.hp > span { background: var(--danger); }

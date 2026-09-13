@@ -22,7 +22,7 @@ describe('i18n', () => {
     for (const f of readdirSync(dir)) {
       if (!f.endsWith('.svelte')) continue;
       const src = readFileSync(`${dir}/${f}`, 'utf8');
-      for (const m of src.matchAll(/\btr\(("(?:[^"\\]|\\.)*")\)/g)) {
+      for (const m of src.matchAll(/\btr\(("(?:[^"\\]|\\.)*")[,)]/g)) {
         const key = JSON.parse(m[1]) as string;
         if (!(key in MESSAGES.fr)) missing.push(`${f}: ${key}`);
       }

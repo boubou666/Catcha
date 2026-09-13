@@ -73,7 +73,7 @@
             <b class="grow">{t.name}</b>
             {#if block === 'researched'}<span class="check">✓</span>{:else}<span class="cost">{t.cost} TP</span>{/if}
           </div>
-          <div class="muted small">{t.desc}</div>
+          <div class="muted small">{tr(t.desc)}</div>
           {#if t.effect.kind === 'mult' && t.effect.stat === 'catch' && block !== 'researched' && game.wild}
             {@const tier = demoTier(game.wild.palId)}
             {@const now = chanceVsWild(game.save, game.wild, tier)}

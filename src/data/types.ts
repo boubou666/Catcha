@@ -159,6 +159,8 @@ export interface BaseState {
   eggs: Egg[];                           // all incubate in parallel
   expeditions: Expedition[];
   reports: ExpeditionReport[];           // newest first, capped
+  raid: import('../engine/baseraid').BaseRaid | null;   // a wild Pal attacking the base right now
+  nextRaidAt: number;                    // stats.playSeconds at which the next raid arrives
 }
 
 export interface SaveState {
@@ -196,6 +198,7 @@ export interface SaveState {
     goldEarned: number; goldSpent: number; playSeconds: number;
     throws: number; condensed: number; luckyDefeated: number;
     chanceSum: number;                   // sum of the odds each throw was made at (expected catches)
+    baseRaidsRepelled: number; baseRaidsLost: number;
     ratedThrows: number;                 // throws counted in chanceSum (older saves started mid-way)
     defeatedByElement: Partial<Record<Element, number>>;
     defeatedByKind: Partial<Record<WildKind, number>>;

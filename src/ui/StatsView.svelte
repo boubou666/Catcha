@@ -36,7 +36,7 @@
   <input type="search" placeholder={tr("Search stats…")} bind:value={filter.query} aria-label={tr("Search statistics")} />
   <select bind:value={filter.section} aria-label={tr("Section")}>
     <option value="any">{tr("All sections")}</option>
-    {#each all as sec (sec.title)}<option value={sec.title}>{sec.title}</option>{/each}
+    {#each all as sec (sec.title)}<option value={sec.title}>{tr(sec.title)}</option>{/each}
     <option value="Defeats by element">{tr("Defeats by element")}</option>
   </select>
   <label class="chk"><input type="checkbox" bind:checked={filter.nonZero} /> {tr("Hide zeros")}</label>
@@ -49,11 +49,11 @@
 <div class="grid">
   {#each sections as sec (sec.title)}
     <section class="card">
-      <h3>{sec.title}</h3>
+      <h3>{tr(sec.title)}</h3>
       <dl>
         {#each sec.rows as r (r.label)}
           <div class="stat" class:sub={r.label.startsWith(' ')}>
-            <dt>{r.label.trim()}</dt>
+            <dt>{tr(r.label.trim())}</dt>
             <dd>{r.value}{#if r.hint}<span class="hint muted">{r.hint}</span>{/if}</dd>
           </div>
         {/each}

@@ -110,6 +110,13 @@ The world view frames the seven regions (locked ones say what opens them) and zo
 current route pulses, cleared spots tick, and the ☰ List button brings the old list back; ▴ folds the panel to one line with the current route (both
 remembered per device). Searching always uses the list and unfolds the panel.
 
+Base raids (`src/engine/baseraid.ts`): every 15–25 minutes of play, once the base has workers and a structure,
+a Pal from the current route attacks it with `RAID_HP_MULT` × wild HP and a 3-minute clock (`save.base.raid`,
+next arrival in `save.base.nextRaidAt` play-seconds, v23). Workers defend at `WORKER_ATTACK_MULT`; `game.rally()`
+adds the party. Production pauses during a raid. Repelling pays `RAID_GOLD_MULT` × gold, `RAID_LOOT_MULT` × drops
+and a throw at the raider; failing steals `STEAL_FRACTION` of two stacks (never spheres or slabs) and costs
+workers `STEAL_SAN`. Deploys apply themselves when the tab is hidden or idle (`update.autoApply`).
+
 Partner skills (`src/data/partner.ts`) are read off each species' Palworld skill name: mounts and gliders
 give exp, diggers and anglers gold, helpers and harvest blessings base output (while the Pal works at the base),
 senses, webs and glares catch odds; the rest are fighting skills and add damage for party members sharing the

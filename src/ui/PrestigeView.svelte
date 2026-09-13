@@ -94,11 +94,11 @@
   {#if !canAscend(save)}
     <p class="muted small">{tr("Clear at least one tower first. Relics come from towers (1–7 each by region), every 10 species owned, and every 10 levels.")}</p>
   {:else}
-    <p class="small">{tr("This run is worth")} <b class="relics">🏺 {worth}</b> — {towersCleared} {tr("tower")}{towersCleared === 1 ? '' : 's'}, {Object.values(save.paldeck).filter((e) => e.caught > 0).length} {tr("species, level")} {save.player.level}.
-      {#each REGIONS as r, i}{#if !save.progress.towers.includes(r.tower.id)} <span class="muted">{tr("Next tower: +")}{i + 1}.</span>{/if}{/each}
+    <p class="small">{tr("This run is worth")} <b class="relics">🏺 {worth}</b> — {tr("{towers} tower(s), {species} species, level {level}.", { towers: towersCleared, species: Object.values(save.paldeck).filter((e) => e.caught > 0).length, level: save.player.level })}
+      {#each REGIONS as r, i}{#if !save.progress.towers.includes(r.tower.id)} <span class="muted">{tr("Next tower: +{n}.", { n: i + 1 })}</span>{/if}{/each}
     </p>
     <div class="row">
-      <h3 class="grow">{tr("Choose up to")} {slots} {tr("to carry")} <span class="muted">{keep.length} / {slots}</span></h3>
+      <h3 class="grow">{tr("Choose up to {n} to carry", { n: slots })} <span class="muted">{keep.length} / {slots}</span></h3>
       <button class="small" disabled={candidates.length === 0} onclick={pickBest} title={tr("Fill the Ark with the strongest Pals in the list below")}>{tr("Pick best")}</button>
       {#if keep.length}<button class="small" onclick={() => (keep = [])}>{tr("Clear picks")}</button>{/if}
     </div>
@@ -126,7 +126,7 @@
       <button class="primary ascend" onclick={() => (confirming = true)}>{tr("Ascend for 🏺")} {worth}</button>
     {:else}
       <div class="confirm">
-        <p><b>{tr("Are you sure?")}</b> {tr("Everything except your records, upgrades and the")} {keep.length} {tr("chosen Pal")}{keep.length === 1 ? '' : 's'} {tr("will be gone. The Merchant, your base and your inventory reset to a fresh start.")}</p>
+        <p><b>{tr("Are you sure?")}</b> {tr("Everything except your records, upgrades and the {n} chosen Pal(s) will be gone. The Merchant, your base and your inventory reset to a fresh start.", { n: keep.length })}</p>
         <div class="row">
           <button class="danger" onclick={doAscend}>{tr("Yes, ascend")}</button>
           <button onclick={() => (confirming = false)}>{tr("Not yet")}</button>

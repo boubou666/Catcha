@@ -32,6 +32,22 @@ class UpdateState {
   }
 
   dismiss() { this.available = false; }
+
+  /**
+   * Apply on our own when it costs nothing: the tab is hidden, or the player has been idle (no pointer / key
+   * activity) for a while and is not in a boss fight. `busy` is asked at the moment of applying.
+   */
+  autoApply(busy: () => boolean, idleMs = 90_000) {
+    let lastInput = Date.now();
+    const bump = () => { lastInput = Date.now(); };
+    for (const ev of ['pointerdown', 'keydown', 'touchstart']) document.addEventListener(ev, bump, { passive: true });
+    const maybe = () => {
+      if (!this.available || this.reloading || busy()) return;
+      if (document.hidden || Date.now() - lastInput > idleMs) this.apply();
+    };
+    setInterval(maybe, 15_000);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) maybe(); });
+  }
 }
 
 export const update = new UpdateState();

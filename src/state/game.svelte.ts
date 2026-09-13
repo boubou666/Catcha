@@ -29,6 +29,7 @@ import { applyOffline, type OfflineReport } from '../engine/offline';
 import { buy, sell } from '../engine/shop';
 import { classifyLog, fillTemplate, type LogMessage, type LogEntry } from '../engine/logfilter';
 import { resolveDefeat } from './defeat';
+import { canRaid, nextRaidDelay, rollRaid, tickRaid } from '../engine/baseraid';
 import { canEnter, canSummon, endRun, enterDungeon, flee, startAlpha, startTower, summonRaid } from './encounters';
 import { applyLoadout, deleteLoadout, renameLoadout, saveLoadout, updateLoadout } from '../engine/loadouts';
 import { bulkAssign, bulkParty, bulkRelease, describeBulk, type BulkResult } from '../engine/bulk';
@@ -165,6 +166,7 @@ export class Game {
       }
     }
     this.save.stats.playSeconds += dtMs / 1000;
+    this.tickBaseRaid(dtMs / 1000);
     this.sinceCheck += dtMs;
     if (this.sinceCheck >= 1000) {
       this.sinceCheck = 0;
@@ -187,6 +189,46 @@ export class Game {
   }
 
   click() { this.save.stats.clicks += 1; this.emit('click'); this.hit(this.clickDmg, true); }
+
+  // ---- base raids --------------------------------------------------------
+
+  private tickBaseRaid(dtSec: number) {
+    const base = this.save.base;
+    if (base.raid) {
+      const out = tickRaid(this.save, base.raid, dtSec);
+      if (!out) return;
+      const name = palById(base.raid.palId).name;
+      base.raid = null;
+      base.nextRaidAt = this.save.stats.playSeconds + nextRaidDelay();
+      if (out.kind === 'repelled') {
+        const loot = Object.entries(out.drops).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') || '—';
+        this.pushT('Raid repelled! {pal} fled — +{gold} gold, {loot}.', { pal: name, gold: out.gold, loot });
+        if (out.catchResult.outcome === 'caught') this.pushT('The raider {pal} was caught with a {sphere}!', { pal: name, sphere: SPHERES[out.catchResult.tier].name }, { chance: out.catchResult.chance, landed: true });
+        else if (out.catchResult.outcome === 'failed') this.pushT('{pal} broke free.', { pal: name }, { chance: out.catchResult.chance, landed: false });
+        this.emit('bossWin');
+        this.notifyT('🛡 Raid repelled — {pal} fled', { pal: name }, 'gold', 5000);
+      } else {
+        const stolen = Object.entries(out.stolen).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') || 'nothing';
+        this.pushT('The base fell to {pal}: {stolen} stolen, the workers are shaken.', { pal: name, stolen });
+        this.notifyT('🚨 {pal} raided the base — {stolen} stolen', { pal: name, stolen }, 'warn', 6000);
+      }
+      return;
+    }
+    if (this.save.stats.playSeconds >= base.nextRaidAt) {
+      if (!canRaid(this.save)) { base.nextRaidAt = this.save.stats.playSeconds + 60; return; }
+      base.raid = rollRaid(this.route);
+      const name = palById(base.raid.palId).name;
+      this.pushT('🚨 {pal} Lv {level} is raiding the base! The workers fight back — rally the party from the Base tab.', { pal: name, level: base.raid.level });
+      this.notifyT('🚨 {pal} is raiding the base!', { pal: name }, 'warn', 8000);
+    }
+  }
+
+  /** Send the party to the base for the rest of the raid. */
+  rally() {
+    if (!this.save.base.raid || this.save.base.raid.rallied) return;
+    this.save.base.raid.rallied = true;
+    this.pushT('The party rushes to the base.');
+  }
 
   // ---- prestige ----------------------------------------------------------
 

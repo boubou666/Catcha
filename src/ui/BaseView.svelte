@@ -8,6 +8,9 @@
   import PalCard from './PalCard.svelte';
   import CatchOdds from './CatchOdds.svelte';
   import { activePartners, summarizePartners } from '../engine/partner';
+  import { defenceDps, RAID_TIME_SEC } from '../engine/baseraid';
+  import PalIcon from './PalIcon.svelte';
+  import { palById } from '../data/pals';
   const partnerLines = $derived(summarizePartners(activePartners(game.save).filter((e) => e.stat === 'work')));
   import CostLine from './CostLine.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
@@ -16,6 +19,7 @@
   import { structureTech } from '../data/tech';
 
   const save = $derived(game.save);
+  const raid = $derived(save.base.raid);
   const workers = $derived(baseWorkers(save));
   const levels = $derived(workLevels(save));
   const rates = $derived(computeRates(save));
@@ -50,6 +54,20 @@
 </script>
 
 <h2>{tr("Base")} <span class="muted">{workers.length} / {save.base.slots} {tr("workers")}</span></h2>
+{#if raid}
+  <div class="raid panel-2">
+    <div class="row">
+      <PalIcon palId={raid.palId} size={44} />
+      <div class="grow">
+        <b>🚨 {tr("Raid on the base!")}</b> {palById(raid.palId).name} <span class="muted">Lv {raid.level}</span>
+        <div class="bar hp"><span style:width="{Math.max(0, raid.hp / raid.maxHp) * 100}%"></span></div>
+        <div class="muted small">{Math.max(0, Math.round(raid.hp)).toLocaleString()} / {raid.maxHp.toLocaleString()} HP · ⏱ {Math.floor(Math.max(0, raid.secondsLeft) / 60)}:{String(Math.max(0, Math.ceil(raid.secondsLeft)) % 60).padStart(2, '0')} · {tr("defence")} <b>{defenceDps(save, raid).toFixed(1)}</b> DPS{raid.rallied ? ` · ${tr("party rallied")}` : ''}</div>
+      </div>
+      {#if !raid.rallied}<button class="primary small" onclick={() => game.rally()} title={tr("Adds the party's attack to the workers' for the rest of the raid")}>{tr("Rally the party")}</button>{/if}
+    </div>
+    <p class="muted small">{tr("Production pauses until it is over. Repel it for triple drops, bonus gold and a throw at the raider; lose and it takes a tenth of two stacks and shakes the workers.")}</p>
+  </div>
+{/if}
 {#if partnerLines.length}<p class="partners small" title={tr("Work-flavoured partner skills of the workers, added up")}>{tr("🤝 Partner skills:")} {partnerLines.join(' · ')}</p>{/if}
 
 <div class="status row">
@@ -156,7 +174,7 @@
     {/snippet}
   </BoxFilterBar>
   <p class="muted small">{tr("Pick a work type under Filters to sort by that job's level. Assigning a party Pal pulls it out of the party.")}</p>
-  {#if full}<p class="muted small">{tr("All")} {save.base.slots} {tr("slots are taken — dismiss a worker or build a Palbox Expansion.")}</p>{/if}
+  {#if full}<p class="muted small">{tr("All {n} slots are taken — dismiss a worker or build a Palbox Expansion.", { n: save.base.slots })}</p>{/if}
   {#if candidates.length === 0 && others > 0}
     <p class="muted">{tr("No Pal matches.")} <button class="small" onclick={clearPick}>{tr("Clear filters")}</button></p>
   {/if}
@@ -174,6 +192,10 @@
 </section>
 
 <style>
+  .raid { padding: 0.6rem; margin: 0.4rem 0 0.6rem; border: 1.5px solid var(--danger); border-radius: var(--radius-sm); }
+  .raid .hp { margin: 0.25rem 0; }
+  .raid .hp span { background: var(--danger); }
+  .raid p { margin: 0.4rem 0 0; }
   .partners { color: var(--accent); font-size: 0.85rem; margin: -0.3rem 0 0.5rem; }
   section { margin-top: 1.25rem; }
   .status { padding: 0.5rem 0.75rem; background: var(--panel-2); border-radius: var(--radius-sm); }

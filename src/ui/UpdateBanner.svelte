@@ -11,7 +11,7 @@
 
 {#if update.available}
   <div class="banner row" role="status">
-    <span class="grow">{tr("🆕 A new version of Catcha is ready.")}</span>
+    <span class="grow">{tr("🆕 A new version of Catcha is ready — it applies itself when you step away.")}</span>
     <button class="primary small" onclick={reload}>{tr("Reload")}</button>
     <button class="small" onclick={() => update.dismiss()} title={tr("Keep playing on this version until next time")}>{tr("Later")}</button>
   </div>

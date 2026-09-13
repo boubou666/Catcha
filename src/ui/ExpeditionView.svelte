@@ -63,7 +63,7 @@
 <h2>{tr("Expeditions")} <span class="muted">{save.base.expeditions.length} / {slots} {tr("out")}</span></h2>
 
 {#if slots === 0}
-  <p class="muted">{tr("Build the")} <b>{tr("Expedition Post")}</b> {tr("at your base (Base → Structures) to send idle Pals on trips. Each level adds a concurrent expedition.")}</p>
+  <p class="muted">{tr("Build the Expedition Post at your base (Base → Structures) to send idle Pals on trips. Each level adds a concurrent expedition.")}</p>
 {/if}
 
 {#if save.base.expeditions.length > 0}
@@ -116,7 +116,7 @@
     <button class="primary small" disabled={!!block} title={block ? BLOCK[block] : ''} onclick={sendNow}>{tr("Send")}</button>
   </div>
   {#if block && picked.length > 0}<div class="warn small">{BLOCK[block]}</div>{/if}
-  <p class="muted small">{tr("Chance is judged against a full party at Lv")} {def.level}{tr(". Stars and attack passives count. Members are unavailable until they return.")}</p>
+  <p class="muted small">{tr("Chance is judged against a full party at Lv {level}. Stars and attack passives count. Members are unavailable until they return.", { level: def.level })}</p>
   <BoxFilterBar bind:filter defaults={PICK_DEFAULTS} label="Search idle Pals" hideStatus>
     {#snippet heading()}
       <span class="grow muted small">{tr("Idle Pals")} {filtering ? `${candidates.length} of ${idle.length}` : idle.length}</span>

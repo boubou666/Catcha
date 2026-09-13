@@ -49,7 +49,7 @@
     if (w.kind === 'raid') return { kind: 'altar', id: 'altar' };
     return game.run ? { kind: 'realm', id: game.run.id } : null;
   });
-  const isFighting = (p: MapPin) => !!fighting && fighting.kind === p.kind && fighting.id === p.id;
+  const isFighting = (p: MapPin) => (!!fighting && fighting.kind === p.kind && fighting.id === p.id) || (p.kind === 'base' && !!game.save.base.raid);
 
   // "show on map" from elsewhere: zoom to the pin's region and select it
   $effect(() => {

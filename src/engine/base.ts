@@ -11,7 +11,7 @@ import { prestigeMult } from './prestige';
 import { partnerMult, ranchMult } from './partner';
 
 export function newBase(): BaseState {
-  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [], expeditions: [], reports: [] };
+  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [], expeditions: [], reports: [], raid: null, nextRaidAt: 20 * 60 };
 }
 
 // ---- workers ---------------------------------------------------------------
@@ -231,6 +231,7 @@ function tickSan(save: SaveState, dtMin: number, drainPerMin: number, medicalPer
 
 export function tickBase(save: SaveState, dtSec: number): void {
   if (dtSec <= 0) return;
+  if (save.base.raid) { tickSan(save, dtSec / 60, 0, 0); return; }   // everyone is fighting, nothing gets made
   const dtMin = dtSec / 60;
   if (save.base.workers.length === 0) { tickSan(save, dtMin, 0, 0); return; }
   const rates = computeRates(save);

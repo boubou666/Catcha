@@ -23,7 +23,7 @@
 
 <div class="row">
   <h2 class="grow">{tr("Achievements")} <span class="muted">{unlockedCount} / {ACHIEVEMENTS.length}</span></h2>
-  <span class="points">🏆 {points} / {totalPoints} {tr("pts · +")}{pct(points * POINT_GOLD_BONUS)} {tr("gold")}</span>
+  <span class="points">🏆 {points} / {totalPoints} {tr("pts · +{pct} gold", { pct: pct(points * POINT_GOLD_BONUS) })}</span>
 </div>
 <div class="row">
   <input type="search" placeholder={tr("Search achievements…")} bind:value={filter.query} aria-label={tr("Search achievements")} />
@@ -45,7 +45,7 @@
     {#if filtering}<button class="small" onclick={clear}>{tr("Clear")}</button>{/if}
   </div>
 {/if}
-<p class="muted small">{tr("Every point is +")}{POINT_GOLD_BONUS * 100}{tr("% gold from defeated Pals, permanently.")}</p>
+<p class="muted small">{tr("Every point is +{n}% gold from defeated Pals, permanently.", { n: POINT_GOLD_BONUS * 100 })}</p>
 
 {#if shown.length === 0}
   <p class="muted">{tr("No achievement matches.")} <button class="small" onclick={clear}>{tr("Clear filters")}</button></p>
@@ -61,7 +61,7 @@
             <b class="grow">{a.name}</b>
             <span class="pts">{done ? '✓ ' : ''}{a.points} pt{a.points === 1 ? '' : 's'}</span>
           </div>
-          <div class="muted small">{a.desc}</div>
+          <div class="muted small">{tr(a.desc)}</div>
           <div class="bar"><span style:width="{(value / a.goal) * 100}%"></span></div>
           <div class="muted small">{fmt(value)} / {fmt(a.goal)}</div>
           {#if !done}{@const hint = achievementCatchHint(game.save, a)}{#if hint}<div class="small odds">{hint}</div>{/if}{/if}

@@ -10,6 +10,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.13.0', date: '2026-09-14', title: 'Base raids',
+    items: [
+      'Wild Pals now raid your base. Every 15–25 minutes of play (once you have workers and a structure), a Pal from your current route shows up with boss-sized HP and three minutes on the clock. The workers fight back at half attack; Rally the party from the Base tab (or the 🚨 button in the arena) to add its damage. Production pauses meanwhile.',
+      'Repel it for triple drops, five times the gold and a throw at the raider; lose and it takes a tenth of two stacks and shakes the workers’ SAN. Your base glows red on the map while it lasts; Stats counts raids repelled and lost.',
+      'Updates apply themselves: when a new version is ready, the game reloads once the tab is hidden or you have been idle for a minute and a half — never mid-boss or inside a realm.',
+      'French: every sentence that was stitched around a number is a proper sentence again; achievement, tech and statistics descriptions are translated too.',
+    ],
+  },
+  {
     version: '0.12.0', date: '2026-09-14', title: 'En français',
     items: [
       'The whole game in French: Settings → Language. Menus, every view, filters, the log, toasts and the tutorial; Pal, route and item names keep their wiki names, as Palworld itself does. Missing strings fall back to English.',

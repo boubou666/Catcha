@@ -73,7 +73,7 @@
     {/each}
   </div>
 {:else}
-  <p class="muted small">{tr("The merchant pays")} {pct(SELL_SHARE)} {tr("of the buy price for stocked goods and fixed rates for drops. Spheres, slabs and keys aren't taken.")}</p>
+  <p class="muted small">{tr("The merchant pays {pct} of the buy price for stocked goods and fixed rates for drops. Spheres, slabs and keys aren't taken.", { pct: pct(SELL_SHARE) })}</p>
   {#if sellableTotal === 0}
     <p class="muted">{tr("Nothing to sell yet — defeat Pals for drops or put Farming Pals on a Ranch.")}</p>
   {:else if sellable.length === 0}

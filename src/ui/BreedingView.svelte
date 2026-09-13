@@ -71,7 +71,7 @@
 <h2>{tr("Breeding Farm")}</h2>
 
 {#if !hasFarm}
-  <p class="muted">{tr("Build the")} <b>{tr("Breeding Farm")}</b> {tr("at your base (Base → Structures). Each egg costs one Cake, baked at the Workbench.")}</p>
+  <p class="muted">{tr("Build the Breeding Farm at your base (Base → Structures). Each egg costs one Cake, baked at the Workbench.")}</p>
 {:else if parents}
   <div class="pair panel-2">
     <div class="row parents">
@@ -87,13 +87,13 @@
     </div>
     <div class="row child muted small">
       <span>{tr("Passives it can inherit:")}</span>
-      {#if activePool.length}<PassiveChips ids={activePool} />{:else}<span>{tr("none —")} {pct(MUTATION_CHANCE)} {tr("chance of a random one per slot")}</span>{/if}
+      {#if activePool.length}<PassiveChips ids={activePool} />{:else}<span>{tr("none — {pct} chance of a random one per slot", { pct: pct(MUTATION_CHANCE) })}</span>{/if}
     </div>
     {#if pair?.progress !== null && pair}
       <div class="bar grow"><span style:width="{pair.progress * 100}%"></span></div>
-      <div class="muted small">{tr("Egg in")} {eggEta((1 - pair.progress) * BREED_SEC)} · {cakes} {itemName(CAKE)} {tr("left")}</div>
+      <div class="muted small">{tr("Egg in {eta} · {n} {cake} left", { eta: eggEta((1 - pair.progress) * BREED_SEC), n: cakes, cake: itemName(CAKE) })}</div>
     {:else}
-      <div class="warn small">{tr("Waiting for a Cake (")}{cakes} {tr("in stock). Bake one under Craft.")}</div>
+      <div class="warn small">{tr("Waiting for a Cake ({n} in stock). Bake one under Craft.", { n: cakes })}</div>
     {/if}
     <button class="small" onclick={() => game.clearPair()}>{tr("Separate pair")}</button>
   </div>

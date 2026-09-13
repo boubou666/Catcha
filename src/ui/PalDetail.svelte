@@ -58,7 +58,7 @@
         <div class="muted">{seen ? `${def.elements.join(' / ')} · ${def.rarity}` : 'Unknown element'}</div>
         {#if seen && def.partnerSkill}<div class="small partner" title={tr("Partner skill")}>🤝 {describePartner(def)}</div>{/if}
         {#if owned.count > 0}
-          <div class="small">{tr("Owned ×")}{owned.count}{owned.best ? ` · best Lv ${owned.best.level}${owned.best.stars ? ' ' + '★'.repeat(owned.best.stars) : ''}` : ''}</div>
+          <div class="small">{tr("Owned ×{n}", { n: owned.count })}{owned.best ? ` · best Lv ${owned.best.level}${owned.best.stars ? ' ' + '★'.repeat(owned.best.stars) : ''}` : ''}</div>
         {:else if seen}<div class="muted small">{tr("Seen, not yet caught")}</div>
         {:else}<div class="muted small">{tr("Not yet encountered")}</div>{/if}
       </div>
@@ -108,7 +108,7 @@
 
     <section>
       <h3>{tr("Habitat")} {#if filtering}<span class="muted small">{places(habitat)} of {places(allHabitat)}</span>{/if}</h3>
-      {#if place}<div class="small best">{tr("🎯 Best place:")} <b>{place.routeName}</b> <span class="muted">({place.regionName}) · {pct(place.share)} {tr("of spawns ×")} {pct(place.odds)} {tr("odds → about 1 catch per")} {Math.max(1, Math.round(1 / place.perDefeat))} {tr("defeat")}{Math.round(1 / place.perDefeat) === 1 ? '' : 's'}</span>{#if !game.inBossFight && game.route.id !== place.routeId}<button class="tiny" onclick={() => { game.travel(place.routeId); onclose(); }}>Go</button>{/if}</div>{/if}
+      {#if place}<div class="small best">{tr("🎯 Best place:")} <b>{place.routeName}</b> <span class="muted">({place.regionName}) · {tr("{share} of spawns × {odds} odds → about 1 catch per {n} defeat(s)", { share: pct(place.share), odds: pct(place.odds), n: Math.max(1, Math.round(1 / place.perDefeat)) })}</span>{#if !game.inBossFight && game.route.id !== place.routeId}<button class="tiny" onclick={() => { game.travel(place.routeId); onclose(); }}>Go</button>{/if}</div>{/if}
       {#if places(allHabitat) === 0}
         <div class="muted small">{tr("Not found in the wild.")}</div>
       {:else if places(habitat) === 0}

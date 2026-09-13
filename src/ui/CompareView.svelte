@@ -32,7 +32,7 @@
   <h2 class="grow">{tr("Compare")} <span class="muted">{insts.length} / {MAX_COMPARE}</span></h2>
   {#if insts.length}<button class="small" onclick={() => compare.clear()}>{tr("Clear")}</button>{/if}
 </div>
-<p class="muted small">{tr("Pick up to")} {MAX_COMPARE} Pals here or with the ⚖ button in the Box. Best value per row is highlighted; work rows are effective output after stars, passives and sanity.</p>
+<p class="muted small">{tr("Pick up to {n} Pals here or with the ⚖ button in the Box. Best value per row is highlighted; work rows are effective output after stars, passives and sanity.", { n: MAX_COMPARE })}</p>
 
 {#if insts.length === 0}
   <p class="muted">{tr("Nothing selected yet — add Pals from the list below.")}</p>

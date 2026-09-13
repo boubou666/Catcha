@@ -35,7 +35,7 @@
 
 <div class="row">
   <h2 class="grow">{tr("Daily Quests")} <span class="muted">{claimedCount} / {daily?.quests.length ?? 0}</span></h2>
-  <span class="muted small">{tr("Resets in")} {untilReset} ({mode === 'utc' ? 'UTC' : 'local'} {tr("midnight · Settings) · tier")} {tier}</span>
+  <span class="muted small">{tr("Resets in {eta} ({mode} midnight · Settings) · tier {tier}", { eta: untilReset, mode: mode === 'utc' ? 'UTC' : tr('local'), tier })}</span>
 </div>
 <p class="muted small">Three quests a day, scaled to how far you've come. Progress counts from the moment the quest appeared; unclaimed quests vanish at reset.</p>
 
@@ -77,7 +77,7 @@
   </div>
 
   <div class="bonus row" class:ready={bonusReady(save)}>
-    <span class="grow">{tr("Daily bonus — claim all three for")} <b>+{BONUS_EFFIGIES} {tr("Effigy")}</b> {tr("(permanent capture power)")}</span>
+    <span class="grow">{tr("Daily bonus — claim all three for")} <b>+{BONUS_EFFIGIES} {tr("Effigy")}</b> <span class="muted">{tr("(permanent capture power)")}</span></span>
     {#if daily.bonusClaimed}<span class="claimed">{tr("✓ claimed")}</span>
     {:else}<button class="small" class:primary={bonusReady(save)} disabled={!bonusReady(save)} onclick={() => game.claimBonus()}>{tr("Claim")}</button>{/if}
   </div>
