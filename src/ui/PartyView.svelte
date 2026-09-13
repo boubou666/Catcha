@@ -6,6 +6,7 @@
   import PalCard from './PalCard.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
   import Loadouts from './Loadouts.svelte';
+  import CatchOdds from './CatchOdds.svelte';
 
   const party = $derived(partyInstances(game.save));
   const empty = $derived(Math.max(0, PARTY_SIZE - party.length));
@@ -26,6 +27,7 @@
 <div class="list">
   {#each party as inst (inst.uid)}
     <PalCard {inst}>
+      <CatchOdds palId={inst.palId} />
       <button class="small" onclick={() => game.removeFromParty(inst.uid)}>To box</button>
     </PalCard>
   {/each}
@@ -55,6 +57,7 @@
       {#each candidates as inst (inst.uid)}
         {@const status = statusOf(game.save, inst.uid)}
         <PalCard {inst}>
+          <CatchOdds palId={inst.palId} />
           {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
           <button class="small" disabled={full || status === 'expedition'} onclick={() => game.addToParty(inst.uid)}
             title={status === 'expedition' ? 'Away until the expedition returns' : status === 'base' ? 'Pulls it off its base job' : status === 'breeding' ? 'Breaks up the breeding pair' : ''}>Add</button>

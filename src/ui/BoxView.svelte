@@ -13,8 +13,7 @@
   import BoxFilterBar from './BoxFilterBar.svelte';
 
   import { ui } from '../state/ui.svelte';
-  import { catchPreview } from '../engine/catch';
-  import { catchText } from './catchText';
+  import CatchOdds from './CatchOdds.svelte';
   let filter = $state<BoxFilter>({ ...DEFAULT_FILTER });
   $effect(() => { const q = ui.boxQuery; if (q !== null) filter = { ...filter, query: ui.takeBoxQuery() ?? '' }; });
   const sorted = $derived(filterBox(game.save, filter));
@@ -92,15 +91,13 @@
     {@const cost = condenseCost(inst)}
     {@const block = condenseBlocker(game.save, inst)}
     {@const dupes = condenseCandidates(game.save, inst).length}
-    {@const pv = catchPreview(game.save, inst.palId)}
     <PalCard {inst} showWork>
       {#if selecting}<input type="checkbox" class="sel" checked={selected.has(inst.uid)} onchange={() => toggleSel(inst.uid)} aria-label="Select {palById(inst.palId).name}" />{/if}
       {#if game.save.base.workers.includes(inst.uid)}<span class="muted small">at base</span>{/if}
       {#if isBreeding(game.save, inst.uid)}<span class="muted small">breeding</span>{/if}
       {#if isAway(game.save, inst.uid)}<span class="muted small">on expedition</span>{/if}
       <button class="small" class:cmp-on={compare.has(inst.uid)} disabled={!compare.has(inst.uid) && compare.full} onclick={() => compare.toggle(inst.uid)} title={compare.has(inst.uid) ? 'Remove from comparison' : 'Add to comparison (Compare tab)'}>⚖</button>
-      <button class="small odds" class:no={!pv.throws} onclick={() => (ui.requestTab = 'settings')}
-        title={`Catching another ${palById(inst.palId).name}: ${catchText(pv)}`}>🎯 {pv.throws ? `${Math.round(pv.chance * 100)}%` : '—'}</button>
+      <CatchOdds palId={inst.palId} />
       {#if cost !== null}
         <button class="small star" class:ready={!block} disabled={!!block} onclick={() => game.condense(inst.uid)}
           title={block ? BLOCK_TEXT[block] : `Condense ${cost} ${palById(inst.palId).name}s into this one`}>
@@ -119,8 +116,6 @@
 
 <style>
   .list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 60vh; overflow-y: auto; }
-  .odds { color: var(--accent-2); font-weight: 700; font-variant-numeric: tabular-nums; }
-  .odds.no { color: var(--muted); font-weight: 400; }
   .small { font-size: 0.8rem; }
   .star.ready { border-color: var(--accent); color: var(--accent); }
   .bulkbar { margin: 0.5rem 0; padding: 0.4rem 0.5rem; border: 2px dashed var(--border-soft); border-radius: var(--radius-sm); }
