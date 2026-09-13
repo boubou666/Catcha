@@ -25,7 +25,7 @@ export const RAIDS: RaidDef[] = [
   { id: 'xenolord', name: 'Xenolord', palId: 125, level: 62, hp: 1_750_000, timeLimitSec: 600, slabItemId: 'slab_xenolord', luckyChance: 0.15,
     unlock: { kind: 'tower', id: 'saya' },
     reward: { gold: 400_000, items: [d('diamond', 1, 4, 8), d('ingot', 1, 40, 80), d('high_quality_pal_oil', 1, 20, 40), d('sphere_legendary', 0.6, 1, 2)], egg: true } },
-  { id: 'libero', name: 'Bellanoir Libero', palId: 1142, level: 72, hp: 2_800_000, timeLimitSec: 600, slabItemId: 'slab_libero', luckyChance: 0.25,
+  { id: 'libero', name: 'Bellanoir Libero', palId: 1142, level: 72, hp: 2_300_000, timeLimitSec: 600, slabItemId: 'slab_libero', luckyChance: 0.25,
     unlock: { kind: 'raid', id: 'bellanoir' },
     reward: { gold: 1_000_000, items: [d('diamond', 1, 8, 15), d('ingot', 1, 80, 150), d('sphere_legendary', 1, 2, 3)], egg: true } },
 ];

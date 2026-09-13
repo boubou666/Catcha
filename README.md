@@ -214,8 +214,9 @@ a full party at the recommended level; success pays a chest, failure a quarter o
 gain exp either way and are locked until they return. Resolves offline. Data in `src/data/expeditions.ts`.
 
 Raids: build the Summoning Altar (tech Lv 35), assemble a slab from Slab Fragments (Sealed Realms
-from region 3, long expeditions), and summon Bellanoir (500k HP), Xenolord (1.5M) or Bellanoir Libero
-(3M) for a ten-minute DPS check. The slab is spent on summon. Winning pays Diamonds, Ingots, a
+from region 3, long expeditions), and summon Bellanoir (650k HP), Xenolord (1.75M) or Bellanoir Libero
+(2.3M) for a ten-minute DPS check — the balance model puts each at 75–79% of the clock for a party from
+the region where it unlocks. The slab is spent on summon. Winning pays Diamonds, Ingots, a
 Legendary Sphere chance and the boss's egg, which inherits passives from the party that won
 (same rule as breeding, with your five fighters as the parent pool) and has a 10% / 15% / 25% chance to
 be Lucky. Data in `src/data/raids.ts`.
