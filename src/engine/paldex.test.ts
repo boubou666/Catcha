@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newState } from './save';
-import { breedingInfoFor, DEFAULT_DETAIL_FILTER, filterBreedingInfo, filterHabitat, habitatOf, isDetailFiltering, ownedCopies } from './paldex';
+import { bestPlace, breedingInfoFor, DEFAULT_DETAIL_FILTER, filterBreedingInfo, filterHabitat, habitatOf, isDetailFiltering, ownedCopies } from './paldex';
 import { PALS, palById } from '../data/pals';
 import { childOf } from './breeding';
 import { addToBox, makeInstance } from './party';
@@ -96,5 +96,21 @@ describe('detail-view filter', () => {
     expect(filterBreedingInfo(save, info, { ...DEFAULT_DETAIL_FILTER, query: partnerName }).producedBy).toEqual([]);   // unseen: hidden
     save.paldeck[partner] = { seen: true, caught: 0 };
     expect(filterBreedingInfo(save, info, { ...DEFAULT_DETAIL_FILTER, query: partnerName }).producedBy).toHaveLength(1);
+  });
+});
+
+describe('best place to hunt', () => {
+  it('weighs spawn share by odds over routes you can reach', () => {
+    const s = newState();
+    s.inventory.sphere_pal = 5;
+    // Lamball: 40% on the Plateau (open), 20% on Grassy Behemoth Hills (locked until the Plateau is cleared)
+    const p = bestPlace(s, 1)!;
+    expect(p.routeId).toBe('plateau');
+    expect(p.share).toBeCloseTo(0.4);
+    expect(p.odds).toBeCloseTo(0.6);
+    expect(p.perDefeat).toBeCloseTo(0.24);
+    expect(bestPlace(s, 142)).toBeNull();        // Bellanoir: raid only
+    s.inventory.sphere_pal = 0;                   // no throw → ranked with a Pal Sphere anyway
+    expect(bestPlace(s, 1)!.odds).toBeCloseTo(0.6);
   });
 });

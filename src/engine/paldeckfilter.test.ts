@@ -84,3 +84,16 @@ describe('paldeck filter', () => {
     expect(ids(s, { sort: 'rarity' })[4]).toBe(3);                            // unseen trail by number
   });
 });
+
+describe('easiest-to-catch sort', () => {
+  it('puts the best odds first, no-throw species after, unseen last', () => {
+    const s = newState();
+    s.inventory.sphere_pal = 3;
+    s.paldeck[1] = { seen: true, caught: 0 };    // Lamball, common — 60%
+    s.paldeck[11] = { seen: true, caught: 0 };   // Penking, rare — 15%
+    s.paldeck[2] = { seen: true, caught: 1 };    // Cattiva, caught — dupe policy says no throw
+    const order = filterDeck(s, { ...DEFAULT_DECK_FILTER, sort: 'odds' }).map((e) => e.def.id);
+    expect(order.slice(0, 3)).toEqual([1, 11, 2]);
+    expect(order.slice(3).every((id) => !s.paldeck[id]?.seen)).toBe(true);
+  });
+});

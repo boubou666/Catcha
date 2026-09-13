@@ -6,6 +6,7 @@
   import { catchText } from './catchText';
   import { palById } from '../data/pals';
   import PalIcon from './PalIcon.svelte';
+  import { prefs } from '../state/prefs.svelte';
 
   // Defaults to the current route; a realm passes its wave pool and guardian.
   let { spawns, where, guardian }: { spawns?: SpawnTable; where?: string; guardian?: number } = $props();
@@ -48,7 +49,7 @@
         <b>{r.name}</b> <span class="muted small">#{r.no}{r.elements.length ? ` · ${r.elements.join('/')}` : ''}{r.status === 'seen' ? ' · seen' : r.status === 'caught' ? ' · caught' : ''}</span>
       </span>
       <span class="muted small chance">{pct(r.chance)}</span>
-      <span class="small chance odds" class:no={!r.catch.throws} title={`Catch: ${catchText(r.catch)}`}>🎯 {r.catch.throws ? pct(r.catch.chance) : '—'}</span>
+      {#if prefs.showOdds}<span class="small chance odds" class:no={!r.catch.throws} title={`Catch: ${catchText(r.catch)}`}>🎯 {r.catch.throws ? pct(r.catch.chance) : '—'}</span>{/if}
       <button class="small watch" class:on={r.watched} onclick={() => game.toggleWatch(r.palId)} title={r.watched ? 'Stop watching' : 'Toast me when this Pal spawns'}>👀</button>
     </div>
   {/each}
@@ -60,7 +61,7 @@
     </div>
   {/if}
 </div>
-<p class="muted tiny">First number: each species' share of the spawn table. 🎯: catch odds with the sphere your policy picks (Settings → Catching). Watched Pals pop a toast when they appear (this device only).</p>
+<p class="muted tiny">{prefs.showOdds ? 'First number: each species\' share of the spawn table. 🎯: catch odds with the sphere your policy picks (Settings → Catching).' : 'Odds are each species\' share of the spawn table.'} Watched Pals pop a toast when they appear (this device only).</p>
 
 <style>
   .head { margin-bottom: 0.3rem; }

@@ -5,6 +5,27 @@ import { DUNGEONS, dungeonById } from '../data/dungeons';
 import { RAIDS, raidById } from '../data/raids';
 import { isUnlocked } from './progress';
 import { childOf, comboKey, SPECIAL_COMBOS } from './breeding';
+import { catchChance, catchPreview } from './catch';
+import { techMult } from './tech';
+import { prestigeMult } from './prestige';
+
+export interface BestPlace { routeId: string; routeName: string; regionName: string; share: number; odds: number; perDefeat: number }
+
+/**
+ * The reachable route where a defeat is most likely to end in a catch of this species: spawn share × catch odds.
+ * Odds use the policy's sphere, or a Pal Sphere when the policy would not throw (so the ranking still means something).
+ */
+export function bestPlace(save: SaveState, palId: number): BestPlace | null {
+  const pv = catchPreview(save, palId);
+  const odds = pv.throws ? pv.chance : catchChance(palById(palId).rarity, 'pal', save.player.effigies, false, techMult(save, 'catch') * prestigeMult(save, 'catch'));
+  let best: BestPlace | null = null;
+  for (const r of habitatOf(palId).routes) {
+    if (!isUnlocked(save, routeById(r.routeId).unlock)) continue;
+    const perDefeat = r.chance * odds;
+    if (!best || perDefeat > best.perDefeat) best = { routeId: r.routeId, routeName: r.routeName, regionName: r.regionName, share: r.chance, odds, perDefeat };
+  }
+  return best;
+}
 
 export interface Habitat {
   routes: { regionName: string; routeId: string; routeName: string; level: number; chance: number }[];

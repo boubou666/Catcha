@@ -10,6 +10,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.10.0', date: '2026-09-14', title: 'Know your odds',
+    items: [
+      'Catch odds wherever a species or a sphere comes up. Towers and raids say what a win gives instead (a tower boss cannot be caught; a raid gives an egg, with its ✨ Lucky odds); Sealed Realm buttons show the guardian’s and the waves’ odds.',
+      '“Who lives here?” — on a route or inside a realm — lists every species with its 🎯 odds next to its spawn share, the guardian included.',
+      'Paldeck: odds on every seen card, a new “Easiest to catch” sort, and a Catching section on each Pal’s page — odds per sphere you have unlocked, wild and as an Alpha, with your stock — plus the best place to hunt it (spawn share × odds).',
+      'Box, Party, Base, Compare and Expedition lists show the odds of catching another of that species; Compare gets a “Catch another” row; Breeding shows what catching the offspring in the wild would take instead.',
+      'Sphere rows in the Merchant, Items and Craft, and the header chips, say what that sphere would do on the Pal in front of you; Capture Technique shows before → after.',
+      'Route tooltips list species odds; search results and watch toasts carry the figure.',
+      'Log lines get a 🎯 badge (green landed, grey broke free, cyan on a boss’s arrival) and the Catching category sums up throws landed vs average odds. Stats: lifetime landed vs expected, your catch bonus and its parts, the odds by rarity. Catching achievements hint at what the odds say.',
+      'Settings → Catching: a switch to hide the 🎯 chips in lists if you find them noisy — the arena line and the Pal page keep theirs.',
+    ],
+  },
+  {
     version: '0.9.0', date: '2026-09-13', title: 'A Palworld look',
     items: [
       'New interface styled after Palworld’s menus: a sunny Palpagos backdrop, dark glass HUD panels with cyan edge-light and chamfered corners, bold rounded type (Nunito), yellow-orange for the actions that matter.',
@@ -20,7 +33,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Tighter tab rows on phones.',
       'Alpha fights are now timed: 5 minutes to win, like the towers’ 10.',
       'Alphas can be caught, like in Palworld: a sphere is thrown when you beat one, at 35% of the normal rate — better spheres and Effigies help. A caught Alpha keeps its boss level.',
-      'The arena and the Alpha buttons now show your catch odds (or why nothing would be thrown — the “Already caught” policy defaults to no throw, to save spheres early on). Catch settings moved from the Merchant to Settings → Catching; the 🎯 line in the arena jumps there. Towers and raids get the same line: “no catch” for a tower boss, and the egg with its ✨ Lucky odds for a raid; Sealed Realm buttons show the guardian’s odds, and “Who lives here?” — on a route or inside a realm — lists every species with its 🎯 catch odds next to its spawn share. The Paldeck shows the odds on every seen card, and a Pal’s page has a Catching section: odds per sphere you’ve unlocked, wild and as an Alpha, with your stock. Box and Party rows show the odds of catching another of that species, Compare has a “Catch another” row, and Breeding shows what catching the offspring in the wild would take instead. Also: route tooltips list species odds, sphere rows (Merchant, Items, Craft, header) say what they’d do on the Pal in front of you, Capture Technique shows before → after, and search results, base lists and watch toasts carry the figure. Log lines get a 🎯 badge (green landed, grey broke free, cyan on a boss’s arrival), and the Catching category shows throws landed vs average odds. Stats: lifetime landed vs expected, your catch bonus and its parts, and the odds by rarity. Catching achievements hint at the odds: throws left at your average, the easiest missing species, what a Lucky or legendary catch takes.',
+      'The arena and the Alpha buttons show your catch odds (or why nothing would be thrown — the “Already caught” policy defaults to no throw, to save spheres early on). Catch settings moved from the Merchant to Settings → Catching; the 🎯 line in the arena jumps there.',
       'The page no longer scrolls as a whole — the columns scroll on their own, so the header and arena stay put.',
     ],
   },

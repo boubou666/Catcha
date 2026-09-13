@@ -10,7 +10,7 @@ export const SETTINGS_SECTIONS: SettingsSectionDef[] = [
   { id: 'daily', title: 'Daily quest reset', keywords: ['daily', 'quest', 'reset', 'midnight', 'utc', 'local', 'time', 'timezone', 'clock', 'day', 'rollover'] },
   { id: 'appearance', title: 'Appearance', keywords: ['appearance', 'theme', 'dark', 'light', 'mode', 'colour', 'color', 'look', 'night', 'day', 'system'] },
   { id: 'sound', title: 'Sound', keywords: ['sound', 'audio', 'sfx', 'effects', 'volume', 'mute', 'music', 'vibration', 'haptic', 'buzz', 'vibrate'] },
-  { id: 'catching', title: 'Catching', keywords: ['catch', 'catching', 'sphere', 'spheres', 'policy', 'throw', 'duplicates', 'dupes', 'auto', 'already caught', 'new species'] },
+  { id: 'catching', title: 'Catching', keywords: ['catch', 'catching', 'sphere', 'spheres', 'policy', 'throw', 'duplicates', 'dupes', 'auto', 'already caught', 'new species', 'odds', 'chips', 'show', 'hide'] },
   { id: 'keyboard', title: 'Keyboard', keywords: ['keyboard', 'shortcuts', 'hotkeys', 'keys', 'rebind', 'binding', 'bindings', 'controls', 'remap'] },
   { id: 'save', title: 'Save', keywords: ['save', 'export', 'import', 'backup', 'transfer', 'copy', 'clipboard', 'reset game', 'delete', 'wipe', 'restart', 'autosave', 'storage', 'browser'] },
   { id: 'about', title: 'About', keywords: ['about', 'version', 'build', 'changelog', "what's new", 'whats new', 'update', 'tutorial', 'help', 'replay', 'how to play', 'steps', 'guide'] },

@@ -1,9 +1,10 @@
+import { catchPreview } from './catch';
 import type { Element, PalDef, Rarity, SaveState, WorkType } from '../data/types';
 import { PALS, paldeckOrder } from '../data/pals';
 import { REGIONS } from '../data/regions';
 
 export type DeckStatus = 'any' | 'caught' | 'seen' | 'missing';
-export type DeckSort = 'number' | 'name' | 'copies' | 'rarity';
+export type DeckSort = 'number' | 'name' | 'copies' | 'rarity' | 'odds';
 
 export interface DeckFilter {
   query: string;
@@ -21,7 +22,7 @@ export interface DeckEntry { def: PalDef; seen: boolean; caught: number }
 export const DEFAULT_DECK_FILTER: DeckFilter = { query: '', status: 'any', element: 'any', work: 'any', rarity: 'any', region: 'any', subspecies: false, sort: 'number' };
 
 export const DECK_STATUS_LABEL: Record<DeckStatus, string> = { any: 'Any status', caught: 'Caught', seen: 'Seen, not caught', missing: 'Never seen' };
-export const DECK_SORT_LABEL: Record<DeckSort, string> = { number: 'Paldeck number', name: 'Name', copies: 'Copies caught', rarity: 'Rarity' };
+export const DECK_SORT_LABEL: Record<DeckSort, string> = { number: 'Paldeck number', name: 'Name', copies: 'Copies caught', rarity: 'Rarity', odds: 'Easiest to catch' };
 export const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 /** Species met anywhere in a region (routes, Alphas, tower boss), computed once. */
@@ -72,16 +73,19 @@ export function filterDeck(save: SaveState, f: DeckFilter): DeckEntry[] {
       if (f.subspecies && !def.variantOf) return false;
       return matchesQuery(e, f.query);
     })
-    .sort(comparator(f.sort));
+    .sort(comparator(f.sort, save));
 }
 
-function comparator(sort: DeckSort): (a: DeckEntry, b: DeckEntry) => number {
+function comparator(sort: DeckSort, save: SaveState): (a: DeckEntry, b: DeckEntry) => number {
   const byNumber = (a: DeckEntry, b: DeckEntry) => paldeckOrder(a.def) - paldeckOrder(b.def);
+  // odds under the current policy; species that get no throw sort as 0, unseen ones trail
+  const odds = (e: DeckEntry) => { if (!e.seen) return -1; const pv = catchPreview(save, e.def.id); return pv.throws ? pv.chance : 0; };
   switch (sort) {
     case 'number': return byNumber;
     // unseen entries would give their name or rarity away, so they trail in number order
     case 'name': return (a, b) => Number(!a.seen) - Number(!b.seen) || (a.seen ? a.def.name.localeCompare(b.def.name) : 0) || byNumber(a, b);
     case 'copies': return (a, b) => b.caught - a.caught || Number(b.seen) - Number(a.seen) || byNumber(a, b);
     case 'rarity': return (a, b) => Number(!a.seen) - Number(!b.seen) || (a.seen ? RARITIES.indexOf(b.def.rarity) - RARITIES.indexOf(a.def.rarity) : 0) || byNumber(a, b);
+    case 'odds': return (a, b) => odds(b) - odds(a) || byNumber(a, b);
   }
 }

@@ -4,7 +4,7 @@
   import { itemName } from '../data/items';
   import { JOB_ICON } from '../data/base';
   import type { WorkType } from '../data/types';
-  import { breedingInfoFor, DEFAULT_DETAIL_FILTER, filterBreedingInfo, filterHabitat, habitatOf, isDetailFiltering, isSeen, ownedCopies, PAIR_KIND_LABEL, type DetailFilter } from '../engine/paldex';
+  import { bestPlace, breedingInfoFor, DEFAULT_DETAIL_FILTER, filterBreedingInfo, filterHabitat, habitatOf, isDetailFiltering, isSeen, ownedCopies, PAIR_KIND_LABEL, type DetailFilter } from '../engine/paldex';
   import { routeById } from '../data/regions';
   import { isUnlocked, describeRequirement } from '../engine/progress';
   import { dungeonById } from '../data/dungeons';
@@ -29,6 +29,7 @@
   const alphaPreview = $derived(catchPreview(save, palId, false, true));
   const table = $derived(catchTable(save, palId));
   const isAlpha = $derived(allHabitat.alphas.length > 0);
+  const place = $derived(seen ? bestPlace(save, palId) : null);
   const allBreeding = $derived(breedingInfoFor(save, palId));
   const habitat = $derived(filterHabitat(save, allHabitat, filter));
   const breeding = $derived(filterBreedingInfo(save, allBreeding, filter));
@@ -105,6 +106,7 @@
 
     <section>
       <h3>Habitat {#if filtering}<span class="muted small">{places(habitat)} of {places(allHabitat)}</span>{/if}</h3>
+      {#if place}<div class="small best">🎯 Best place: <b>{place.routeName}</b> <span class="muted">({place.regionName}) · {pct(place.share)} of spawns × {pct(place.odds)} odds → about 1 catch per {Math.max(1, Math.round(1 / place.perDefeat))} defeat{Math.round(1 / place.perDefeat) === 1 ? '' : 's'}</span>{#if !game.inBossFight && game.route.id !== place.routeId}<button class="tiny" onclick={() => { game.travel(place.routeId); onclose(); }}>Go</button>{/if}</div>{/if}
       {#if places(allHabitat) === 0}
         <div class="muted small">Not found in the wild.</div>
       {:else if places(habitat) === 0}
@@ -165,6 +167,7 @@
   .tier { display: inline-flex; align-items: center; gap: 0.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
   .tier.none { opacity: 0.5; font-weight: 400; }
   .odds { color: var(--accent-2); font-weight: 700; margin-left: 0.3rem; }
+  .best { margin: 0.2rem 0 0.4rem; color: var(--accent-2); }
   .odds.no { color: var(--muted); font-weight: 400; }
   .link { background: none; border: none; padding: 0; color: var(--accent-2); cursor: pointer; font: inherit; text-decoration: underline; }
   .controls { margin-top: 1rem; }

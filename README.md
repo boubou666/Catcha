@@ -97,7 +97,9 @@ boss's arrival — and filtering the Log on Catching sums it up: throws landed v
 the lifetime version (landed vs expected from the odds, save v22 adds the running sum), the catch bonus in
 force with its parts, and the odds by rarity with your policy's sphere. Open catching achievements carry a
 hint from the odds: throws still needed at your average, the easiest species you are missing, what a Lucky
-or a legendary catch takes.
+or a legendary catch takes. The Paldeck sorts by "Easiest to catch", and a Pal's page names the best place to
+hunt it (spawn share × odds, with a Go button). Settings → Catching has a per-device switch that hides the 🎯
+chips in lists; the arena line and Pal pages keep theirs.
 
 ## Data
 

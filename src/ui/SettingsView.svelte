@@ -13,6 +13,7 @@
   import { SPHERES } from '../data/spheres';
   import { SPHERE_TIERS, type SpherePolicy } from '../data/types';
   import ItemIcon from './ItemIcon.svelte';
+  import { prefs } from '../state/prefs.svelte';
   const policies: { value: SpherePolicy; label: string }[] = [
     { value: 'none', label: "Don't throw" },
     ...SPHERE_TIERS.map((t) => ({ value: t, label: SPHERES[t].name })),
@@ -147,6 +148,7 @@
       </select>
     </label>
   </div>
+  <label class="row"><input type="checkbox" checked={prefs.showOdds} onchange={(e) => prefs.setShowOdds(e.currentTarget.checked)} /> Show 🎯 catch odds in Pal lists, Paldeck cards and spawn tables <span class="muted small">(the arena line and Pal pages always show them; this device only)</span></label>
   <p class="muted small">Duplicates are what breeding, condensing and the base run on — throwing at them costs spheres, so it starts off. Spheres: {#each SPHERE_TIERS as t}{#if (save.inventory[SPHERES[t].itemId] ?? 0) > 0}<span class="chip"><ItemIcon id={SPHERES[t].itemId} size={14} /> {SPHERES[t].name} ×{save.inventory[SPHERES[t].itemId]}</span>{/if}{/each}{#if SPHERE_TIERS.every((t) => !(save.inventory[SPHERES[t].itemId] ?? 0))}none — buy or craft some{/if}</p>
 </section>
 {/if}

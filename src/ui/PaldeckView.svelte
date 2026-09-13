@@ -10,6 +10,7 @@
 
   import { ui } from '../state/ui.svelte';
   import { catchPreview } from '../engine/catch';
+  import { prefs } from '../state/prefs.svelte';
   import { catchText } from './catchText';
   let selected = $state<number | null>(null);
   // global search may ask for an entry to open
@@ -70,7 +71,7 @@
 
 <div class="grid">
   {#each shown as { def, seen, caught } (def.id)}
-    {@const pv = seen ? catchPreview(game.save, def.id) : null}
+    {@const pv = seen && prefs.showOdds ? catchPreview(game.save, def.id) : null}
     <button class="entry" class:caught={caught > 0} class:seen={seen && caught === 0} onclick={() => (selected = def.id)} title={pv ? `Catch: ${catchText(pv)}` : undefined}>
       <PalIcon palId={def.id} size={44} unknown={!seen} />
       <div class="num">{paldeckNumber(def)}</div>
