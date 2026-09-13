@@ -95,7 +95,9 @@ after on it; global search species results, base workers, the Compare picker and
 figure. Log lines carry a 🎯 badge — green when a throw landed, grey when it broke free, cyan on a
 boss's arrival — and filtering the Log on Catching sums it up: throws landed vs the average odds. Stats keeps
 the lifetime version (landed vs expected from the odds, save v22 adds the running sum), the catch bonus in
-force with its parts, and the odds by rarity with your policy's sphere.
+force with its parts, and the odds by rarity with your policy's sphere. Open catching achievements carry a
+hint from the odds: throws still needed at your average, the easiest species you are missing, what a Lucky
+or a legendary catch takes.
 
 ## Data
 

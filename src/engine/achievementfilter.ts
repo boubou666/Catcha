@@ -1,6 +1,44 @@
 import type { SaveState } from '../data/types';
 import { ACHIEVEMENTS, categoryLabel, type AchievementCategory, type AchievementDef } from '../data/achievements';
 import { isUnlocked, progressOf } from './achievements';
+import { PALS } from '../data/pals';
+import { catchChance, catchPreview } from './catch';
+import { catchBonus } from './stats';
+import { LUCKY_CATCH_PENALTY, SPHERES } from '../data/spheres';
+import { LUCKY_CHANCE } from './formulas';
+
+const pct = (n: number) => `${n < 0.1 ? (n * 100).toFixed(1) : Math.round(n * 100)}%`;
+
+/**
+ * What the odds say about an open catching achievement: throws still needed at your average odds (Catcher),
+ * the easiest species you are missing (Paldeck), a Lucky catch's odds (Fortune), a legendary's (Legend). Null otherwise.
+ */
+export function achievementCatchHint(save: SaveState, def: AchievementDef): string | null {
+  if (isUnlocked(save, def.id)) return null;
+  const b = catchBonus(save);
+  const mult = b.tech * b.mastery;
+  const st = save.stats;
+  if (def.id.startsWith('caught_')) {
+    const left = def.goal - progressOf(save, def);
+    const avg = st.ratedThrows ? st.chanceSum / st.ratedThrows : catchChance('common', b.tier, save.player.effigies, false, mult);
+    return `🎯 ~${Math.ceil(left / avg).toLocaleString()} more throws at ${pct(avg)} average odds`;
+  }
+  if (def.id.startsWith('paldeck_')) {
+    const missing = PALS.filter((p) => save.paldeck[p.id]?.seen && !(save.paldeck[p.id]?.caught ?? 0)).map((p) => ({ p, pv: catchPreview(save, p.id) }));
+    if (missing.length === 0) return null;
+    const throwing = missing.filter((m) => m.pv.throws) as { p: (typeof PALS)[number]; pv: { chance: number } }[];
+    if (throwing.length === 0) return `🎯 ${missing.length} seen but uncaught — no sphere would be thrown (Settings → Catching)`;
+    const best = throwing.reduce((a, m) => (m.pv.chance > a.pv.chance ? m : a));
+    return `🎯 Easiest missing: ${best.p.name} ${pct(best.pv.chance)}${missing.length > 1 ? ` · ${missing.length} seen but uncaught` : ''}`;
+  }
+  if (def.id.startsWith('lucky_')) {
+    return `🎯 1 in ${Math.round(1 / LUCKY_CHANCE)} wild Pals is Lucky, caught at ×${LUCKY_CATCH_PENALTY}: a common one ${pct(catchChance('common', b.tier, save.player.effigies, true, mult))} with a ${SPHERES[b.tier].name}`;
+  }
+  if (def.id === 'legendary') {
+    return `🎯 A legendary is caught at ${pct(catchChance('legendary', b.tier, save.player.effigies, false, mult))} with a ${SPHERES[b.tier].name}`;
+  }
+  return null;
+}
 
 export type AchStatusFilter = 'any' | 'done' | 'todo' | 'close';
 export type AchSort = 'default' | 'progress' | 'points' | 'name';

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { newState } from './save';
 import { ACHIEVEMENTS } from '../data/achievements';
 import { checkAchievements } from './achievements';
-import { ACH_CATEGORIES, DEFAULT_ACH_FILTER, filterAchievements, groupByCategory, isAchFiltering, type AchievementFilter } from './achievementfilter';
+import { ACH_CATEGORIES, achievementCatchHint, DEFAULT_ACH_FILTER, filterAchievements, groupByCategory, isAchFiltering, type AchievementFilter } from './achievementfilter';
 
 const f = (over: Partial<AchievementFilter>): AchievementFilter => ({ ...DEFAULT_ACH_FILTER, ...over });
 const ids = (s: ReturnType<typeof newState>, over: Partial<AchievementFilter>) => filterAchievements(s, f(over)).map((r) => r.def.id);
@@ -56,5 +56,27 @@ describe('achievement filter', () => {
     expect(byPoints).toEqual([...byPoints].sort((a, b) => b - a));
     const byName = filterAchievements(s, f({ sort: 'name' })).map((r) => r.def.name);
     expect(byName).toEqual([...byName].sort((a, b) => a.localeCompare(b)));
+  });
+});
+
+describe('catching achievement hints', () => {
+  const def = (id: string) => ACHIEVEMENTS.find((a) => a.id === id)!;
+  it('estimates throws left, points at the easiest missing species, and stays quiet elsewhere', () => {
+    const s = newState();
+    s.inventory.sphere_pal = 5;
+    expect(achievementCatchHint(s, def('caught_1'))).toBe('🎯 ~17 more throws at 60% average odds');   // 10 left at the common Pal Sphere rate
+    s.stats.chanceSum = 2; s.stats.ratedThrows = 4; s.stats.caught = 4;
+    expect(achievementCatchHint(s, def('caught_1'))).toBe('🎯 ~12 more throws at 50% average odds');
+    expect(achievementCatchHint(s, def('paldeck_1'))).toBeNull();                                    // nothing seen yet
+    s.paldeck[1] = { seen: true, caught: 0 };    // Lamball, common
+    s.paldeck[11] = { seen: true, caught: 0 };   // Penking, rare
+    expect(achievementCatchHint(s, def('paldeck_1'))).toBe('🎯 Easiest missing: Lamball 60% · 2 seen but uncaught');
+    s.inventory.sphere_pal = 0;
+    expect(achievementCatchHint(s, def('paldeck_1'))).toMatch(/no sphere would be thrown/);
+    expect(achievementCatchHint(s, def('lucky_1'))).toMatch(/^🎯 1 in 300 wild Pals is Lucky, caught at ×0.5: a common one 30% with a Pal Sphere$/);
+    expect(achievementCatchHint(s, def('legendary'))).toBe('🎯 A legendary is caught at 2.0% with a Pal Sphere');
+    expect(achievementCatchHint(s, def('defeat_1'))).toBeNull();
+    s.achievements.push('legendary');
+    expect(achievementCatchHint(s, def('legendary'))).toBeNull();
   });
 });

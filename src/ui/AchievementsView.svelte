@@ -2,7 +2,7 @@
   import { game } from '../state/game.svelte';
   import { ACHIEVEMENTS, categoryLabel, POINT_GOLD_BONUS } from '../data/achievements';
   import { achievementPoints, totalPoints } from '../engine/achievements';
-  import { ACH_CATEGORIES, ACH_SORT_LABEL, ACH_STATUS_LABEL, DEFAULT_ACH_FILTER, filterAchievements, groupByCategory, isAchFiltering, type AchievementFilter } from '../engine/achievementfilter';
+  import { ACH_CATEGORIES, ACH_SORT_LABEL, ACH_STATUS_LABEL, achievementCatchHint, DEFAULT_ACH_FILTER, filterAchievements, groupByCategory, isAchFiltering, type AchievementFilter } from '../engine/achievementfilter';
 
   const save = $derived(game.save);
   const points = $derived(achievementPoints(save));
@@ -62,6 +62,7 @@
           <div class="muted small">{a.desc}</div>
           <div class="bar"><span style:width="{(value / a.goal) * 100}%"></span></div>
           <div class="muted small">{fmt(value)} / {fmt(a.goal)}</div>
+          {#if !done}{@const hint = achievementCatchHint(game.save, a)}{#if hint}<div class="small odds">{hint}</div>{/if}{/if}
         </div>
       {/each}
     </div>
@@ -71,6 +72,7 @@
 <style>
   .points { color: var(--accent); font-weight: 600; }
   .small { font-size: 0.8rem; }
+  .odds { color: var(--accent-2); margin-top: 0.2rem; }
   section { margin-top: 1rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.5rem; }
   .ach { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.5rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.25rem; }
