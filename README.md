@@ -87,7 +87,8 @@ and lists the waves', and "Who lives here?" during a run shows the wave pool wit
 The route spawn list has the same 🎯 column, and so does every seen Paldeck card; a Pal's detail
 has a Catching section with the odds per unlocked sphere (wild and as an Alpha) and what's in the bag.
 Box and Party rows show the odds of catching another of that species (what condensing and breeding run on),
-and Compare has a "🎯 Catch another" row.
+and Compare has a "🎯 Catch another" row. Breeding shows the odds of catching the offspring's species in the
+wild instead — on the preview, the active pair, each candidate's would-be child and every egg.
 
 ## Data
 

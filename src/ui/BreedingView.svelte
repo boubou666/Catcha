@@ -14,6 +14,7 @@
   import PassiveChips from './PassiveChips.svelte';
   import { MUTATION_CHANCE } from '../data/passives';
   import BoxFilterBar from './BoxFilterBar.svelte';
+  import CatchOdds from './CatchOdds.svelte';
   import { DEFAULT_FILTER, isFiltering, partnerCandidates, type BoxFilter } from '../engine/boxfilter';
 
   const save = $derived(game.save);
@@ -72,14 +73,15 @@
 {:else if parents}
   <div class="pair panel-2">
     <div class="row parents">
-      <PalCard inst={parents[0]} />
+      <PalCard inst={parents[0]}><CatchOdds palId={parents[0].palId} /></PalCard>
       <span class="heart">♥</span>
-      <PalCard inst={parents[1]} />
+      <PalCard inst={parents[1]}><CatchOdds palId={parents[1].palId} /></PalCard>
     </div>
     <div class="row child">
       <span class="muted">Offspring:</span>
       {#if activeChild !== null}<PalIcon palId={activeChild} size={28} /> <b>{palById(activeChild).name}</b>{/if}
       <span class="muted small">· incubates {formatDuration(INCUBATION_SEC[palById(activeChild!).rarity] * 1000)} · ✨ {pct(activeLucky)} Lucky</span>
+      {#if activeChild !== null}<span class="muted small">· or in the wild</span> <CatchOdds palId={activeChild} prefix={`Catching a wild ${palById(activeChild).name} instead`} />{/if}
     </div>
     <div class="row child muted small">
       <span>Passives it can inherit:</span>
@@ -114,6 +116,7 @@
       <span class="muted">Offspring:</span> <PalIcon palId={preview} size={28} /> <b>{palById(preview).name}</b>
       {#if previewPool.length}<span class="muted small">· may inherit</span> <PassiveChips ids={previewPool} />{/if}
       <span class="muted small">· ✨ {pct(previewLucky)} Lucky</span>
+      <span class="muted small">· or in the wild</span> <CatchOdds palId={preview} prefix={`Catching a wild ${palById(preview).name} instead`} />
     {/if}
     <span class="grow"></span>
     <button class="primary small" disabled={!aUid || !bUid || !!block} title={block ? BLOCK_TEXT[block] : ''}
@@ -138,7 +141,7 @@
       {#each candidates as p (p.uid)}
         {@const child = picked ? childWith(p.uid) : null}
         <PalCard inst={p}>
-          {#if child !== null}<span class="muted small child-tag">→ <PalIcon palId={child} size={20} /> {palById(child).name}</span>{/if}
+          {#if child !== null}<span class="muted small child-tag">→ <PalIcon palId={child} size={20} /> {palById(child).name} <CatchOdds palId={child} prefix={`Catching a wild ${palById(child).name} instead`} /></span>{:else}<CatchOdds palId={p.palId} />{/if}
           <button class="small" onclick={() => pick(p.uid)}>{!aUid ? 'Parent A' : !bUid ? 'Parent B' : 'Swap B'}</button>
         </PalCard>
       {/each}
@@ -168,6 +171,7 @@
         <PalIcon palId={egg.palId} size={32} />
         <span class="grow">{#if egg.lucky}<span class="lucky-tag">✨ Lucky</span> {/if}{palById(egg.palId).name} egg{#if egg.passives.length} <PassiveChips ids={egg.passives} />{/if}</span>
         <div class="bar egg-bar"><span style:width="{(1 - Math.max(0, egg.remaining) / total) * 100}%"></span></div>
+        <CatchOdds palId={egg.palId} prefix={`Catching a wild ${palById(egg.palId).name}`} />
         <span class="muted small eta">{eggEta(egg.remaining)}</span>
       </div>
     {/each}
