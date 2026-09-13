@@ -9,7 +9,7 @@ import { game } from './state/game.svelte';
   const m = location.hash.match(/^#save=(.+)$/);
   if (m) {
     history.replaceState(null, '', location.pathname + location.search);
-    if (confirm('This link carries a Catcha save. Load it here? Your current save on this device will be replaced.')) {
+    if (import.meta.env.DEV || confirm('This link carries a Catcha save. Load it here? Your current save on this device will be replaced.')) {   // dev: no prompt, for screenshot runs
       game.importCode(decodeURIComponent(m[1])).then((ok) => { if (!ok) alert('Could not read the save in that link.'); });
     }
   }

@@ -1,7 +1,7 @@
 {
   "name": "catcha",
   "private": true,
-  "version": "0.17.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,8 @@
     "balance": "tsx scripts/balance.mjs",
     "icons": "node scripts/make-icons.mjs",
     "fetch-item-art": "tsx scripts/fetch-item-art.mjs",
-    "fetch-map": "node scripts/fetch-map.mjs"
+    "fetch-map": "node scripts/fetch-map.mjs",
+    "demo-save": "tsx scripts/demo-save.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.3.0",

@@ -1,7 +1,7 @@
 {
   "name": "Catcha",
   "short_name": "Catcha",
-  "description": "A Palworld-themed idle clicker: catch, build, breed, ascend.",
+  "description": "A Palworld-themed idle catcher: fight wild Pals, throw spheres, build a base, breed, duel rivals, and clear towers, realms and raids. Free, offline, no account.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,8 +9,39 @@
   "background_color": "#bfe7f7",
   "theme_color": "#8fd3f4",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/desktop.jpg",
+      "sizes": "1280x800",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "The world map, the arena and your party"
+    },
+    {
+      "src": "screenshots/mobile.jpg",
+      "sizes": "520x1000",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "On a phone: the arena bar with skills, and the party"
+    }
   ]
 }

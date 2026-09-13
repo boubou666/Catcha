@@ -1,12 +1,46 @@
 # Catcha
 
-A Palworld-themed idle/clicker in the spirit of PokéClicker. Browser-only, saves to `localStorage`.
+**Play it: https://boubou666.github.io/Catcha/** — free, in the browser, works offline, no account.
 
-Design notes: [DESIGN.md](DESIGN.md).
+![Catcha on desktop: the Palpagos map, the arena and your party](public/screenshots/desktop.jpg)
+
+Catcha is a Palworld-themed idle catcher in the spirit of PokéClicker. Wild Pals appear in the arena; your party
+fights them on its own and you tap to help. Beat one and a Pal Sphere is thrown — the odds are shown before
+every fight. Caught Pals join the party, work at your base, breed, condense into stars or get posted to
+outposts. Clear the routes of a region to reach its Alpha Pals and its tower; towers open the next region on
+the official Palpagos map, up to Sakurajima and Feybreak.
+
+Along the way: a base that gets raided and has to be defended, Sealed Realm runs, raids summoned at an altar,
+a rival in every region who duels you with three Pals, Alphas that come back stronger, a daily challenge route,
+daily quests, expeditions, achievements, an Ascension loop with permanent upgrades — and every Pal's partner
+skill and active skill doing something. Play in English or French. Saves stay in your browser; a save code or
+a link moves them between devices.
+
+<img src="public/screenshots/mobile.jpg" alt="Catcha on a phone" width="260" align="right">
+
+**How to play in one minute**
+
+1. Tap **Attack** (or just wait — the party fights). A caught Pal joins your party.
+2. Clear **Plateau of Beginnings** (10 defeats) to open the next route; the map's pins tell you what is where.
+3. Research the **Workbench**, put a Pal to work under **Base**, craft **Pal Spheres**.
+4. Beat **Alpha Chillet** from the Bosses panel, then the tower, then the next region.
+5. Check **Daily** every day, watch the arena for ⭐ challenge routes and 🚨 base raids, and duel the region's
+   rival when the ⚔ button lights up.
+
+The tutorial card walks through all of this; **?** lists the keyboard shortcuts.
+
+**Credits.** Catcha is a fan project and is not affiliated with Pocketpair. Palworld, the Pals, the item icons and
+the world map are © Pocketpair, Inc.; the images come from [palworld.wiki.gg](https://palworld.wiki.gg), as in the
+fan wiki, for a free, non-commercial game. Code by Thomas with Claude, under the MIT licence (code only — see
+[LICENSE](LICENSE)).
+
+---
+
+# For developers
+
+Design notes: [DESIGN.md](DESIGN.md). Everything below describes how the game is built.
 
 ## Play
-
-Hosted build: **https://boubou666.github.io/Catcha/**
 
 It installs as a PWA (Chrome/Edge: install icon in the address bar; Android: "Add to Home screen"; iOS Safari:
 Share → Add to Home Screen) and keeps working offline after the first load. When a new version is deployed, open tabs show a

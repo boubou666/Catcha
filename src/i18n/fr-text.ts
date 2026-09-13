@@ -945,4 +945,5 @@ export const FR_TEXT: Record<string, string> = {
   "More posted Pals at every outpost.": "Plus de Pals postés à chaque avant-poste.",
   "{rival} wins the duel: “{line}” Back in half an hour of play.": "{rival} remporte le duel : « {line} » De retour dans une demi-heure de jeu.",
   "Duel won! {rival}: “{line}” — {gold} gold and {n} {prize}. Tier {tier} next time.": "Duel gagné ! {rival} : « {line} » — {gold} or et {n} {prize}. Rang {tier} la prochaine fois.",
+  "Catcha is a fan project and is not affiliated with Pocketpair. Palworld, the Pals, the item icons and the world map are © Pocketpair, Inc.; the images come from palworld.wiki.gg, as in the fan wiki, for a free, non-commercial game. Code by Thomas with Claude, MIT-licensed on GitHub.": "Catcha est un projet de fans, sans lien avec Pocketpair. Palworld, les Pals, les icônes d’objets et la carte du monde sont © Pocketpair, Inc. ; les images viennent de palworld.wiki.gg, comme sur le wiki, pour un jeu gratuit et non commercial. Code par Thomas avec Claude, sous licence MIT sur GitHub.",
 };

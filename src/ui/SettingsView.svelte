@@ -214,6 +214,7 @@
   {#if showSteps}
     <div class="steps"><TutorialSteps /></div>
   {/if}
+  <p class="muted small credits">{tr("Catcha is a fan project and is not affiliated with Pocketpair. Palworld, the Pals, the item icons and the world map are © Pocketpair, Inc.; the images come from palworld.wiki.gg, as in the fan wiki, for a free, non-commercial game. Code by Thomas with Claude, MIT-licensed on GitHub.")} <a href="https://github.com/boubou666/Catcha" target="_blank" rel="noopener">github.com/boubou666/Catcha</a></p>
 </section>
 {/if}
 
@@ -225,6 +226,8 @@
   .opt.on { border-color: var(--accent); }
   .opt input { margin-top: 0.2rem; }
   .sound { gap: 1.5rem; }
+  .credits { margin-top: 0.8rem; }
+  .credits a { color: var(--accent-2); }
   .sound input[type=range] { flex: 1; min-height: 0; }
   input[type='search'] { min-width: 10rem; flex: 1; max-width: 16rem; }
   .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }

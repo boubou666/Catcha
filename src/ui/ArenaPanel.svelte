@@ -74,6 +74,13 @@
       </div>
       <button class="primary attack-c" onclick={() => game.click()}><span class="sr-only">{t('arena.attack')}</span>⚔<span class="dmg">+{game.clickDmg.toFixed(1)}</span></button>
     </div>
+    {#if skills.length}
+      <div class="skills cskills">
+        {#each skills as sk (sk.uid)}
+          <button class="skill" class:ready={sk.charge >= 1} style:--charge="{Math.round(sk.charge * 100)}%" onclick={() => game.fireSkill(sk.uid)} disabled={sk.charge < 1} title={`${sk.name}: ${tr(sk.skill)}`} aria-label={`${sk.name}: ${tr(sk.skill)}`}><span class="ico">{SKILL_ICON[sk.el]}</span></button>
+        {/each}
+      </div>
+    {/if}
   {:else if wild && def}
     <div class="row">
       <PalIcon palId={wild.palId} size={110} lucky={wild.lucky} render />
@@ -145,6 +152,8 @@
   .skill .lbl { margin-left: 0.25rem; }
   .skill.ready { opacity: 1; border-color: var(--accent-2); box-shadow: 0 0 8px rgba(53, 208, 255, 0.6); }
   .skill.ready::before { background: rgba(53, 208, 255, 0.45); }
+  .cskills { margin-top: 0.25rem; gap: 0.25rem; }
+  .cskills .skill { padding: 0.1rem 0.45rem; font-size: 0.8rem; }
   .bar.hp { margin: 0.35rem 0; }
   .catch { color: var(--accent-2); margin-top: 0.15rem; font-size: 0.85rem; background: none; border: none; padding: 0; clip-path: none; text-align: left; cursor: pointer; font-weight: 700; }
   .catch:hover { text-decoration: underline; background: none; }

@@ -11,6 +11,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.0.0', date: '2026-09-14', title: 'One point oh',
+    items: [
+      'Catcha is complete enough to call 1.0: seven regions on the official map, catching with visible odds, a base with workers, structures, raids and outposts, breeding and condensing, Sealed Realms, raids, rivals, Alpha rematches, daily quests and challenges, expeditions, partner and active skills, achievements, Ascension, a tutorial, English and French, and saves you can carry between devices.',
+      'Skills on the phone: the compact arena bar has a strip of skill chips, so you can fire a charged skill by tapping it there too.',
+      'Settings → About credits Pocketpair and palworld.wiki.gg properly; the code is MIT-licensed on GitHub. The install prompt shows real screenshots.',
+    ],
+    fr: { title: 'Un point zéro', items: [
+      "Catcha est assez complet pour s’appeler 1.0 : sept régions sur la carte officielle, une capture aux chances visibles, une base avec travailleurs, structures, raids et avant-postes, élevage et condensation, Royaumes scellés, raids, rivaux, revanches d’Alpha, quêtes et défis quotidiens, expéditions, compétences partenaires et actives, succès, Ascension, un tutoriel, anglais et français, et des sauvegardes transportables d’un appareil à l’autre.",
+      "Les compétences sur téléphone : la barre d’arène compacte a une rangée de jetons de compétence, donc vous pouvez aussi y lancer une compétence chargée d’un toucher.",
+      "Options → À propos crédite correctement Pocketpair et palworld.wiki.gg ; le code est sous licence MIT sur GitHub. L’invite d’installation montre de vraies captures d’écran.",
+    ] },
+  },
+  {
     version: '0.17.0', date: '2026-09-14', title: 'Signatures',
     items: [
       'Rivals have a face now: each leads with a signature Pal — the Syndicate Scout with a Grizzbolt, the Moonflower Warrior with a Selyne, the Marauder with a Bastigor — and has a line for winning and for losing. Duels retuned from the model: rounds are worth the clock (a third of it at tier 0, past it by tier 3 without Ascension), and every region’s rival is in the balance printout.',
