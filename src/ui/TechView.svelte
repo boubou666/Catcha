@@ -1,5 +1,11 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
+  import { chanceVsWild, chooseSphere } from '../engine/catch';
+  import { palById } from '../data/pals';
+  import { SPHERE_TIERS } from '../data/types';
+  import { SPHERES } from '../data/spheres';
+  // the sphere the policy would throw, else the first one in the bag, else a plain Pal Sphere
+  const demoTier = (palId: number) => chooseSphere(game.save, palId) ?? SPHERE_TIERS.find((t) => (game.save.inventory[SPHERES[t].itemId] ?? 0) > 0) ?? 'pal';
   import { TECHS, techById, type TechDef } from '../data/tech';
   import { type TechBlock } from '../engine/tech';
   import { DEFAULT_TECH_FILTER, filterTechs, groupByLevel, isTechFiltering, TECH_KIND_LABEL, TECH_STAT_LABEL, TECH_STATUS_LABEL, type TechFilter } from '../engine/techfilter';
@@ -66,6 +72,12 @@
             {#if block === 'researched'}<span class="check">✓</span>{:else}<span class="cost">{t.cost} TP</span>{/if}
           </div>
           <div class="muted small">{t.desc}</div>
+          {#if t.effect.kind === 'mult' && t.effect.stat === 'catch' && block !== 'researched' && game.wild}
+            {@const tier = demoTier(game.wild.palId)}
+            {@const now = chanceVsWild(game.save, game.wild, tier)}
+            {@const after = chanceVsWild(game.save, game.wild, tier, t.effect.mult)}
+            {#if now !== null && after !== null}<div class="small odds">🎯 {palById(game.wild.palId).name} with a {SPHERES[tier].name}: {Math.round(now * 100)}% → {Math.round(after * 100)}%</div>{/if}
+          {/if}
           {#if block !== 'researched'}
             <button class="small" class:primary={block === null} disabled={block !== null} title={block ? BLOCK[block](t) : ''}
               onclick={() => game.research(t.id)}>
@@ -79,6 +91,7 @@
 {/each}
 
 <style>
+  .odds { color: var(--accent-2); font-weight: 700; }
   .points { font-weight: 600; color: var(--accent); }
   .small { font-size: 0.8rem; }
   section { margin-top: 1rem; }

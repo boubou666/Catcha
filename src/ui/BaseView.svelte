@@ -5,6 +5,7 @@
   import { baseWorkers, computeRates, DEFAULT_STRUCTURE_FILTER, filterStructures, isHungry, isStructureFiltering, MEDICINE_ITEM, sanStatus, STRUCTURE_STATUS_LABEL, workLevels, DEFAULT_PRODUCTION_FILTER, filterJobs, type ProductionFilter, type StructureFilter } from '../engine/base';
   import { countOf } from '../engine/inventory';
   import PalCard from './PalCard.svelte';
+  import CatchOdds from './CatchOdds.svelte';
   import CostLine from './CostLine.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
   import ItemIcon from './ItemIcon.svelte';
@@ -76,6 +77,7 @@
   <div class="list">
     {#each shownWorkers as inst (inst.uid)}
       <PalCard {inst} showWork showSan>
+        <CatchOdds palId={inst.palId} />
         <button class="small" onclick={() => game.unassignWorker(inst.uid)}>Dismiss</button>
       </PalCard>
     {/each}
@@ -159,6 +161,7 @@
       {@const status = statusOf(save, inst.uid)}
       <PalCard {inst} showWork>
         {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
+        <CatchOdds palId={inst.palId} />
         <button class="small" disabled={full || status === 'expedition'} onclick={() => game.assignWorker(inst.uid)}
           title={status === 'expedition' ? 'Away until the expedition returns' : status === 'party' ? 'Removes it from the party' : status === 'breeding' ? 'Breaks up the breeding pair' : ''}>Assign</button>
       </PalCard>

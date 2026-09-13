@@ -10,6 +10,7 @@
   import { formatDuration } from './format';
   import PalIcon from './PalIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
+  import CatchOdds from './CatchOdds.svelte';
 
   const save = $derived(game.save);
   const slots = $derived(expeditionSlots(save));
@@ -131,6 +132,7 @@
         <PalIcon palId={p.palId} size={32} lucky={p.lucky} />
         <span class="grow"><b>{palById(p.palId).name}</b> <span class="muted">Lv {p.level}{p.stars ? ' ' + '★'.repeat(p.stars) : ''}</span>
           <PassiveChips ids={p.passives} /></span>
+        <CatchOdds palId={p.palId} />
       </label>
     {/each}
     {#if idle.length === 0}<p class="muted small">No idle Pals — everyone is in the party, working, breeding or already away.</p>{/if}

@@ -8,6 +8,9 @@ import { PRESTIGE_UPGRADES } from '../data/prestige';
 import { SETTINGS_SECTIONS } from './settingsfilter';
 import { reachableRegions } from './routefilter';
 import { allBosses } from './bossfilter';
+import { catchPreview } from './catch';
+
+const oddsTag = (save: SaveState, palId: number) => { const pv = catchPreview(save, palId); return pv.throws ? `🎯 ${Math.round(pv.chance * 100)}%` : '🎯 —'; };
 import { isUnlocked } from './progress';
 
 export type SearchKind = 'tab' | 'pal' | 'species' | 'route' | 'boss' | 'item' | 'recipe' | 'tech' | 'upgrade' | 'achievement' | 'setting';
@@ -52,7 +55,7 @@ export function globalSearch(save: SaveState, query: string, tabs: TabEntry[], k
     const e = save.paldeck[def.id];
     const seen = !!e?.seen;
     if (seen ? hit(ws, def.name, def.no, ...def.elements) : hit(ws, def.no))
-      push({ kind: 'species', id: String(def.id), title: seen ? def.name : `??? #${def.no}`, subtitle: seen ? `#${def.no} · ${def.elements.join('/')}${(e?.caught ?? 0) > 0 ? ' · caught' : ' · seen'}` : 'Paldeck entry', action: { tab: 'paldeck', paldeck: def.id } });
+      push({ kind: 'species', id: String(def.id), title: seen ? def.name : `??? #${def.no}`, subtitle: seen ? `#${def.no} · ${def.elements.join('/')}${(e?.caught ?? 0) > 0 ? ' · caught' : ' · seen'} · ${oddsTag(save, def.id)}` : 'Paldeck entry', action: { tab: 'paldeck', paldeck: def.id } });
   }
 
   if (want('route')) for (const region of reachableRegions(save)) for (const r of region.routes) {

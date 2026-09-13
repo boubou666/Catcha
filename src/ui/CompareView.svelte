@@ -6,6 +6,7 @@
   import PalIcon from './PalIcon.svelte';
   import PassiveChips from './PassiveChips.svelte';
   import PalCard from './PalCard.svelte';
+  import CatchOdds from './CatchOdds.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
   import { DEFAULT_FILTER, filterBox, isFiltering, statusOf, STATUS_LABEL, type BoxFilter } from '../engine/boxfilter';
 
@@ -90,6 +91,7 @@
         {@const status = statusOf(save, p.uid)}
         <PalCard inst={p} showWork>
           {#if status !== 'idle'}<span class="muted small">{STATUS_LABEL[status].toLowerCase()}</span>{/if}
+          <CatchOdds palId={p.palId} />
           <button class="small" disabled={compare.full} onclick={() => compare.toggle(p.uid)}>⚖ Add</button>
         </PalCard>
       {/each}

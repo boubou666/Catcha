@@ -6,7 +6,7 @@
   import { dungeonById } from '../data/dungeons';
   import PalIcon from './PalIcon.svelte';
   import SpawnList from './SpawnList.svelte';
-  import { catchPreview } from '../engine/catch';
+  import { catchPreview, isCatchable } from '../engine/catch';
   import { catchText } from './catchText';
   import { raidById } from '../data/raids';
   import { ui } from '../state/ui.svelte';
@@ -28,8 +28,7 @@
     return () => clearInterval(id);
   });
   const secondsLeft = $derived(wild?.deadlineAt ? Math.max(0, Math.ceil((wild.deadlineAt - now) / 1000)) : null);
-  const catchable = $derived(!!wild && (wild.kind === 'wild' || wild.kind === 'alpha' || wild.kind === 'dungeon' || wild.kind === 'dungeonBoss'));
-  const preview = $derived(wild && catchable ? catchPreview(game.save, wild.palId, wild.lucky, wild.kind === 'alpha') : null);
+  const preview = $derived(isCatchable(wild) ? catchPreview(game.save, wild.palId, wild.lucky, wild.kind === 'alpha') : null);
   const catchLine = $derived(preview ? catchText(preview) : '');
   // towers and raids never throw a sphere: say so where the odds would be
   const raid = $derived(wild?.kind === 'raid' && wild.refId ? raidById(wild.refId) : null);

@@ -2,6 +2,7 @@
   import { game } from '../state/game.svelte';
   import { describeRequirement, routeCleared, routeKills } from '../engine/progress';
   import { routeQuota } from '../engine/prestige';
+  import { tableOddsText } from './catchText';
   import { ELEMENTS } from '../data/types';
   import { DEFAULT_ROUTE_FILTER, filterRoutes, isRouteFiltering, ROUTE_STATUS_LABEL, type RouteFilter } from '../engine/routefilter';
 
@@ -58,7 +59,7 @@
             class:cleared={status === 'cleared'}
             disabled={status === 'locked' || game.inBossFight}
             onclick={() => game.travel(r.id)}
-            title={status !== 'locked' ? `${routeKills(game.save, r.id)} / ${routeQuota(game.save, r)} defeated` : describeRequirement(r.unlock)}
+            title={status !== 'locked' ? `${routeKills(game.save, r.id)} / ${routeQuota(game.save, r)} defeated. Catch: ${tableOddsText(game.save, r.spawns)}.` : describeRequirement(r.unlock)}
           >
             <span>{r.name}</span>
             <span class="muted">Lv {r.level}{status === 'cleared' ? ' ✓' : status === 'locked' ? ' 🔒' : ''}</span>
@@ -76,7 +77,7 @@
           class:cleared
           disabled={!unlocked || game.inBossFight}
           onclick={() => game.travel(r.id)}
-          title={unlocked ? `${routeKills(game.save, r.id)} / ${routeQuota(game.save, r)} defeated` : describeRequirement(r.unlock)}
+          title={unlocked ? `${routeKills(game.save, r.id)} / ${routeQuota(game.save, r)} defeated. Catch: ${tableOddsText(game.save, r.spawns)}.` : describeRequirement(r.unlock)}
         >
           <span>{r.name}</span>
           <span class="muted">Lv {r.level}{cleared ? ' ✓' : ''}</span>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
   import { SPHERES } from '../data/spheres';
+  import { sphereVsWild } from './catchText';
   import { SPHERE_TIERS } from '../data/types';
   import { STOCK, SELL_SHARE } from '../data/shop';
   import { describeRequirement } from '../engine/progress';
@@ -61,7 +62,7 @@
         <ItemIcon id={it.itemId} size={34} />
         <div class="grow">
           <b>{it.name}</b> <span class="muted small">{CATEGORY_LABEL[it.category]}{it.owned ? ` · you have ${fmt(it.owned)}` : ''}</span>
-          {#if it.itemId.startsWith('sphere_')}<span class="muted small">· ×{SPHERES[it.itemId.slice(7) as typeof SPHERE_TIERS[number]].mult} catch rate</span>{/if}
+          {#if it.itemId.startsWith('sphere_')}{@const tier = it.itemId.slice(7) as typeof SPHERE_TIERS[number]}<span class="muted small">· ×{SPHERES[tier].mult} catch rate</span> <span class="odds small">🎯 {sphereVsWild(game.save, game.wild, tier)}</span>{/if}
           {#if !it.unlocked}<div class="muted small">🔒 {describeRequirement(it.unlock)}</div>{/if}
         </div>
         <span class="price">{fmt(it.price)} 💰</span>
@@ -96,6 +97,7 @@
 <p class="muted small">Which sphere gets thrown, and whether to throw at species you already own, is under <b>Settings → Catching</b>.</p>
 
 <style>
+  .odds { color: var(--accent-2); font-weight: 700; }
   .gold { font-weight: 600; color: var(--accent); }
   .sides { display: flex; gap: 0.25rem; }
   .sides button.active { background: var(--accent-2); color: #fff; }

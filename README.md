@@ -89,6 +89,10 @@ has a Catching section with the odds per unlocked sphere (wild and as an Alpha) 
 Box and Party rows show the odds of catching another of that species (what condensing and breeding run on),
 and Compare has a "🎯 Catch another" row. Breeding shows the odds of catching the offspring's species in the
 wild instead — on the preview, the active pair, each candidate's would-be child and every egg.
+Elsewhere: route tooltips list each species' odds; sphere rows in the Merchant, Items, Craft and the header
+chips say what that sphere would do on the Pal in front of you; Capture Technique techs show the before →
+after on it; global search species results, base workers, the Compare picker and the watch toast carry the
+figure; catch log lines include the odds that landed.
 
 ## Data
 

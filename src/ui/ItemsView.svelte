@@ -2,6 +2,8 @@
   import { game } from '../state/game.svelte';
   import { CATEGORY_LABEL, DEFAULT_ITEMS_FILTER, filterItems, isItemsFiltering, ITEMS_SORT_LABEL, type ItemsFilter } from '../engine/itemsfilter';
   import ItemIcon from './ItemIcon.svelte';
+  import { sphereVsWild } from './catchText';
+  import type { SphereTier } from '../data/types';
 
   let filter = $state<ItemsFilter>({ ...DEFAULT_ITEMS_FILTER });
   let open = $state(false);
@@ -50,6 +52,7 @@
             <div>{it.def.name} <span class="cat muted">{CATEGORY_LABEL[it.def.category]}</span></div>
             {#if it.sources.length}<div class="muted tiny">From: {list(it.sources)}</div>{/if}
             {#if it.uses.length}<div class="muted tiny">For: {list(it.uses)}</div>{/if}
+            {#if it.def.id.startsWith('sphere_')}<div class="tiny odds">🎯 {sphereVsWild(game.save, game.wild, it.def.id.slice(7) as SphereTier)}</div>{/if}
           </td>
           <td class="n">{it.count.toLocaleString()}</td>
         </tr>
@@ -63,6 +66,7 @@
   td { padding: 0.35rem 0.25rem; border-bottom: 1.5px solid var(--border-soft); vertical-align: top; }
   tr.none { opacity: 0.55; }
   .iconcell { width: 2.4rem; padding-right: 0; }
+  .odds { color: var(--accent-2); font-weight: 700; }
   .n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
   .cat { font-size: 0.75rem; margin-left: 0.3rem; }
   .tiny { font-size: 0.75rem; }

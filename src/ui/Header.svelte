@@ -7,6 +7,7 @@
   import NotificationCenter from './NotificationCenter.svelte';
   import GlobalSearch from './GlobalSearch.svelte';
   import ItemIcon from './ItemIcon.svelte';
+  import { sphereVsWild } from './catchText';
   import type { TabEntry } from '../engine/globalsearch';
 
   let { tabs, go }: { tabs: TabEntry[]; go: (tab: string) => void } = $props();
@@ -54,7 +55,7 @@
     <span class="chip" title="Tech points">🔬 {player.techPoints}</span>
     <span class="chip" title="Achievement points">🏆 {achievementPoints(game.save)}</span>
     {#if game.save.prestige.relics > 0 || game.save.prestige.ascensions > 0}<span class="chip" title="Ancient Relics">🏺 {game.save.prestige.relics}</span>{/if}
-    {#each spheres as s}<span class="chip sphere" title={SPHERES[s.tier].name}>{SPHERES[s.tier].name.replace(' Sphere', '')} ×{s.n}</span>{/each}
+    {#each spheres as s}<span class="chip sphere" title="{SPHERES[s.tier].name} — {sphereVsWild(game.save, game.wild, s.tier)}">{SPHERES[s.tier].name.replace(' Sphere', '')} ×{s.n}</span>{/each}
     {#if spheres.length === 0}<span class="chip muted">no spheres</span>{/if}
   </div>
   {#if searchOpen}<div class="row search-row"><GlobalSearch {tabs} {go} /></div>{/if}
@@ -81,7 +82,7 @@
     <div class="label">Spheres</div>
     <div class="muted small">
       {#if spheres.length === 0}none — visit the Merchant{/if}
-      {#each spheres as s}<span class="chip"><ItemIcon id={SPHERES[s.tier].itemId} size={16} /> {SPHERES[s.tier].name} ×{s.n}</span>{/each}
+      {#each spheres as s}<span class="chip" title="🎯 {sphereVsWild(game.save, game.wild, s.tier)}"><ItemIcon id={SPHERES[s.tier].itemId} size={16} /> {SPHERES[s.tier].name} ×{s.n}</span>{/each}
     </div>
   </div>
 

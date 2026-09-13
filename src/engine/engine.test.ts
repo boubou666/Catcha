@@ -4,7 +4,7 @@ import { PALS, palById } from '../data/pals';
 import { REGIONS, routeById } from '../data/regions';
 import { itemById } from '../data/items';
 import { newState } from './save';
-import { catchChance, catchPreview, catchTable, chooseSphere, tryCatch } from './catch';
+import { catchChance, catchPreview, catchTable, chanceVsWild, chooseSphere, isCatchable, tryCatch } from './catch';
 import { ALPHA_CATCH_PENALTY } from '../data/spheres';
 import { applyDefeat, partyDps, spawnWild } from './combat';
 import { addToBox, grantExp, makeInstance } from './party';
@@ -173,5 +173,22 @@ describe('catch table', () => {
     expect(rows.map((r) => r.tier)).toEqual(['pal', 'mega']);
     expect(rows[1].chance).toBeGreaterThan(rows[0].chance);
     expect(rows[1].stock).toBe(0);
+  });
+});
+
+describe('odds against the current wild', () => {
+  it('only wild, Alpha and realm Pals are catchable; a sphere tier gets its own odds with penalties', () => {
+    const s = newState();
+    const wild = { ...spawnWild(routeById('plateau'), () => 0), lucky: false };
+    expect(isCatchable(wild)).toBe(true);
+    expect(isCatchable(null)).toBe(false);
+    expect(isCatchable({ ...wild, kind: 'tower' })).toBe(false);
+    expect(isCatchable({ ...wild, kind: 'raid' })).toBe(false);
+    const rarity = palById(wild.palId).rarity;
+    expect(chanceVsWild(s, wild, 'pal')).toBeCloseTo(catchChance(rarity, 'pal', 0, false));
+    expect(chanceVsWild(s, wild, 'mega')).toBeGreaterThan(chanceVsWild(s, wild, 'pal')!);
+    expect(chanceVsWild(s, { ...wild, kind: 'alpha' }, 'pal')).toBeCloseTo(catchChance(rarity, 'pal', 0, false) * ALPHA_CATCH_PENALTY);
+    expect(chanceVsWild(s, wild, 'pal', 1.15)).toBeCloseTo(Math.min(0.99, catchChance(rarity, 'pal', 0, false) * 1.15));
+    expect(chanceVsWild(s, { ...wild, kind: 'tower' }, 'pal')).toBeNull();
   });
 });

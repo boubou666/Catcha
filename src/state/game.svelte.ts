@@ -4,7 +4,7 @@ import { ALPHA_TIME_LIMIT_SEC, alphaById, regionById, REGIONS, routeById, towerB
 import { SPHERES } from '../data/spheres';
 import { clearSave, exportSave, importSave, loadState, newState, persist } from '../engine/save';
 import { applyDefeat, partyDps, spawnBoss, spawnWild, type Wild } from '../engine/combat';
-import { tryCatch } from '../engine/catch';
+import { catchPreview, tryCatch } from '../engine/catch';
 import { isUnlocked } from '../engine/progress';
 import { addToParty, release, removeFromParty } from '../engine/party';
 import { clickDamage, wildHp } from '../engine/formulas';
@@ -257,7 +257,7 @@ export class Game {
     if (w.kind === 'alpha') {
       // Alphas can be caught, at a reduced rate; the throw uses the same sphere policy
       const res = tryCatch(save, w);
-      if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name}!`); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
+      if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name} (${Math.round(res.chance * 100)}%)!`); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
       else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
       else this.push(`No sphere thrown at Alpha ${def.name} — see Settings → Catching.`);
     }
@@ -265,7 +265,7 @@ export class Game {
       if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
       const res = tryCatch(save, w);
       const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
-      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`); this.emit('caught'); this.notify(`Caught ${label}`, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
+      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name} (${Math.round(res.chance * 100)}%)!`); this.emit('caught'); this.notify(`Caught ${label}`, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
       else if (res.outcome === 'failed') { this.push(`${label} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
       else if (w.lucky) this.push(`A Lucky ${def.name} got away — no sphere thrown.`);
       if (this.run && w.kind !== 'wild') {
@@ -316,7 +316,7 @@ export class Game {
   spawn() {
     this.wild = spawnWild(this.route);
     if (this.wild.lucky) { this.emit('luckySpawn'); this.notify(`✨ A Lucky ${palById(this.wild.palId).name} appeared!`, 'warn', 5000); }
-    else if (this.watched.has(this.wild.palId)) this.notify(`👀 ${palById(this.wild.palId).name} is here!`, 'info', 3000);
+    else if (this.watched.has(this.wild.palId)) { const pv = catchPreview(this.save, this.wild.palId, this.wild.lucky, this.wild.kind === 'alpha'); this.notify(`👀 ${palById(this.wild.palId).name} is here!${pv.throws ? ` 🎯 ${Math.round(pv.chance * 100)}%` : ''}`, 'info', 3000); }
   }
 
   // ---- watch list (per device, not part of the save) ----------------------

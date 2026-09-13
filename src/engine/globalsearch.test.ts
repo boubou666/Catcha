@@ -35,3 +35,13 @@ describe('global search', () => {
     expect(sphere.length).toBeLessThanOrEqual(30);
   });
 });
+
+it('species results carry their catch odds', () => {
+  const s = newState();
+  s.paldeck[1] = { seen: true, caught: 0 };
+  s.inventory.sphere_pal = 2;
+  const hit = globalSearch(s, 'lamball', []).find((h) => h.kind === 'species')!;
+  expect(hit.subtitle).toMatch(/🎯 \d+%$/);
+  s.inventory.sphere_pal = 0;
+  expect(globalSearch(s, 'lamball', []).find((h) => h.kind === 'species')!.subtitle).toMatch(/🎯 —$/);
+});

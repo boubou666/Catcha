@@ -59,6 +59,17 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
   return { outcome: 'failed', tier, chance };
 }
 
+/** Wild Pals, Alphas and realm waves/guardians can be caught; tower bosses and raids cannot. */
+export function isCatchable(wild: Wild | null | undefined): wild is Wild {
+  return !!wild && (wild.kind === 'wild' || wild.kind === 'alpha' || wild.kind === 'dungeon' || wild.kind === 'dungeonBoss');
+}
+
+/** Odds of a specific sphere tier against the current wild (Lucky and Alpha penalties included), or null when nothing catchable is out. */
+export function chanceVsWild(save: SaveState, wild: Wild | null | undefined, tier: SphereTier, extraMult = 1): number | null {
+  if (!isCatchable(wild)) return null;
+  return catchChance(palById(wild.palId).rarity, tier, save.player.effigies, wild.lucky, techMult(save, 'catch') * prestigeMult(save, 'catch') * extraMult, wild.kind === 'alpha');
+}
+
 export interface CatchTableRow { tier: SphereTier; stock: number; chance: number; alpha: number }
 
 /** Odds for this species with every sphere the merchant has unlocked so far (wild, and as an Alpha), with what's in the bag. */
