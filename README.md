@@ -105,8 +105,8 @@ The Routes panel opens as a map: the official Palpagos map from palworld.wiki.gg
 `npm run fetch-map` at 1024 and 2048 px) with a pin per route, tower, Alpha and Sealed Realm, placed by hand
 in `src/data/map.ts`. Tap a pin for its status, odds and a Travel / Fight / Enter button; tap it again to go.
 The world view frames the seven regions (locked ones say what opens them) and zooms to one on tap; the
-current route pulses, cleared spots tick, and the ☰ List button brings the old list back (remembered per
-device). Searching always uses the list.
+current route pulses, cleared spots tick, and the ☰ List button brings the old list back; ▴ folds the panel to one line with the current route (both
+remembered per device). Searching always uses the list and unfolds the panel.
 
 Partner skills (`src/data/partner.ts`) are read off each species' Palworld skill name: mounts and gliders
 give exp, diggers and anglers gold, helpers and harvest blessings base output (while the Pal works at the base),

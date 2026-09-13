@@ -20,13 +20,22 @@
   });
   const total = $derived(game.regions.reduce((n, r) => n + r.routes.length, 0));
   const clear = () => { filter = { ...DEFAULT_ROUTE_FILTER }; };
+  // folded: one line with where you are; searching unfolds it
+  const folded = $derived(!prefs.routesOpen && !filtering);
 </script>
 
-<div class="panel">
-  {#if prefs.routesView === 'map' && !filtering}
+<div class="panel" class:folded>
+  {#if folded}
+    <div class="row head">
+      <h3 class="grow">📍 {game.route.name} <span class="muted">Lv {game.route.level} · {game.region.name} · {routeKills(game.save, game.route.id)} / {routeQuota(game.save, game.route)}</span></h3>
+      <input type="search" placeholder="Search routes, Pals…" bind:value={filter.query} aria-label="Search routes" />
+      <button class="small fold" onclick={() => prefs.setRoutesOpen(true)} title="Show the {prefs.routesView === 'map' ? 'map' : 'routes'}" aria-expanded="false">▾</button>
+    </div>
+  {:else if prefs.routesView === 'map' && !filtering}
     <div class="row head">
       <h3 class="grow">Map — {game.region.name}</h3>
       <input type="search" placeholder="Search routes, Pals…" bind:value={filter.query} aria-label="Search routes" />
+      <button class="small fold" onclick={() => prefs.setRoutesOpen(false)} title="Minimize the map" aria-expanded="true">▴</button>
     </div>
     <WorldMap />
   {:else}
@@ -41,7 +50,7 @@
     <h3 class="grow">{filtering ? `Routes — ${rows.length} of ${total}` : `Routes — ${game.region.name}`}</h3>
     <input type="search" placeholder="Search routes, Pals…" bind:value={filter.query} aria-label="Search routes" />
     <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
-    {#if !filtering}<button class="small" onclick={() => prefs.setRoutesView('map')} title="Show the map">🗺 Map</button>{/if}
+    {#if !filtering}<button class="small" onclick={() => prefs.setRoutesView('map')} title="Show the map">🗺 Map</button><button class="small fold" onclick={() => prefs.setRoutesOpen(false)} title="Minimize the routes" aria-expanded="true">▴</button>{/if}
   </div>
   {#if open}
     <div class="filters">
@@ -102,6 +111,9 @@
   .regions { margin-bottom: 0.6rem; }
   .regions button.active { background: linear-gradient(180deg, #7fe3ff, #35d0ff); color: var(--on-accent); border-color: #d9f6ff; }
   .head { margin-bottom: 0.4rem; }
+  .folded .head { margin-bottom: 0; }
+  .folded input[type='search'] { max-width: 8rem; }
+  .fold { padding-inline: 0.5rem; }
   .head h3 { margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .routes { display: flex; flex-direction: column; gap: 0.25rem; }
   .routes button { display: flex; justify-content: space-between; text-align: left; }
