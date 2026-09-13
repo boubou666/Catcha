@@ -8,6 +8,7 @@
   import GlobalSearch from './GlobalSearch.svelte';
   import ItemIcon from './ItemIcon.svelte';
   import { sphereVsWild } from './catchText';
+  import { t } from '../i18n/index.svelte';
   import type { TabEntry } from '../engine/globalsearch';
 
   let { tabs, go }: { tabs: TabEntry[]; go: (tab: string) => void } = $props();
@@ -47,7 +48,7 @@
     <div class="bar exp grow" title="{Math.floor(player.exp)} / {expToLevel(player.level + 1)} exp"><span style:width="{expPct}%"></span></div>
     <button class="small icon" class:active={searchOpen} onclick={() => { searchOpen = !searchOpen; if (searchOpen) ui.focusSearch += 1; }} aria-expanded={searchOpen} title="Search">🔍</button>
     <NotificationCenter />
-    <button class="small" onclick={() => game.persist()}>Save</button>
+    <button class="small" onclick={() => game.persist()}>{t('header.save')}</button>
   </div>
   <div class="row chips">
     <span class="chip">💰 {fmt(player.gold)}</span>
@@ -68,20 +69,20 @@
   </div>
 
   <div class="stat">
-    <div class="label">Level {player.level}</div>
+    <div class="label">{t('header.level')} {player.level}</div>
     <div class="bar exp"><span style:width="{expPct}%"></span></div>
     <div class="muted small">{Math.floor(player.exp)} / {expToLevel(player.level + 1)} exp</div>
   </div>
 
   <div class="stat">
     <div class="label">💰 {Math.floor(player.gold).toLocaleString()}</div>
-    <div class="muted small">Effigies: {player.effigies} · Tech pts: {player.techPoints} · 🏆 {achievementPoints(game.save)}{#if game.save.prestige.relics > 0 || game.save.prestige.ascensions > 0}&nbsp;· 🏺 {game.save.prestige.relics}{/if}</div>
+    <div class="muted small">{t('header.effigies')}: {player.effigies} · {t('header.techPts')}: {player.techPoints} · 🏆 {achievementPoints(game.save)}{#if game.save.prestige.relics > 0 || game.save.prestige.ascensions > 0}&nbsp;· 🏺 {game.save.prestige.relics}{/if}</div>
   </div>
 
   <div class="stat grow">
-    <div class="label">Spheres</div>
+    <div class="label">{t('header.spheres')}</div>
     <div class="muted small">
-      {#if spheres.length === 0}none — visit the Merchant{/if}
+      {#if spheres.length === 0}{t('header.noSpheres')}{/if}
       {#each spheres as s}<span class="chip" title="🎯 {sphereVsWild(game.save, game.wild, s.tier)}"><ItemIcon id={SPHERES[s.tier].itemId} size={16} /> {SPHERES[s.tier].name} ×{s.n}</span>{/each}
     </div>
   </div>
@@ -90,7 +91,7 @@
 
   <div class="row">
     <NotificationCenter />
-    <button class="small" onclick={() => game.persist()}>Save</button>
+    <button class="small" onclick={() => game.persist()}>{t('header.save')}</button>
   </div>
 </header>
 {/if}

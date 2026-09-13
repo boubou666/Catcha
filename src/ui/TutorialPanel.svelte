@@ -1,5 +1,6 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
+  import { t, tOr } from '../i18n/index.svelte';
   import { TUTORIAL } from '../engine/tutorial';
   import TutorialSteps from './TutorialSteps.svelte';
 
@@ -19,11 +20,11 @@
         {#each TUTORIAL as _, i}<span class="dot" class:done={i < index} class:now={i === index}></span>{/each}
       </span>
       <span class="grow"></span>
-      <button class="small ghost" onclick={() => (showAll = !showAll)} aria-expanded={showAll}>{showAll ? 'Hide steps' : 'All steps'}</button>
-      <button class="small ghost" onclick={() => game.skipTutorial()}>{last ? 'Done' : 'Skip tutorial'}</button>
+      <button class="small ghost" onclick={() => (showAll = !showAll)} aria-expanded={showAll}>{showAll ? t('tutorial.hideSteps') : t('tutorial.allSteps')}</button>
+      <button class="small ghost" onclick={() => game.skipTutorial()}>{last ? t('tutorial.done') : t('tutorial.skip')}</button>
     </div>
-    <div class="title">{step.title}</div>
-    <p class="muted">{step.text}</p>
+    <div class="title">{tOr(`tutorial.${step.id}.title`, step.title)}</div>
+    <p class="muted">{tOr(`tutorial.${step.id}.text`, step.text)}</p>
     {#if step.tab && step.tab !== tab}
       <button class="small primary" onclick={() => go(step.tab!)}>Take me there →</button>
     {/if}

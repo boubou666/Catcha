@@ -7,6 +7,7 @@
   import BoxFilterBar from './BoxFilterBar.svelte';
   import Loadouts from './Loadouts.svelte';
   import CatchOdds from './CatchOdds.svelte';
+  import { t } from '../i18n/index.svelte';
   import { activePartners, summarizePartners } from '../engine/partner';
   const partnerLines = $derived(summarizePartners(activePartners(game.save).filter((e) => e.stat !== 'work')));
 
@@ -23,7 +24,7 @@
   const clear = () => { filter = { ...PICK_DEFAULTS, sort: filter.sort }; };
 </script>
 
-<h2>Party <span class="muted">{party.length} / {PARTY_SIZE}</span></h2>
+<h2>{t('panel.party')} <span class="muted">{party.length} / {PARTY_SIZE}</span></h2>
 <p class="muted">Party Pals attack automatically. Element matchups against the wild Pal change their damage.</p>
 {#if partnerLines.length}<p class="partners small" title="Partner skills of the party, added up">🤝 Partner skills: {partnerLines.join(' · ')}</p>{/if}
 

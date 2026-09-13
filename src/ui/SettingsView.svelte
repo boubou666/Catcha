@@ -14,16 +14,14 @@
   import { SPHERE_TIERS, type SpherePolicy } from '../data/types';
   import ItemIcon from './ItemIcon.svelte';
   import { prefs } from '../state/prefs.svelte';
+  import { t } from '../i18n/index.svelte';
+  import { LOCALES } from '../i18n/messages';
   const policies: { value: SpherePolicy; label: string }[] = [
     { value: 'none', label: "Don't throw" },
     ...SPHERE_TIERS.map((t) => ({ value: t, label: SPHERES[t].name })),
   ];
   const stock = (t: SpherePolicy) => (t === 'none' ? '' : ` (×${save.inventory[SPHERES[t].itemId] ?? 0})`);
-  const THEMES: { value: ThemeChoice; label: string; desc: string }[] = [
-    { value: 'dark', label: 'Dark HUD', desc: 'Navy glass panels over the Palpagos sky — the default.' },
-    { value: 'light', label: 'Light HUD', desc: 'Cream glass with ink text; easier in bright daylight.' },
-    { value: 'system', label: 'Follow the system', desc: 'Light or dark as your device prefers.' },
-  ];
+  const THEMES: { value: ThemeChoice; key: string }[] = [{ value: 'dark', key: 'dark' }, { value: 'light', key: 'light' }, { value: 'system', key: 'system' }];
   import { ui } from '../state/ui.svelte';
 
   let sound = $state(getPref());
@@ -73,13 +71,13 @@
 </script>
 
 <div class="row">
-  <h2 class="grow">Settings <span class="muted">{filtering ? `${shown.size} of ${SETTINGS_SECTIONS.length}` : ''}</span></h2>
-  <input type="search" placeholder="Search settings…" bind:value={query} aria-label="Search settings" />
+  <h2 class="grow">{t('settings.title')} <span class="muted">{filtering ? `${shown.size} of ${SETTINGS_SECTIONS.length}` : ''}</span></h2>
+  <input type="search" placeholder={t('settings.search')} bind:value={query} aria-label="Search settings" />
 </div>
 <nav class="chips">
-  <button class="chip" class:on={only === null} onclick={() => (only = null)}>All</button>
+  <button class="chip" class:on={only === null} onclick={() => (only = null)}>{t('settings.all')}</button>
   {#each SETTINGS_SECTIONS as sec (sec.id)}
-    <button class="chip" class:on={only === sec.id} onclick={() => (only = only === sec.id ? null : sec.id)}>{sec.title}</button>
+    <button class="chip" class:on={only === sec.id} onclick={() => (only = only === sec.id ? null : sec.id)}>{t(`settings.${sec.id}`)}</button>
   {/each}
 </nav>
 {#if shown.size === 0}
@@ -88,7 +86,7 @@
 
 {#if show('daily')}
 <section>
-  <h3>Daily quest reset</h3>
+  <h3>{t('settings.daily')}</h3>
   <div class="options">
     <label class="opt" class:on={mode === 'utc'}>
       <input type="radio" name="reset" checked={mode === 'utc'} onchange={() => pick('utc')} />
@@ -104,12 +102,12 @@
 
 {#if show('appearance')}
 <section>
-  <h3>Appearance</h3>
+  <h3>{t('settings.appearance')}</h3>
   <div class="options">
-    {#each THEMES as t (t.value)}
-      <label class="opt" class:on={theme.choice === t.value}>
-        <input type="radio" name="theme" checked={theme.choice === t.value} onchange={() => theme.set(t.value)} />
-        <span><b>{t.label}</b>{#if t.value === 'system'} <span class="muted small">(now {theme.effective})</span>{/if}<br /><span class="muted small">{t.desc}</span></span>
+    {#each THEMES as th (th.value)}
+      <label class="opt" class:on={theme.choice === th.value}>
+        <input type="radio" name="theme" checked={theme.choice === th.value} onchange={() => theme.set(th.value)} />
+        <span><b>{t(`theme.${th.key}`)}</b>{#if th.value === 'system'} <span class="muted small">(now {theme.effective})</span>{/if}<br /><span class="muted small">{t(`theme.${th.key}Desc`)}</span></span>
       </label>
     {/each}
   </div>
@@ -118,7 +116,7 @@
 
 {#if show('sound')}
 <section>
-  <h3>Sound</h3>
+  <h3>{t('settings.sound')}</h3>
   <div class="row sound">
     <label class="row"><input type="checkbox" checked={sound.enabled} onchange={(e) => setSound({ enabled: e.currentTarget.checked })} /> Sound effects</label>
     <label class="row grow"><span class="muted small">Volume</span>
@@ -134,7 +132,7 @@
 
 {#if show('catching')}
 <section>
-  <h3>Catching</h3>
+  <h3>{t('settings.catching')}</h3>
   <p class="muted small">A sphere is thrown automatically when you defeat a wild Pal or an Alpha. Choose which one — or none — for species you haven't caught yet and for ones you already own. If the chosen tier is out of stock, the next lower one is thrown.</p>
   <div class="row policies">
     <label class="grow policy">New species
@@ -153,10 +151,25 @@
 </section>
 {/if}
 
+{#if show('language')}
+<section>
+  <h3>{t('settings.language')}</h3>
+  <div class="options">
+    {#each LOCALES as l (l.id)}
+      <label class="opt" class:on={prefs.lang === l.id}>
+        <input type="radio" name="lang" checked={prefs.lang === l.id} onchange={() => prefs.setLang(l.id)} />
+        <span><b>{l.label}</b></span>
+      </label>
+    {/each}
+  </div>
+  <p class="muted small">{t('settings.languageHint')}</p>
+</section>
+{/if}
+
 {#if show('keyboard')}
 <section>
   <div class="row">
-    <h3 class="grow">Keyboard</h3>
+    <h3 class="grow">{t('settings.keyboard')}</h3>
     <button class="small" onclick={() => (ui.shortcutsOpen = true)}>Show the list</button>
   </div>
   <KeyBindings />
@@ -165,7 +178,7 @@
 
 {#if show('save')}
 <section>
-  <h3>Save</h3>
+  <h3>{t('settings.save')}</h3>
   <p class="muted small">Autosaves every 30 s and when you leave. Saves are per browser — use Export / Import to move between the local copy and the hosted one.</p>
   <div class="row">
     <button class="small" onclick={() => game.persist()}>Save now</button>
@@ -179,7 +192,7 @@
 
 {#if show('about')}
 <section>
-  <h3>About</h3>
+  <h3>{t('settings.about')}</h3>
   <p class="muted small">Catcha version <code>{version}</code>{version !== 'dev' ? `, built ${new Date(builtAt).toLocaleString()}` : ' (development build)'}. Changelog v{LATEST_VERSION}. New deploys show a reload banner at the top; the hosted copy checks every 30 minutes and whenever you return to the tab.</p>
   <div class="row">
     <button class="small" onclick={() => whatsNew.showAll()}>What's new</button>

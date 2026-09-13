@@ -5,6 +5,7 @@ import { SPHERES } from '../data/spheres';
 import { clearSave, exportSave, importSave, loadState, newState, persist } from '../engine/save';
 import { applyDefeat, partyDps, spawnBoss, spawnWild, type Wild } from '../engine/combat';
 import { catchPreview, tryCatch } from '../engine/catch';
+import { clockMult } from '../engine/partner';
 import { isUnlocked } from '../engine/progress';
 import { addToParty, release, removeFromParty } from '../engine/party';
 import { clickDamage, wildHp } from '../engine/formulas';
@@ -258,7 +259,7 @@ export class Game {
       // Alphas can be caught, at a reduced rate; the throw uses the same sphere policy
       const res = tryCatch(save, w);
       if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name}!`, { chance: res.chance, landed: true }); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
-      else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
+      else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free${res.refunded ? ' — the sphere came back' : ''}.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
       else this.push(`No sphere thrown at Alpha ${def.name} — see Settings → Catching.`);
     }
     if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
@@ -266,7 +267,7 @@ export class Game {
       const res = tryCatch(save, w);
       const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
       if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`, { chance: res.chance, landed: true }); this.emit('caught'); this.notify(`Caught ${label}`, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
-      else if (res.outcome === 'failed') { this.push(`${label} broke free.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
+      else if (res.outcome === 'failed') { this.push(`${label} broke free${res.refunded ? ' — the sphere came back' : ''}.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
       else if (w.lucky) this.push(`A Lucky ${def.name} got away — no sphere thrown.`);
       if (this.run && w.kind !== 'wild') {
         this.run.gold += reward.gold;
@@ -352,14 +353,14 @@ export class Game {
   startAlpha(id: string) {
     const a = alphaById(id);
     if (!isUnlocked(this.save, a.unlock)) return;
-    this.wild = spawnBoss(a.palId, a.level, wildHp(a.level) * a.hpMult, 'alpha', id, Date.now() + ALPHA_TIME_LIMIT_SEC * 1000);
+    this.wild = spawnBoss(a.palId, a.level, wildHp(a.level) * a.hpMult, 'alpha', id, Date.now() + ALPHA_TIME_LIMIT_SEC * 1000 * clockMult(this.save));
     { const pv = catchPreview(this.save, a.palId, false, true); this.push(`Alpha ${palById(a.palId).name} appears — ${ALPHA_TIME_LIMIT_SEC / 60} minutes on the clock.`, pv.throws ? { chance: pv.chance } : {}); }
   }
 
   startTower(id: string) {
     const t = towerById(id);
     if (!isUnlocked(this.save, t.unlock)) return;
-    this.wild = spawnBoss(t.palId, t.level, t.hp, 'tower', id, Date.now() + t.timeLimitSec * 1000);
+    this.wild = spawnBoss(t.palId, t.level, t.hp, 'tower', id, Date.now() + t.timeLimitSec * 1000 * clockMult(this.save));
     this.push(`${t.boss} — ${t.timeLimitSec / 60} minutes on the clock.`);
   }
 

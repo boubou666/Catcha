@@ -6,7 +6,7 @@ import { addItem, earnGold } from './inventory';
 import { achievementGoldMult } from './achievements';
 import { prestigeMult } from './prestige';
 import { techMult } from './tech';
-import { partnerAttackMult, partnerMult } from './partner';
+import { partnerAttackMult, partnerMult, scavengeChance } from './partner';
 import { expReward, goldReward, instanceAttack, LUCKY_CHANCE, LUCKY_HP_MULT, wildHp } from './formulas';
 
 export type Rng = () => number;
@@ -84,6 +84,13 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
       drops[drop.itemId] = (drops[drop.itemId] ?? 0) + n;
       addItem(save, drop.itemId, n);
     }
+  }
+
+  // scavenger partner skills: one more of the first drop, sometimes
+  const first = def.drops[0];
+  if (first && rand() < scavengeChance(save)) {
+    drops[first.itemId] = (drops[first.itemId] ?? 0) + 1;
+    addItem(save, first.itemId, 1);
   }
 
   const entry = (save.paldeck[wild.palId] ??= { seen: false, caught: 0 });

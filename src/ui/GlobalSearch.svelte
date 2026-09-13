@@ -1,5 +1,6 @@
 <script lang="ts">
   import { game } from '../state/game.svelte';
+  import { t } from '../i18n/index.svelte';
   import { ui } from '../state/ui.svelte';
   import { globalSearch, SEARCH_KIND_LABEL, SEARCH_KINDS, type SearchAction, type SearchKind, type TabEntry } from '../engine/globalsearch';
 
@@ -36,7 +37,7 @@
 
 <div class="search">
   <div class="row box">
-    <input type="search" bind:this={input} bind:value={query} placeholder="Search everything… (Ctrl+K)" aria-label="Search the game"
+    <input type="search" bind:this={input} bind:value={query} placeholder={t('header.search')} aria-label="Search the game"
       onfocus={() => (open = true)} onkeydown={onKey} onblur={() => setTimeout(() => (open = false), 150)} />
     <select bind:value={kind} aria-label="Search kind" onchange={() => input?.focus()}>
       <option value="any">All</option>

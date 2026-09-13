@@ -8,6 +8,7 @@
   import SpawnList from './SpawnList.svelte';
   import { catchPreview, isCatchable } from '../engine/catch';
   import { catchText, pct } from './catchText';
+  import { t } from '../i18n/index.svelte';
   import { raidById } from '../data/raids';
   import { ui } from '../state/ui.svelte';
 
@@ -59,10 +60,10 @@
           · DPS <b>{game.dps.toFixed(1)}</b>
           {#if preview}· 🎯 {preview.throws ? `${pct(preview.chance)}` : 'no throw'}{:else if noCatchShort}· {noCatchShort}{/if}
           {#if wild.kind === 'wild'} · {Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}
-          {:else} · <button class="tiny flee" onclick={() => game.flee()}>{run ? 'Leave' : wild.kind === 'raid' ? 'Give up' : 'Retreat'}</button>{/if}
+          {:else} · <button class="tiny flee" onclick={() => game.flee()}>{run ? t('arena.leave') : wild.kind === 'raid' ? t('arena.giveUpShort') : t('arena.retreat')}</button>{/if}
         </div>
       </div>
-      <button class="primary attack-c" onclick={() => game.click()}><span class="sr-only">Attack</span>⚔<span class="dmg">+{game.clickDmg.toFixed(1)}</span></button>
+      <button class="primary attack-c" onclick={() => game.click()}><span class="sr-only">{t('arena.attack')}</span>⚔<span class="dmg">+{game.clickDmg.toFixed(1)}</span></button>
     </div>
   {:else if wild && def}
     <div class="row">
@@ -82,23 +83,23 @@
         <div class="muted small">{fmt(Math.max(0, wild.hp))} / {fmt(wild.maxHp)} HP
           {#if secondsLeft !== null} · ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}{/if}
         </div>
-        {#if preview}<button class="link catch" class:no={!preview.throws} onclick={() => (ui.requestTab = 'settings')} title="Catch settings">🎯 Catch: {catchLine}</button>
-        {:else if noCatchLine}<div class="small catch" class:no={wild.kind === 'tower'} class:egg={!!raid}>{raid ? '🥚' : '🎯'} Catch: {noCatchLine}</div>{/if}
+        {#if preview}<button class="link catch" class:no={!preview.throws} onclick={() => (ui.requestTab = 'settings')} title={t('arena.catchSettings')}>🎯 {t('arena.catch')}: {catchLine}</button>
+        {:else if noCatchLine}<div class="small catch" class:no={wild.kind === 'tower'} class:egg={!!raid}>{raid ? '🥚' : '🎯'} {t('arena.catch')}: {noCatchLine}</div>{/if}
       </div>
     </div>
 
     <button class="primary attack" onclick={() => game.click()}>
-      Attack <span class="muted">(+{game.clickDmg.toFixed(1)})</span>
+      {t('arena.attack')} <span class="muted">(+{game.clickDmg.toFixed(1)})</span>
     </button>
 
     <div class="row muted small">
-      <span>Party DPS: <b>{game.dps.toFixed(1)}</b></span>
+      <span>{t('arena.partyDps')}: <b>{game.dps.toFixed(1)}</b></span>
       {#if wild.kind === 'wild'}
-        <span>· Route progress: <b>{Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}</b></span>
-        {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? 'Hide' : 'Who lives here?'}</button>{/if}
+        <span>· {t('arena.routeProgress')}: <b>{Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}</b></span>
+        {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? t('arena.hide') : t('arena.whoLivesHere')}</button>{/if}
       {:else}
-        <button class="small" onclick={() => game.flee()}>{run ? 'Leave realm' : wild.kind === 'raid' ? 'Give up (slab lost)' : 'Retreat'}</button>
-        {#if run && !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? 'Hide' : 'Who lives here?'}</button>{/if}
+        <button class="small" onclick={() => game.flee()}>{run ? t('arena.leaveRealm') : wild.kind === 'raid' ? t('arena.giveUp') : t('arena.retreat')}</button>
+        {#if run && !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? t('arena.hide') : t('arena.whoLivesHere')}</button>{/if}
       {/if}
     </div>
     {#if showHere && !compact && wild.kind === 'wild'}

@@ -7,7 +7,7 @@ import { techMult } from './tech';
 import { prestigeMult } from './prestige';
 import { rollWildPassives } from './passives';
 import { isUnlocked } from './progress';
-import { partnerMult } from './partner';
+import { partnerMult, refundChance } from './partner';
 
 /** Everything that multiplies catch odds besides the sphere: tech, Sphere Mastery and partner skills. */
 export function catchMult(save: SaveState): number {
@@ -43,7 +43,7 @@ export function chooseSphere(save: SaveState, palId: number): SphereTier | null 
 
 export type CatchResult =
   | { outcome: 'skipped' }
-  | { outcome: 'caught' | 'failed'; tier: SphereTier; chance: number };
+  | { outcome: 'caught' | 'failed'; tier: SphereTier; chance: number; refunded?: boolean };
 
 export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): CatchResult {
   const tier = chooseSphere(save, wild.palId);
@@ -64,6 +64,7 @@ export function tryCatch(save: SaveState, wild: Wild, rand: Rng = Math.random): 
     if (wild.lucky) save.stats.luckyCaught += 1;
     return { outcome: 'caught', tier, chance };
   }
+  if (rand() < refundChance(save)) { save.inventory[itemId] += 1; return { outcome: 'failed', tier, chance, refunded: true }; }
   return { outcome: 'failed', tier, chance };
 }
 

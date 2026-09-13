@@ -10,6 +10,7 @@
   import { routeById } from '../data/regions';
   import { tableOddsText } from './catchText';
   import { prefs } from '../state/prefs.svelte';
+  import { t } from '../i18n/index.svelte';
 
   const regions = $derived(worldMap(game.save));
   const byId = $derived(new Map(regions.map((r) => [r.id, r])));
@@ -37,7 +38,7 @@
   const current = $derived(selected ? regions.flatMap((r) => r.pins).find((p) => p.kind === selected!.kind && p.id === selected!.id) ?? null : null);
 
   const ICON: Record<MapPin['kind'], string> = { route: '', tower: '🗼', alpha: '💀', realm: '🗝', base: '🏠', altar: '🔮' };
-  const ACTION: Record<MapPin['kind'], string> = { route: 'Travel', tower: 'Challenge tower', alpha: 'Fight Alpha', realm: 'Enter realm', base: 'Open the base', altar: '' };
+  const ACTION_KEY: Record<MapPin['kind'], string> = { route: 'map.travel', tower: 'map.challengeTower', alpha: 'map.fightAlpha', realm: 'map.enterRealm', base: 'map.openBase', altar: '' };
   const RAID_BLOCK: Record<SummonBlock, string> = { 'no-altar': 'Build the Summoning Altar', locked: 'Locked', 'no-slab': 'Craft a slab first' };
 
   // the boss / realm / raid you are fighting right now, if any
@@ -86,12 +87,12 @@
 
 <div class="map" class:world={!zoom}>
   <div class="row mapbar">
-    <button class="small" class:active={!zoom} onclick={() => { zoom = null; selected = null; }}>🌍 World</button>
+    <button class="small" class:active={!zoom} onclick={() => { zoom = null; selected = null; }}>🌍 {t('routes.world')}</button>
     {#each regions as r (r.id)}
       {#if r.reachable}<button class="small" class:active={zoom === r.id} onclick={() => zoomTo(r)}>{r.name}</button>{/if}
     {/each}
     <span class="grow"></span>
-    <button class="small" onclick={() => prefs.setRoutesView('list')} title="Back to the list">☰ List</button>
+    <button class="small" onclick={() => prefs.setRoutesView('list')} title={t('routes.backToList')}>☰ {t('routes.list')}</button>
   </div>
 
   <svg {viewBox} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the Palpagos Islands" style:aspect-ratio="{view.w} / {view.h}">
@@ -138,10 +139,10 @@
   {#if current}
     <div class="row detail">
       <div class="grow">
-        <b>{ICON[current.kind]} {current.name}</b> <span class="muted">Lv {current.level}{current.current ? ' · you are here' : ''}</span>
+        <b>{ICON[current.kind]} {current.name}</b> <span class="muted">Lv {current.level}{current.current ? ` · ${t('map.youAreHere')}` : ''}</span>
         <div class="muted small">{current.status === 'locked' ? `🔒 ${current.detail}` : current.detail}</div>
         {#if odds(current)}<div class="small odds-line">🎯 {odds(current).replace('Catch: ', '')}</div>{/if}
-        {#if isFighting(current)}<div class="small fight">⚔ Fighting here now</div>{/if}
+        {#if isFighting(current)}<div class="small fight">⚔ {t('map.fightingHere')}</div>{/if}
       </div>
       {#if current.kind === 'altar'}
         <div class="raids">
@@ -151,11 +152,11 @@
           {/each}
         </div>
       {:else}
-        <button class="small" class:primary={canAct(current)} disabled={!canAct(current)} onclick={() => act(current!)} title={game.inBossFight && current.kind !== 'base' ? 'Finish or leave the current fight first' : ''}>{current.current ? 'Here' : ACTION[current.kind]}</button>
+        <button class="small" class:primary={canAct(current)} disabled={!canAct(current)} onclick={() => act(current!)} title={game.inBossFight && current.kind !== 'base' ? t('map.finishFight') : ''}>{current.current ? t('map.here') : t(ACTION_KEY[current.kind])}</button>
       {/if}
     </div>
   {:else}
-    <p class="muted small hint">{zoom ? 'Tap a pin for details, tap it again to go. Routes follow the trail in order.' : 'Tap a region to zoom in. Locked regions show what opens them.'} <span class="credit">Map: palworld.wiki.gg</span></p>
+    <p class="muted small hint">{zoom ? t('map.hintRegion') : t('map.hintWorld')} <span class="credit">{t('map.credit')}</span></p>
   {/if}
 </div>
 

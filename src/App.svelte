@@ -33,6 +33,7 @@
   import { whatsNew } from './state/whatsnew.svelte';
   import { ui } from './state/ui.svelte';
   import { prefs } from './state/prefs.svelte';
+  import { t } from './i18n/index.svelte';
   import ShortcutsHelp from './ui/ShortcutsHelp.svelte';
   import { isFieldTarget, resolveShortcut } from './engine/shortcuts';
   import { keys } from './state/keys.svelte';
@@ -41,20 +42,13 @@
 
   type Tab = 'routes' | 'bosses' | 'log' | 'party' | 'box' | 'compare' | 'paldeck' | 'breed' | 'base' | 'craft' | 'items' | 'shop' | 'expedition' | 'tech' | 'daily' | 'achievements' | 'prestige' | 'settings' | 'stats';
   type Group = { id: string; label: string; tabs: { id: Tab; label: string }[] };
-  const WORLD: Group = { id: 'world', label: 'World', tabs: [{ id: 'routes', label: 'Routes' }, { id: 'bosses', label: 'Bosses' }, { id: 'log', label: 'Log' }] };
+  // labels come from the i18n table (keys group.<id> / tab.<id>) so they follow the language setting
+  const tabsOf = (ids: Tab[]) => ids.map((id) => ({ id, get label() { return t(`tab.${id}`); } }));
+  const WORLD: Group = { id: 'world', get label() { return t('group.world'); }, tabs: tabsOf(['routes', 'bosses', 'log']) };
   const GROUPS: Group[] = [
-    { id: 'pals', label: 'Pals', tabs: [
-      { id: 'party', label: 'Party' }, { id: 'box', label: 'Box' }, { id: 'compare', label: 'Compare' },
-      { id: 'paldeck', label: 'Paldeck' }, { id: 'breed', label: 'Breeding' },
-    ] },
-    { id: 'base', label: 'Base', tabs: [
-      { id: 'base', label: 'Base' }, { id: 'craft', label: 'Craft' }, { id: 'items', label: 'Items' },
-      { id: 'shop', label: 'Merchant' }, { id: 'expedition', label: 'Expeditions' },
-    ] },
-    { id: 'progress', label: 'Progress', tabs: [
-      { id: 'tech', label: 'Tech' }, { id: 'daily', label: 'Daily' }, { id: 'achievements', label: 'Achievements' }, { id: 'stats', label: 'Stats' },
-      { id: 'prestige', label: 'Ascension' }, { id: 'settings', label: 'Settings' },
-    ] },
+    { id: 'pals', get label() { return t('group.pals'); }, tabs: tabsOf(['party', 'box', 'compare', 'paldeck', 'breed']) },
+    { id: 'base', get label() { return t('group.base'); }, tabs: tabsOf(['base', 'craft', 'items', 'shop', 'expedition']) },
+    { id: 'progress', get label() { return t('group.progress'); }, tabs: tabsOf(['tech', 'daily', 'achievements', 'stats', 'prestige', 'settings']) },
   ];
   // Below 800px the left column folds into a "World" group and the arena becomes a sticky bar.
   let isMobile = $state(false);

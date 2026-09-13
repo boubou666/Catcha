@@ -114,6 +114,15 @@ Partner skills (`src/data/partner.ts`) are read off each species' Palworld skill
 give exp, diggers and anglers gold, helpers and harvest blessings base output (while the Pal works at the base),
 senses, webs and glares catch odds; the rest are fighting skills and add damage for party members sharing the
 Pal's first element. +3/4/6/8/12% by rarity, additive within a stat; the Party and Base tabs show the totals.
+A few named skills also carry a mechanic (`PartnerSpecial`): scavengers add a 15% chance of an extra drop per
+defeat, ranch skills double that Pal's ranch output, senses name unseen species on spawn tables, companions
+give a 25% chance of a sphere refund on a miss, shields add 15% to Alpha and tower clocks.
+
+Language: Settings → Language switches the chrome (tabs, header, arena, routes and map, panel headers,
+settings, tutorial) to French; strings live in `src/i18n/messages.ts` (`t()` / `tOr()` in `src/i18n`), English is
+the fallback, and data names stay as on the wiki. `src/engine/progression.test.ts` plays the whole world by data
+and asserts every route, Alpha, tower, realm and raid opens in order, every requirement points at something real,
+and every species can be obtained.
 
 ## Data
 

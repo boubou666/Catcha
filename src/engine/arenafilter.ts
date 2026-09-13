@@ -1,6 +1,7 @@
 import type { Element, RouteDef, SaveState } from '../data/types';
 import { palById } from '../data/pals';
 import { catchPreview, type CatchPreview } from './catch';
+import { revealsUnseen } from './partner';
 
 export type SpawnStatus = 'caught' | 'seen' | 'missing';
 export interface SpawnFilter { query: string; status: SpawnStatus | 'any'; element: Element | 'any'; watchedOnly: boolean }
@@ -28,12 +29,14 @@ export function routeSpawns(save: SaveState, route: RouteDef, watched: ReadonlyS
 /** Any spawn table (a route, a realm's wave pool) with spawn share, catch odds and Paldeck status, most common first. */
 export function spawnTable(save: SaveState, spawns: SpawnTable, watched: ReadonlySet<number> = new Set()): SpawnRow[] {
   const total = spawns.reduce((s, x) => s + x.weight, 0);
+  const reveal = revealsUnseen(save);   // a Sixth Sense in the party names what you have not met
   return spawns
     .map((s) => {
       const def = palById(s.palId);
       const e = save.paldeck[def.id];
       const status: SpawnStatus = (e?.caught ?? 0) > 0 ? 'caught' : e?.seen ? 'seen' : 'missing';
-      return { palId: def.id, name: status === 'missing' ? '???' : def.name, no: def.no, chance: s.weight / total, status, elements: status === 'missing' ? [] : def.elements, watched: watched.has(def.id), catch: catchPreview(save, def.id) };
+      const known = status !== 'missing' || reveal;
+      return { palId: def.id, name: known ? def.name : '???', no: def.no, chance: s.weight / total, status, elements: known ? def.elements : [], watched: watched.has(def.id), catch: catchPreview(save, def.id) };
     })
     .sort((a, b) => b.chance - a.chance || a.no.localeCompare(b.no));
 }

@@ -4,6 +4,7 @@
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { catchPreview } from '../engine/catch';
   import { ui } from '../state/ui.svelte';
+  import { t } from '../i18n/index.svelte';
   import { spawnTable } from '../engine/arenafilter';
   import { catchText, pct } from './catchText';
   import { describeRequirement, isUnlocked } from '../engine/progress';
@@ -48,7 +49,7 @@
 
 <div class="panel">
   <div class="row head">
-    <h3 class="grow">{filtering ? `Bosses — ${rows.length} of ${total}` : 'Bosses'}</h3>
+    <h3 class="grow">{filtering ? `${t('panel.bosses')} — ${rows.length} / ${total}` : t('panel.bosses')}</h3>
     <input type="search" placeholder="Search bosses…" bind:value={filter.query} aria-label="Search bosses" />
     <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
   </div>

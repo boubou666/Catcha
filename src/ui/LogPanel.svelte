@@ -1,6 +1,7 @@
 <script lang="ts">
   import { pct } from './catchText';
   import { game } from '../state/game.svelte';
+  import { t } from '../i18n/index.svelte';
   import { catchSummary, DEFAULT_LOG_FILTER, filterLog, isLogFiltering, LOG_KIND_LABEL, LOG_KINDS, type LogFilter } from '../engine/logfilter';
 
   const COMPACT = 12;
@@ -18,7 +19,7 @@
 
 <div class="panel log">
   <div class="row head">
-    <h3 class="grow">Log <span class="muted">{filtering ? `${matches.length} of ${game.log.length}` : game.log.length}</span></h3>
+    <h3 class="grow">{t('panel.log')} <span class="muted">{filtering ? `${matches.length} of ${game.log.length}` : game.log.length}</span></h3>
     <input type="search" placeholder="Search log…" bind:value={filter.query} aria-label="Search the log" />
     <select bind:value={filter.kind} aria-label="Log category">
       <option value="any">All</option>

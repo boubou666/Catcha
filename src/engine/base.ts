@@ -8,7 +8,7 @@ import { isUnlocked } from './progress';
 import { recipeUnlocked, structureUnlocked, techMult } from './tech';
 import { passiveMult } from './passives';
 import { prestigeMult } from './prestige';
-import { partnerMult } from './partner';
+import { partnerMult, ranchMult } from './partner';
 
 export function newBase(): BaseState {
   return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [], expeditions: [], reports: [] };
@@ -148,7 +148,7 @@ export function computeRates(save: SaveState): BaseRates {
   if (lvl('ranch') > 0) {
     for (const inst of baseWorkers(save)) {
       const farm = palById(inst.palId).farmDrop;
-      if (farm) add(farm.itemId, farm.perMinute * workerMult(inst) * mult);
+      if (farm) add(farm.itemId, farm.perMinute * workerMult(inst) * mult * ranchMult(palById(inst.palId)));
     }
   }
 
