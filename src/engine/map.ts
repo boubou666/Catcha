@@ -10,10 +10,13 @@ import { ALTAR, RAIDS } from '../data/raids';
 import { REGION_MAPS } from '../data/map';
 import { fmtCooldown, rematchInfo } from './rematch';
 import { todaysChallenge } from './challenge';
+import { rivalsOf } from '../data/rivals';
+import { rivalInfo } from './rival';
+import { fmtCooldown as fmtCd } from './rematch';
 import { alphaById, routeById, towerById } from '../data/regions';
 import { dungeonById } from '../data/dungeons';
 
-export type PinKind = 'route' | 'tower' | 'alpha' | 'realm' | 'base' | 'altar';
+export type PinKind = 'route' | 'tower' | 'alpha' | 'realm' | 'base' | 'altar' | 'rival';
 export type PinStatus = 'locked' | 'open' | 'cleared';
 
 export interface MapPin {
@@ -86,6 +89,15 @@ export function worldMap(save: SaveState, now = save.stats.playSeconds): MapRegi
         detail: open ? `${d.waves} waves and a guardian${clears ? ` · cleared ×${clears}` : ''}` : describeRequirement(d.unlock),
       });
     }
+    for (const rv of rivalsOf(region.id)) {
+      const info = rivalInfo(save, rv, now);
+      const [x, y] = spotOf(region.id, rv.id);
+      pins.push({
+        kind: 'rival', id: rv.id, regionId: region.id, name: rv.name, level: info.level, x, y,
+        status: !info.open ? 'locked' : info.ready ? 'open' : 'cleared', current: false,
+        detail: !info.open ? describeRequirement(rv.unlock) : info.ready ? `${rv.faction} — three Pals, 90 s each · ${info.gold.toLocaleString()} gold${info.tier ? ` · tier ${info.tier}` : ''}` : `Beaten ×${info.wins} — back in ${fmtCd(info.secondsLeft)} of play`,
+      });
+    }
     if (region.id === 'windswept') {
       // home: the base, and the Summoning Altar once it is built
       const [bx, by] = spotOf(region.id, 'base');
@@ -111,6 +123,7 @@ export function pinRegion(kind: PinKind, id: string): string | null {
     if (kind === 'alpha') return alphaById(id).regionId;
     if (kind === 'tower') return towerById(id).regionId;
     if (kind === 'realm') return dungeonById(id).regionId;
+    if (kind === 'rival') return REGION_MAPS.find((m) => m.spots[id])?.regionId ?? null;
     return REGION_MAPS.find((m) => m.spots[id])?.regionId ?? null;
   } catch { return null; }
 }

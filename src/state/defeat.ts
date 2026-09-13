@@ -14,6 +14,9 @@ import { earnGold } from '../engine/inventory';
 import { recordAlphaWin, rematchInfo } from '../engine/rematch';
 import { activeMods, countChallengeKill, claimChallenge, CHALLENGE_REWARD } from '../engine/challenge';
 import { LUCKY_CHANCE } from '../engine/formulas';
+import { rivalById } from '../data/rivals';
+import { duelOpponent, winDuel } from '../engine/rival';
+import { itemName as itemLabel } from '../data/items';
 import type { GameCore } from './core';
 
 export function resolveDefeat(g: GameCore, w: Wild, byClick = false) {
@@ -86,6 +89,19 @@ export function resolveDefeat(g: GameCore, w: Wild, byClick = false) {
     g.pushT('{boss} defeated — {tower} cleared!', { boss: tower.boss, tower: tower.name });
     g.emit('towerWin');
     g.notifyT('🏰 {tower} cleared!', { tower: tower.name }, 'gold', 6000);
+  } else if (w.kind === 'duel' && g.duel) {
+    const r = rivalById(g.duel.rivalId);
+    g.duel.index += 1;
+    if (g.duel.index < g.duel.team.length) {
+      g.wild = duelOpponent(save, g.duel);
+      g.pushT('{rival} sends out {pal} ({n} of {total}).', { rival: r.name, pal: palById(g.wild.palId).name, n: g.duel.index + 1, total: g.duel.team.length });
+      return;
+    }
+    const win = winDuel(save, g.duel.rivalId);
+    g.duel = null;
+    g.pushT('Duel won! {rival} pays {gold} gold and {n} {prize}. Tier {tier} next time.', { rival: r.name, gold: win.gold.toLocaleString(), n: win.prize.n, prize: itemLabel(win.prize.itemId), tier: win.tier + 1 });
+    g.emit('towerWin');
+    g.notifyT('🏅 Duel won — {rival} +{gold} gold', { rival: r.name, gold: win.gold.toLocaleString() }, 'gold', 6000);
   } else if (w.kind === 'raid' && w.refId) {
     const raid = raidById(w.refId);
     const chest = completeRaid(save, raid);

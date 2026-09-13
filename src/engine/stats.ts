@@ -20,7 +20,7 @@ export interface StatRow { label: string; value: string; hint?: string }
 export interface StatSection { title: string; rows: StatRow[] }
 
 export const KIND_LABEL: Record<WildKind, string> = {
-  wild: 'Wild Pals', alpha: 'Alphas', tower: 'Tower bosses', dungeon: 'Sealed Realm Pals', dungeonBoss: 'Realm bosses', raid: 'Raid bosses',
+  wild: 'Wild Pals', alpha: 'Alphas', tower: 'Tower bosses', dungeon: 'Sealed Realm Pals', dungeonBoss: 'Realm bosses', raid: 'Raid bosses', duel: 'Rival Pals',
 };
 
 export const fmtInt = (n: number) => Math.round(n).toLocaleString();
@@ -144,6 +144,7 @@ export function statsReport(save: SaveState, live: { dps: number; clickDmg: numb
       { label: 'Alpha rematches won', value: fmtInt(st.rematchesWon), hint: Object.keys(save.progress.alphaRematch).length ? `highest tier ${Math.max(...Object.values(save.progress.alphaRematch).map((r) => r.tier)) - 1}` : undefined },
       { label: 'Base raids', value: `${fmtInt(st.baseRaidsRepelled)} repelled · ${fmtInt(st.baseRaidsLost)} lost` },
       { label: 'Daily challenges done', value: fmtInt(st.challengesDone) },
+      { label: 'Rival duels', value: `${fmtInt(st.duelsWon)} won · ${fmtInt(st.duelsLost)} lost`, hint: Object.keys(save.progress.rivals).length ? `highest tier ${Math.max(...Object.values(save.progress.rivals).map((r) => r.tier))}` : undefined },
       { label: 'Towers cleared', value: `${save.progress.towers.length} / ${REGIONS.length}` },
       { label: 'Sealed Realm clears', value: fmtInt(realmClears), hint: `${Object.keys(save.progress.dungeons).length} / ${DUNGEONS.length} realms cleared at least once` },
       { label: 'Raid wins', value: fmtInt(raidWins), hint: `${Object.keys(save.progress.raids).length} / ${RAIDS.length} raid bosses beaten` },

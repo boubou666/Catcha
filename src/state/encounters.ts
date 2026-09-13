@@ -11,6 +11,8 @@ import { isUnlocked } from '../engine/progress';
 import { rematchInfo } from '../engine/rematch';
 import { bossName, dungeonUnlocked, spawnFor, startRun } from '../engine/dungeon';
 import { summon, summonBlocker } from '../engine/raid';
+import { rivalById } from '../data/rivals';
+import { duelOpponent, loseDuel, rivalInfo, rollTeam } from '../engine/rival';
 import type { GameCore } from './core';
 
 export function startAlpha(g: GameCore, id: string) {
@@ -34,6 +36,7 @@ export function startTower(g: GameCore, id: string) {
 
 export function flee(g: GameCore) {
   if (g.run) { endRun(g, 'Retreated'); return; }
+  if (g.duel) { endDuel(g, false); return; }
   if (g.wild?.kind === 'raid') { g.pushT('Retreated from {pal} — the slab is spent.', { pal: palById(g.wild.palId).name }); g.spawn(); return; }
   g.pushT('Retreated.');
   g.spawn();
@@ -66,5 +69,37 @@ export function endRun(g: GameCore, why: string) {
   const earned = run.gold > 0 || Object.keys(run.items).length > 0;
   g.push(`${why} — left ${dungeonById(run.id).name}${earned ? ` with ${run.gold} gold and ${Object.values(run.items).reduce((a, b) => a + b, 0)} items` : ''}.`);
   g.run = null;
+  g.spawn();
+}
+
+// ---- rival duels ---------------------------------------------------------
+
+export function canDuel(g: GameCore, rivalId: string): boolean {
+  const r = rivalById(rivalId);
+  const info = rivalInfo(g.save, r);
+  return !g.run && !g.duel && !g.inBossFight && info.open && info.ready;
+}
+
+export function startDuel(g: GameCore, rivalId: string) {
+  if (!canDuel(g, rivalId)) return;
+  const r = rivalById(rivalId);
+  g.duel = { rivalId, team: rollTeam(g.save, r), index: 0 };
+  g.wild = duelOpponent(g.save, g.duel);
+  const info = rivalInfo(g.save, r);
+  g.pushT('{rival}: “{line}” — {n} Pals, {seconds} seconds each{tier}.', { rival: r.name, line: r.line, n: g.duel.team.length, seconds: 90, tier: info.tier ? ` · tier ${info.tier}` : '' });
+  g.emit('summon');
+}
+
+/** Time out or retreat: the rival walks off for the cooldown. */
+export function endDuel(g: GameCore, won: boolean) {
+  const duel = g.duel;
+  if (!duel) return;
+  const r = rivalById(duel.rivalId);
+  g.duel = null;
+  if (!won) {
+    loseDuel(g.save, duel.rivalId);
+    g.pushT('{rival} wins the duel and walks off. Back in half an hour of play.', { rival: r.name });
+    g.notifyT('❌ {rival} won the duel', { rival: r.name }, 'warn', 5000);
+  }
   g.spawn();
 }

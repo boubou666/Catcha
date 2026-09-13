@@ -5,7 +5,7 @@ import { newStats } from './achievements';
 import { newTutorial, TUTORIAL } from './tutorial';
 import { STARTING_TECH_POINTS, structureTech, TECH_POINTS_PER_LEVEL } from '../data/tech';
 
-export const SAVE_VERSION = 25;
+export const SAVE_VERSION = 26;
 const STORAGE_KEY = 'catcha.save';
 
 export function newState(): SaveState {
@@ -18,7 +18,8 @@ export function newState(): SaveState {
     inventory: { sphere_pal: 20, red_berries: 30 },
     base: newBase(),
     tech: [],
-    progress: { route: STARTING_ROUTE, routeKills: {}, alphas: [], towers: [], dungeons: {}, raids: {}, alphaRematch: {}, challenge: null },
+    progress: { route: STARTING_ROUTE, routeKills: {}, alphas: [], towers: [], dungeons: {}, raids: {}, alphaRematch: {}, challenge: null, rivals: {} },
+    outposts: [],
     settings: { sphereForNew: 'pal', sphereForDupe: 'none', dailyReset: 'utc' },
     stats: newStats(),
     achievements: [],
@@ -164,6 +165,12 @@ export function migrate(raw: unknown): SaveState | null {
   if (s.version === 24) {
     if (s.stats) { s.stats.challengesDone ??= 0; s.stats.rematchesWon ??= 0; }
     s.version = 25;
+  }
+  if (s.version === 25) {
+    if (s.progress) s.progress.rivals ??= {};
+    s.outposts ??= [];
+    if (s.stats) { s.stats.duelsWon ??= 0; s.stats.duelsLost ??= 0; }
+    s.version = 26;
   }
   if (s.version !== SAVE_VERSION) return null;
   return s as SaveState;

@@ -11,6 +11,21 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.16.0', date: '2026-09-14', title: 'Rivals',
+    items: [
+      'A rival in every region: a faction fighter (Syndicate Scout, Alliance Zealot, Pyre Cultist, PIDF Trooper, Research Unit Guard, Moonflower Warrior, Feybreak Marauder) who duels you with three of the region’s hardest hitters in a row, 90 seconds each and none catchable. Win for gold and a prize — spheres, oil, Diamonds, a Legendary Sphere — and they come back a tier stronger after half an hour of play. Bosses panel and map.',
+      'Active skills: every party Pal charges its element’s signature attack (Ignis Blast, Aqua Gun, Seed Machine Gun…) over 20 seconds and fires it for six seconds’ worth of damage with the matchup — a row of chips under the arena shows the charge; tap a full one to fire it now. About +30% damage overall; the balance model includes it.',
+      'Outposts: once a region’s tower is beaten, found a camp there (5,000 gold and materials) and post up to three idle Pals; they gather that region’s drops on their own, about one item a minute each. A home for the duplicates the late game piles up. Base tab.',
+      'Stats opens with a “This session” line (defeats, catches, gold, hatches, raids, duels), and Settings → Save can copy a link that carries your save — open it on another device to load it there.',
+    ],
+    fr: { title: 'Rivaux', items: [
+      "Un rival dans chaque région : un combattant de faction (Éclaireur du Syndicat, Zélote de l’Alliance, Cultiste du Bûcher, Soldat des FDIP, Garde de l’Unité de recherche, Guerrier Fleur-de-lune, Maraudeur de Feybreak) qui vous affronte avec trois des plus gros frappeurs de la région d’affilée, 90 secondes chacun, aucun capturable. Gagnez pour de l’or et un prix — sphères, huile, Diamants, une Sphère légendaire — et ils reviennent un rang plus forts après une demi-heure de jeu. Panneau Boss et carte.",
+      "Compétences actives : chaque Pal de l’équipe charge l’attaque signature de son élément (Explosion ignée, Pistolet à eau, Mitrailleuse à graines…) en 20 secondes et la lance pour l’équivalent de six secondes de dégâts avec l’affinité — une rangée de jetons sous l’arène montre la charge ; touchez-en un plein pour tirer maintenant. Environ +30 % de dégâts au total ; le modèle d’équilibrage en tient compte.",
+      "Avant-postes : une fois la tour d’une région battue, fondez-y un camp (5 000 or et des matériaux) et postez jusqu’à trois Pals disponibles ; ils récoltent seuls le butin de la région, environ un objet par minute chacun. Un foyer pour les doublons que la fin de partie accumule. Onglet Base.",
+      "Les Stats s’ouvrent sur une ligne « Cette session » (victoires, captures, or, éclosions, raids, duels), et Options → Sauvegarde peut copier un lien qui contient votre sauvegarde — ouvrez-le sur un autre appareil pour l’y charger.",
+    ] },
+  },
+  {
     version: '0.15.0', date: '2026-09-14', title: 'Watchtower',
     items: [
       'Three structures for the late base: the Watchtower (workers defend raids at full attack; Lv 2 adds a minute to the clock; Lv 3 rallies the party on its own), the Sphere Assembly Line (Handiwork on the craft queue ×1.5 / ×2 / ×2.5) and Pal Beds (resting Pals recover SAN ×2 / ×3).',

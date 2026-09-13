@@ -16,7 +16,7 @@ export type WorkType =
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
-export type WildKind = 'wild' | 'alpha' | 'tower' | 'dungeon' | 'dungeonBoss' | 'raid';
+export type WildKind = 'wild' | 'alpha' | 'tower' | 'dungeon' | 'dungeonBoss' | 'raid' | 'duel';
 export type SphereTier = 'pal' | 'mega' | 'giga' | 'hyper' | 'ultra' | 'legendary';
 export const SPHERE_TIERS: SphereTier[] = ['pal', 'mega', 'giga', 'hyper', 'ultra', 'legendary'];
 
@@ -191,7 +191,9 @@ export interface SaveState {
     raids: Record<string, number>;       // raidId -> wins
     alphaRematch: Record<string, import('../engine/rematch').RematchState>;   // per beaten Alpha: next tier and when
     challenge: { day: string; kills: number; claimed: boolean } | null;      // today's challenge route progress
+    rivals: Record<string, import('../engine/rival').RivalState>;            // per rival: tier, wins, cooldown
   };
+  outposts: import('../engine/outpost').Outpost[];                           // camps in cleared regions that gather drops
   settings: {
     sphereForNew: SpherePolicy;          // sphere to throw at a Pal not yet in the Paldeck
     sphereForDupe: SpherePolicy;         // sphere to throw at an already-caught species
@@ -205,6 +207,7 @@ export interface SaveState {
     chanceSum: number;                   // sum of the odds each throw was made at (expected catches)
     baseRaidsRepelled: number; baseRaidsLost: number;
     challengesDone: number; rematchesWon: number;
+    duelsWon: number; duelsLost: number;
     ratedThrows: number;                 // throws counted in chanceSum (older saves started mid-way)
     defeatedByElement: Partial<Record<Element, number>>;
     defeatedByKind: Partial<Record<WildKind, number>>;

@@ -11,6 +11,11 @@
   import { t, t as tr } from '../i18n/index.svelte';
   import { raidById } from '../data/raids';
   import { activeMods, todaysChallenge, MOD_LABEL } from '../engine/challenge';
+  import { rivalById } from '../data/rivals';
+  import { partyInstances } from '../engine/party';
+  import { SKILL_CHARGE_SEC, SKILL_ICON, skillElement, skillName } from '../engine/skills';
+  const duel = $derived(game.duel);
+  const skills = $derived(partyInstances(game.save).map((p) => ({ uid: p.uid, name: palById(p.palId).name, el: skillElement(p), skill: skillName(p), charge: Math.min(1, (game.charges[p.uid] ?? 0) / SKILL_CHARGE_SEC) })));
   import { ui } from '../state/ui.svelte';
 
   /** compact: the sticky mobile bar (smaller art, one-line stats) */
@@ -54,6 +59,7 @@
           {#if wild.kind === 'dungeonBoss'}<span class="tag realm">{tr("GUARDIAN")}</span>{/if}
           {#if wild.kind === 'raid'}<span class="tag raid">{tr("RAID")}</span>{/if}
           {#if challenge}<span class="tag challenge" title={tr(MOD_LABEL[challenge.mod])}>⭐ {challenge.kills}/{challenge.goal}</span>{/if}
+          {#if duel && wild.kind === 'duel'}<span class="tag duel" title={rivalById(duel.rivalId).name}>⚔ {tr("DUEL")} {duel.index + 1}/{duel.team.length} · {rivalById(duel.rivalId).name}</span>{/if}
           {#if wild.lucky}<span class="tag lucky">{tr("LUCKY")}</span>{/if}
           {def.name} <span class="muted">Lv {wild.level}</span>
         </div>
@@ -78,6 +84,7 @@
           {#if wild.kind === 'dungeon' && run && runDef}<span class="tag realm">{tr("WAVE")} {run.wave + 1}/{runDef.waves}</span>{/if}
           {#if wild.kind === 'dungeonBoss'}<span class="tag realm">{tr("GUARDIAN")}</span>{/if}
           {#if wild.kind === 'raid'}<span class="tag raid">{tr("RAID")}</span>{/if}
+          {#if duel && wild.kind === 'duel'}<span class="tag duel" title={rivalById(duel.rivalId).name}>⚔ {tr("DUEL")} {duel.index + 1}/{duel.team.length} · {rivalById(duel.rivalId).name}</span>{/if}
           {#if wild.lucky}<span class="tag lucky">{tr("LUCKY")}</span>{/if}
           {def.name} <span class="muted">Lv {wild.level}</span>
         </div>
@@ -102,10 +109,19 @@
         <span>· {t('arena.routeProgress')}: <b>{Math.min(kills, routeQuota(game.save, game.route))} / {routeQuota(game.save, game.route)}</b></span>
         {#if !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? t('arena.hide') : t('arena.whoLivesHere')}</button>{/if}
       {:else}
-        <button class="small" onclick={() => game.flee()}>{run ? t('arena.leaveRealm') : wild.kind === 'raid' ? t('arena.giveUp') : t('arena.retreat')}</button>
+        <button class="small" onclick={() => game.flee()}>{run ? t('arena.leaveRealm') : wild.kind === 'raid' ? t('arena.giveUp') : wild.kind === 'duel' ? tr("Concede") : t('arena.retreat')}</button>
         {#if run && !compact}<span class="grow"></span><button class="small" class:active={showHere} onclick={() => (ui.spawnListOpen = !ui.spawnListOpen)} aria-expanded={showHere}>{showHere ? t('arena.hide') : t('arena.whoLivesHere')}</button>{/if}
       {/if}
     </div>
+    {#if !compact && skills.length}
+      <div class="skills" title={tr("Active skills charge over 20 s and fire on their own; tap a full one to fire it now")}>
+        {#each skills as sk (sk.uid)}
+          <button class="skill" class:ready={sk.charge >= 1} style:--charge="{Math.round(sk.charge * 100)}%" onclick={() => game.fireSkill(sk.uid)} disabled={sk.charge < 1} title={`${sk.name}: ${tr(sk.skill)}`}>
+            <span class="ico">{SKILL_ICON[sk.el]}</span><span class="lbl">{tr(sk.skill)}</span>
+          </button>
+        {/each}
+      </div>
+    {/if}
     {#if showHere && !compact && wild.kind === 'wild'}
       <div class="here"><SpawnList /></div>
     {:else if showHere && !compact && run && runDef}
@@ -121,6 +137,14 @@
   .tag.realm { background: var(--accent-2); }
   .tag.raid { background: #7b2cbf; }
   .tag.challenge { background: var(--accent); color: var(--on-accent); }
+  .tag.duel { background: #b91c1c; }
+  .skills { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+  .skill { position: relative; overflow: hidden; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); opacity: 0.85; }
+  .skill::before { content: ''; position: absolute; inset: 0; width: var(--charge); background: rgba(53, 208, 255, 0.28); transition: width 0.3s linear; }
+  .skill .ico, .skill .lbl { position: relative; }
+  .skill .lbl { margin-left: 0.25rem; }
+  .skill.ready { opacity: 1; border-color: var(--accent-2); box-shadow: 0 0 8px rgba(53, 208, 255, 0.6); }
+  .skill.ready::before { background: rgba(53, 208, 255, 0.45); }
   .bar.hp { margin: 0.35rem 0; }
   .catch { color: var(--accent-2); margin-top: 0.15rem; font-size: 0.85rem; background: none; border: none; padding: 0; clip-path: none; text-align: left; cursor: pointer; font-weight: 700; }
   .catch:hover { text-decoration: underline; background: none; }

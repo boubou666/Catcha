@@ -16,7 +16,7 @@ describe('WorldMap', () => {
   it('opens on the current region with a pin per location, tap to select, tap again to travel', async () => {
     game.save.progress.routeKills.plateau = 10;   // opens Grassy Behemoth Hills
     const { container } = render(WorldMap);
-    expect(container.querySelectorAll('.pin').length).toBe(13);   // 7 routes, 2 Alphas, tower, realm, base, altar
+    expect(container.querySelectorAll('.pin').length).toBe(14);   // 7 routes, 2 Alphas, tower, realm, base, altar, rival
     const behemoth = pin(/^Grassy Behemoth Hills/);
     await fireEvent.click(behemoth);
     expect(container.querySelector('.detail')).toHaveTextContent('Grassy Behemoth Hills Lv 3 0 / 20 defeated');

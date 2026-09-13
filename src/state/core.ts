@@ -1,6 +1,7 @@
 import type { RouteDef, SaveState } from '../data/types';
 import type { Wild } from '../engine/combat';
 import type { DungeonRun } from '../engine/dungeon';
+import type { Duel } from '../engine/rival';
 import type { LogMessage } from '../engine/logfilter';
 import type { NoticeKind } from '../engine/notices';
 
@@ -12,6 +13,7 @@ export interface GameCore {
   save: SaveState;
   wild: Wild | null;
   run: DungeonRun | null;
+  duel: Duel | null;
   readonly route: RouteDef;
   readonly inBossFight: boolean;
   emit(event: string): void;

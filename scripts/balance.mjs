@@ -20,6 +20,7 @@ import { arkSlots, buyUpgrade, prestigeMult, routeQuota } from '../src/engine/pr
 import { PRESTIGE_UPGRADES } from '../src/data/prestige.ts';
 import { RAID_HP_MULT, RAID_TIME_SEC, WORKER_ATTACK_MULT } from '../src/engine/baseraid.ts';
 import { REMATCH_HP_STEP, REMATCH_LEVEL_STEP } from '../src/engine/rematch.ts';
+import { SKILL_CHARGE_SEC, SKILL_MULT } from '../src/engine/skills.ts';
 
 const fmt = (s) => (s >= 3600 ? `${(s / 3600).toFixed(1)}h` : s >= 60 ? `${(s / 60).toFixed(1)}m` : `${s.toFixed(0)}s`);
 const pad = (s, n) => String(s).padEnd(n);
@@ -52,9 +53,10 @@ function carriedPal() {
 }
 
 /** Party DPS: `carried` Ark Pals plus region Pals for the rest, techs by level, prestige on top. */
+const SKILL_BONUS = 1 + SKILL_MULT / SKILL_CHARGE_SEC;   // active skills: six seconds of damage every twenty
 function partyDps(save, region, level, stars, carried) {
   const n = Math.min(5, carried);
-  const dps = n * carriedPal() + (5 - n) * regionPal(region, level, stars);
+  const dps = (n * carriedPal() + (5 - n) * regionPal(region, level, stars)) * SKILL_BONUS;
   return dps * attackTechMult(level) * prestigeMult(save, 'attack');
 }
 

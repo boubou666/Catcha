@@ -52,6 +52,11 @@
     codeNote = `${code.length.toLocaleString()} characters`;
     try { await navigator.clipboard?.writeText(code); codeNote += ' · copied'; } catch { /* clipboard blocked */ }
   }
+  async function doLink() {
+    const c = await game.saveCode();
+    const url = `${location.origin}${location.pathname}#save=${c}`;
+    try { await navigator.clipboard?.writeText(url); codeNote = tr('Link copied — open it on the other device to load this save there.'); } catch { code = url; codeNote = tr('Copy this link and open it on the other device.'); }
+  }
   async function doImport() {
     const ok = code.trim() ? await game.importCode(code) : false;
     codeNote = ok ? 'Save loaded.' : 'Could not read that code.';
@@ -188,6 +193,7 @@
     <button class="small" onclick={() => game.persist()}>{tr("Save now")}</button>
     <button class="small" onclick={doExport}>{tr("Copy save code")}</button>
     <button class="small" onclick={doImport} disabled={!code.trim()}>{tr("Load pasted code")}</button>
+    <button class="small" onclick={doLink} title={tr("A link that carries this save; opening it on another device offers to load it")}>{tr("Copy link")}</button>
     <span class="grow"></span>
     <button class="small danger" onclick={doReset}>{tr("Reset game")}</button>
   </div>

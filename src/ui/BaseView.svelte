@@ -11,6 +11,9 @@
   import { defenceDps, RAID_TIME_SEC } from '../engine/baseraid';
   import PalIcon from './PalIcon.svelte';
   import { palById } from '../data/pals';
+  import { REGIONS, regionById } from '../data/regions';
+  import { OUTPOST_COST, outpostRate, outpostWorkers } from '../engine/outpost';
+  import { isUnlocked } from '../engine/progress';
   const partnerLines = $derived(summarizePartners(activePartners(game.save).filter((e) => e.stat === 'work')));
   import CostLine from './CostLine.svelte';
   import BoxFilterBar from './BoxFilterBar.svelte';
@@ -20,6 +23,8 @@
 
   const save = $derived(game.save);
   const raid = $derived(save.base.raid);
+  const outpostRegions = $derived(REGIONS.filter((r) => r.id !== 'windswept' && isUnlocked(save, { kind: 'tower', id: r.tower.id })));
+  const outpostCandidates = $derived(save.box.filter((p) => statusOf(save, p.uid) === 'idle').slice(0, 40));
   const workers = $derived(baseWorkers(save));
   const levels = $derived(workLevels(save));
   const rates = $derived(computeRates(save));
@@ -67,6 +72,39 @@
     </div>
     <p class="muted small">{tr("Production pauses until it is over. Repel it for triple drops, bonus gold and a throw at the raider; lose and it takes a tenth of two stacks and shakes the workers.")}</p>
   </div>
+{/if}
+{#if outpostRegions.length || save.outposts.length}
+  <section class="outposts">
+    <h3>🏕 {tr("Outposts")} <span class="muted">{save.outposts.length} / {outpostRegions.length}</span></h3>
+    <p class="muted small">{tr("A camp in a region whose tower you have beaten. Posted Pals gather that region's drops on their own — about one item a minute each, more with stars — with no structures, raids or queue. Costs {gold} gold, {wood} Wood, {stone} Stone and {ingot} Ingots.", { gold: OUTPOST_COST.gold.toLocaleString(), wood: OUTPOST_COST.wood, stone: OUTPOST_COST.stone, ingot: OUTPOST_COST.ingot })}</p>
+    {#each save.outposts as o (o.regionId)}
+      <div class="outpost panel-2">
+        <div class="row">
+          <b class="grow">{regionById(o.regionId).name} <span class="muted">{o.workers.length} / {o.slots} · {outpostRate(save, o).toFixed(1)} {tr("items/min")}</span></b>
+        </div>
+        <div class="small muted">{tr("Gathered:")} {Object.entries(o.taken).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') || '—'}</div>
+        <div class="list">
+          {#each outpostWorkers(save, o) as w (w.uid)}
+            <PalCard inst={w} showWork><button class="small" onclick={() => game.recallFromOutpost(o.regionId, w.uid)}>{tr("Recall")}</button></PalCard>
+          {/each}
+        </div>
+        {#if o.workers.length < o.slots}
+          <div class="row post">
+            <select onchange={(e) => { const uid = e.currentTarget.value; if (uid) game.postToOutpost(o.regionId, uid); e.currentTarget.value = ''; }} aria-label={tr("Post a Pal")}>
+              <option value="">{tr("Post an idle Pal…")}</option>
+              {#each outpostCandidates as p (p.uid)}<option value={p.uid}>{palById(p.palId).name} Lv {p.level}{p.stars ? ' ' + '★'.repeat(p.stars) : ''}</option>{/each}
+            </select>
+          </div>
+        {/if}
+      </div>
+    {/each}
+    {#each outpostRegions.filter((r) => !save.outposts.some((o) => o.regionId === r.id)) as r (r.id)}
+      <div class="row">
+        <span class="grow">{r.name}</span>
+        <button class="small" disabled={!game.canFoundOutpost(r.id)} onclick={() => game.foundOutpost(r.id)}>{tr("Found an outpost")}</button>
+      </div>
+    {/each}
+  </section>
 {/if}
 {#if save.base.raidLog.length}
   <details class="raidlog">
@@ -202,6 +240,11 @@
 </section>
 
 <style>
+  .outposts { margin: 0.4rem 0 0.8rem; }
+  .outposts h3 { margin: 0 0 0.3rem; }
+  .outpost { padding: 0.5rem; margin: 0.4rem 0; }
+  .outpost .list { margin-top: 0.3rem; }
+  .post select { max-width: 20rem; }
   .raid { padding: 0.6rem; margin: 0.4rem 0 0.6rem; border: 1.5px solid var(--danger); border-radius: var(--radius-sm); }
   .raid .hp { margin: 0.25rem 0; }
   .raid .hp span { background: var(--danger); }

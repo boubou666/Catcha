@@ -22,7 +22,7 @@ export function addToBox(save: SaveState, inst: PalInstance): void {
 
 /** Away on an expedition — untouchable until it returns. */
 export function isAway(save: SaveState, uid: string): boolean {
-  return save.base.expeditions.some((e) => e.members.includes(uid));
+  return save.base.expeditions.some((e) => e.members.includes(uid)) || (save.outposts ?? []).some((o) => o.workers.includes(uid));
 }
 
 /** Level up one Pal by an amount of exp (expeditions, etc.). */

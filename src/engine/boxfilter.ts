@@ -6,7 +6,7 @@ import { isAway } from './party';
 import { breedable, childOf, isBreeding } from './breeding';
 import { instanceByUid } from './party';
 
-export type BoxStatus = 'any' | 'idle' | 'party' | 'base' | 'breeding' | 'expedition';
+export type BoxStatus = 'any' | 'idle' | 'party' | 'base' | 'breeding' | 'expedition' | 'outpost';
 export type BoxSort = 'stars' | 'level' | 'attack' | 'work' | 'name' | 'species' | 'newest';
 
 export interface BoxFilter {
@@ -23,7 +23,7 @@ export interface BoxFilter {
 export const DEFAULT_FILTER: BoxFilter = { query: '', element: 'any', work: 'any', status: 'any', lucky: false, starred: false, dupes: false, sort: 'stars' };
 
 export const STATUS_LABEL: Record<BoxStatus, string> = {
-  any: 'Any status', idle: 'Idle', party: 'In party', base: 'At base', breeding: 'Breeding', expedition: 'On expedition',
+  any: 'Any status', idle: 'Idle', party: 'In party', base: 'At base', breeding: 'Breeding', expedition: 'On expedition', outpost: 'At an outpost',
 };
 export const SORT_LABEL: Record<BoxSort, string> = {
   stars: 'Stars, then level', level: 'Level', attack: 'Attack', work: 'Work suitability', name: 'Name', species: 'Paldeck number', newest: 'Newest',
@@ -39,6 +39,7 @@ export function statusOf(save: SaveState, uid: string): Exclude<BoxStatus, 'any'
   if (save.party.includes(uid)) return 'party';
   if (save.base.workers.includes(uid)) return 'base';
   if (isBreeding(save, uid)) return 'breeding';
+  if (save.outposts.some((o) => o.workers.includes(uid))) return 'outpost';
   if (isAway(save, uid)) return 'expedition';
   return 'idle';
 }

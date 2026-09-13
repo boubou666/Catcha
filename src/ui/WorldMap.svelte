@@ -37,8 +37,8 @@
   // keep the selected pin fresh when the save changes (status, detail)
   const current = $derived(selected ? regions.flatMap((r) => r.pins).find((p) => p.kind === selected!.kind && p.id === selected!.id) ?? null : null);
 
-  const ICON: Record<MapPin['kind'], string> = { route: '', tower: '🗼', alpha: '💀', realm: '🗝', base: '🏠', altar: '🔮' };
-  const ACTION_KEY: Record<MapPin['kind'], string> = { route: 'map.travel', tower: 'map.challengeTower', alpha: 'map.fightAlpha', realm: 'map.enterRealm', base: 'map.openBase', altar: '' };
+  const ICON: Record<MapPin['kind'], string> = { route: '', tower: '🗼', alpha: '💀', realm: '🗝', base: '🏠', altar: '🔮', rival: '⚔' };
+  const ACTION_KEY: Record<MapPin['kind'], string> = { route: 'map.travel', tower: 'map.challengeTower', alpha: 'map.fightAlpha', realm: 'map.enterRealm', base: 'map.openBase', altar: '', rival: 'map.duel' };
   const RAID_BLOCK: Record<SummonBlock, string> = { 'no-altar': 'Build the Summoning Altar', locked: 'Locked', 'no-slab': 'Craft a slab first' };
 
   // the boss / realm / raid you are fighting right now, if any
@@ -47,6 +47,7 @@
     if (!w || w.kind === 'wild') return null;
     if (w.kind === 'alpha' || w.kind === 'tower') return w.refId ? { kind: w.kind, id: w.refId } : null;
     if (w.kind === 'raid') return { kind: 'altar', id: 'altar' };
+    if (w.kind === 'duel') return game.duel ? { kind: 'rival', id: game.duel.rivalId } : null;
     return game.run ? { kind: 'realm', id: game.run.id } : null;
   });
   const isFighting = (p: MapPin) => (!!fighting && fighting.kind === p.kind && fighting.id === p.id) || (p.kind === 'base' && !!game.save.base.raid);
@@ -63,13 +64,14 @@
     selected = pin;
   });
 
-  const canAct = (p: MapPin) => p.kind === 'base' || (p.status !== 'locked' && !(p.kind === 'alpha' && p.status === 'cleared') && !game.inBossFight && !(p.kind === 'route' && p.current) && !(p.kind === 'realm' && !game.canEnter(p.id)) && p.kind !== 'altar');
+  const canAct = (p: MapPin) => p.kind === 'base' || (p.status !== 'locked' && !(p.kind === 'alpha' && p.status === 'cleared') && !game.inBossFight && !(p.kind === 'route' && p.current) && !(p.kind === 'realm' && !game.canEnter(p.id)) && !(p.kind === 'rival' && !game.canDuel(p.id)) && p.kind !== 'altar');
   function act(p: MapPin) {
     if (!canAct(p)) return;
     if (p.kind === 'base') ui.requestTab = 'base';
     else if (p.kind === 'route') game.travel(p.id);
     else if (p.kind === 'alpha') game.startAlpha(p.id);
     else if (p.kind === 'tower') game.startTower(p.id);
+    else if (p.kind === 'rival') game.startDuel(p.id);
     else game.enterDungeon(p.id);
   }
   function tap(p: MapPin) {
@@ -82,7 +84,7 @@
     selected = null;
   }
   const odds = (p: MapPin) => (p.kind === 'route' && p.status !== 'locked' ? `Catch: ${tableOddsText(game.save, routeById(p.id).spawns)}` : '');
-  const short = (p: MapPin) => (p.kind === 'route' ? p.name : p.kind === 'tower' ? 'Tower' : p.kind === 'alpha' ? p.name.replace('Alpha ', 'α ') : p.kind === 'realm' ? 'Realm' : p.kind === 'base' ? 'Base' : 'Altar');
+  const short = (p: MapPin) => (p.kind === 'route' ? p.name : p.kind === 'tower' ? 'Tower' : p.kind === 'alpha' ? p.name.replace('Alpha ', 'α ') : p.kind === 'realm' ? 'Realm' : p.kind === 'base' ? 'Base' : p.kind === 'rival' ? p.name : 'Altar');
 </script>
 
 <div class="map" class:world={!zoom}>
@@ -187,12 +189,13 @@
   .pin.realm circle { fill: #35d0ff; }
   .pin.base circle { fill: #fff; }
   .pin.altar circle { fill: #7b2cbf; }
+  .pin.rival circle { fill: #b91c1c; }
   .pin.fighting > circle:not(.pulse) { fill: #ff5f5f; }
   .pin.fighting .pulse { stroke: #ff5f5f; }
   .fight { color: var(--danger); font-weight: 700; }
   .raids { display: flex; flex-direction: column; gap: 0.25rem; }
   .raids button { text-align: left; }
-  .pin.locked.tower circle, .pin.locked.alpha circle, .pin.locked.realm circle, .pin.locked.altar circle { fill: #64748b; }
+  .pin.locked.tower circle, .pin.locked.alpha circle, .pin.locked.realm circle, .pin.locked.altar circle, .pin.locked.rival circle { fill: #64748b; }
   .pin.sel circle:not(.pulse):not(.done) { stroke: #fff; stroke-width: 5; filter: drop-shadow(0 0 8px #fff); }
   .pin:focus-visible { outline: none; }
   .pin:focus-visible circle:not(.pulse) { stroke: #fff; stroke-width: 5; }

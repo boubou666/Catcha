@@ -4,6 +4,8 @@
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { catchPreview } from '../engine/catch';
   import { fmtCooldown, rematchInfo } from '../engine/rematch';
+  import { rivalsOf } from '../data/rivals';
+  import { rivalInfo } from '../engine/rival';
   import { ui } from '../state/ui.svelte';
   import { t, t as tr } from '../i18n/index.svelte';
   import { spawnTable } from '../engine/arenafilter';
@@ -101,6 +103,15 @@
       {tower.boss}{towerDone ? ' ✓' : ''}{#if towerUnlocked} <span class="odds no">{tr("🎯 no catch")}</span>{/if}
     </button>
   </div>
+  {#each rivalsOf(game.region.id) as rv (rv.id)}
+    {@const info = rivalInfo(game.save, rv, game.playSecond)}
+    <div class="row realm-row">
+      <button class="rival-btn" class:primary={info.open && info.ready && !game.inBossFight} disabled={!game.canDuel(rv.id)} onclick={() => game.startDuel(rv.id)}
+        title={info.open ? `${rv.faction}. ${tr("Three Pals in a row, 90 seconds each — none can be caught. Win: {gold} gold and {n} {prize}.", { gold: info.gold.toLocaleString(), n: rv.reward.prize.n, prize: itemName(rv.reward.prize.itemId) })}` : describeRequirement(rv.unlock)}>
+        ⚔ {rv.name} <span class="muted">Lv {info.level}{info.tier ? ` · ${tr("tier {n}", { n: info.tier })}` : ''}{info.wins ? ` · ${tr("won ×{n}", { n: info.wins })}` : ''}{info.open && !info.ready ? ` · ⏳ ${fmtCooldown(info.secondsLeft)}` : ''}</span>
+      </button>
+    </div>
+  {/each}
   {#if hasAltar}
     <div class="row realm-row">
       {#each RAIDS as r (r.id)}
@@ -129,7 +140,7 @@
 </div>
 
 <style>
-  .raid-btn { text-align: left; }
+  .raid-btn, .rival-btn { text-align: left; }
   .odds { font-size: 0.75rem; margin-left: 0.25rem; }
   .odds.egg { color: var(--accent); }
   .realm-row { margin-top: 0.5rem; }

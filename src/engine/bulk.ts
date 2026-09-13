@@ -24,7 +24,7 @@ export function bulkRelease(save: SaveState, uids: string[]): BulkResult {
     if (p.lucky) { r.skipped.push({ uid, reason: 'lucky' }); continue; }
     if (p.stars > 0) { r.skipped.push({ uid, reason: 'starred' }); continue; }
     const st = statusOf(save, uid);
-    if (st !== 'idle') { r.skipped.push({ uid, reason: st === 'expedition' ? 'away' : st }); continue; }
+    if (st !== 'idle') { r.skipped.push({ uid, reason: st === 'expedition' || st === 'outpost' ? 'away' : st }); continue; }
     release(save, uid);
     r.done.push(uid);
   }
@@ -39,7 +39,7 @@ export function bulkAssign(save: SaveState, uids: string[]): BulkResult {
     if (st === 'gone') { r.skipped.push({ uid, reason: 'gone' }); continue; }
     if (st === 'base') { r.skipped.push({ uid, reason: 'already' }); continue; }
     if (st === 'party') { r.skipped.push({ uid, reason: 'party' }); continue; }
-    if (st === 'expedition') { r.skipped.push({ uid, reason: 'away' }); continue; }
+    if (st === 'expedition' || st === 'outpost') { r.skipped.push({ uid, reason: 'away' }); continue; }
     if (save.base.workers.length >= save.base.slots) { r.skipped.push({ uid, reason: 'full' }); continue; }
     if (assignWorker(save, uid)) r.done.push(uid); else r.skipped.push({ uid, reason: 'full' });
   }
@@ -53,7 +53,7 @@ export function bulkParty(save: SaveState, uids: string[]): BulkResult {
     const st = instanceByUid(save, uid) ? statusOf(save, uid) : 'gone';
     if (st === 'gone') { r.skipped.push({ uid, reason: 'gone' }); continue; }
     if (st === 'party') { r.skipped.push({ uid, reason: 'already' }); continue; }
-    if (st === 'expedition') { r.skipped.push({ uid, reason: 'away' }); continue; }
+    if (st === 'expedition' || st === 'outpost') { r.skipped.push({ uid, reason: 'away' }); continue; }
     if (addToParty(save, uid)) r.done.push(uid); else r.skipped.push({ uid, reason: 'full' });
   }
   return r;

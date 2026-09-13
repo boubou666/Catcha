@@ -66,7 +66,7 @@ export interface DefeatSummary {
 /** Apply gold / exp / item drops / Paldeck "seen" for a defeated Pal. */
 export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random): DefeatSummary {
   const def = palById(wild.palId);
-  const bossMult = { wild: 1, dungeon: 2, alpha: 10, dungeonBoss: 12, tower: 25, raid: 40 }[wild.kind];
+  const bossMult = { wild: 1, dungeon: 2, alpha: 10, dungeonBoss: 12, tower: 25, raid: 40, duel: 4 }[wild.kind];
   const luckyMult = wild.lucky ? 5 : 1;
   const mods = wild.kind === 'wild' ? activeMods(save) : null;   // today's challenge route
 

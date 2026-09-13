@@ -1,6 +1,7 @@
 import type { DailyReset, RouteDef, SaveState, SpherePolicy, SphereTier } from '../data/types';
 import { palById } from '../data/pals';
 import { regionById, REGIONS, routeById } from '../data/regions';
+import { rivalsOf } from '../data/rivals';
 import { SPHERES } from '../data/spheres';
 import { clearSave, decodeSaveCode, encodeSaveCode, exportSave, importSave, loadState, newState, persist } from '../engine/save';
 import { partyDps, spawnWild, type Wild } from '../engine/combat';
@@ -29,7 +30,11 @@ import { resolveDefeat } from './defeat';
 import { canRaid, nextRaidDelay, rollRaidFor, tickRaid } from '../engine/baseraid';
 import { rematchInfo } from '../engine/rematch';
 import { activeMods, claimChallenge, countChallengeKill, todaysChallenge } from '../engine/challenge';
-import { canEnter, canSummon, endRun, enterDungeon, flee, startAlpha, startTower, summonRaid } from './encounters';
+import { canDuel, canEnter, canSummon, endDuel, endRun, enterDungeon, flee, startAlpha, startDuel, startTower, summonRaid } from './encounters';
+import type { Duel } from '../engine/rival';
+import { chargeSkills, skillDamage } from '../engine/skills';
+import { canFound, found, post, recall, tickOutposts } from '../engine/outpost';
+import { partyInstances } from '../engine/party';
 import { build, buyItem, cancelCraftAll, condense, craft, research, sellItem, setPair, sphereAvailable } from './economy';
 import { applyLoadout, deleteLoadout, renameLoadout, saveLoadout, updateLoadout } from '../engine/loadouts';
 import { bulkAssign, bulkParty, bulkRelease, describeBulk, type BulkResult } from '../engine/bulk';
@@ -50,7 +55,7 @@ export type ToastKind = NoticeKind;
 
 export type GameEvent =
   | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
-  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep' | 'raidAlarm';
+  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep' | 'raidAlarm' | 'skill';
 
 export class Game {
   save = $state<SaveState>(newState());
@@ -85,6 +90,11 @@ export class Game {
   emit(e: GameEvent) { for (const fn of this.listeners) { try { fn(e); } catch { /* ignore */ } } }
   offline = $state<OfflineReport | null>(null);   // "while you were away" summary, until dismissed
   run = $state<DungeonRun | null>(null);           // active Sealed Realm run
+  duel = $state<Duel | null>(null);                 // a rival duel in progress
+  /** Skill charge per party Pal (seconds), not saved. */
+  charges = $state<Record<string, number>>({});
+  /** Stats at the start of this session, for the "this session" rows. */
+  sessionStart = structuredClone($state.snapshot(this.save.stats));
   private sinceSave = 0;
   private sinceCheck = 0;
 
@@ -108,6 +118,7 @@ export class Game {
   get dps(): number { return this.wild ? partyDps(this.save, this.wild) : 0; }
   get clickDmg(): number { return clickDamage(this.save.player.level, this.save.player.weaponTier) * techMult(this.save, 'click'); }
   get inBossFight(): boolean { return this.wild?.kind !== 'wild'; }
+  get nextRival(): string | null { return rivalsOf(this.region.id).find((r) => this.canDuel(r.id))?.id ?? null; }
   /** The play clock rounded to the second: views that show countdowns read this instead of stats.playSeconds, so they re-render once a second, not ten times. */
   playSecond = $derived(Math.floor(this.save.stats.playSeconds));
 
@@ -160,10 +171,13 @@ export class Game {
     if (w) {
       if (w.deadlineAt && Date.now() > w.deadlineAt) {
         if (this.run) this.endRun('Time ran out');
+        else if (this.duel) endDuel(this, false);
         else if (w.kind === 'raid') { this.pushT('{pal} withdrew — the slab is spent.', { pal: palById(w.palId).name }); this.spawn(); }
         else { this.pushT("Time's up — {pal} retreats.", { pal: palById(w.palId).name }); this.spawn(); }
       } else {
         this.hit((this.dps * dtMs) / 1000);
+        // active skills: charge, fire the ready ones
+        for (const uid of chargeSkills(this.charges, partyInstances(this.save), dtMs / 1000)) this.fireSkill(uid);
       }
     }
     this.save.stats.playSeconds += dtMs / 1000;
@@ -180,6 +194,7 @@ export class Game {
       if (rollDaily(this.save)) { this.pushT('A new day — fresh daily quests are up.'); this.notifyT('📅 New daily quests are up', {}, 'info'); }
     }
     const queued = this.save.base.queue.length;
+    tickOutposts(this.save, dtMs / 1000);
     const world = tickWorld(this.save, dtMs / 1000);
     if (this.save.base.queue.length < queued) this.emit('craftDone');
     for (const palId of world.hatched) { this.pushT('An egg hatched: {pal}!', { pal: palById(palId).name }); this.emit('hatched'); this.notifyT('🥚 {pal} hatched!', { pal: palById(palId).name }, 'success'); }
@@ -246,6 +261,7 @@ export class Game {
     if (!next) return;
     this.save = next;
     this.run = null;
+    this.duel = null;
     this.spawn();
     this.persist();
     this.push(`Ascension ${next.prestige.ascensions} — +${relics} Ancient Relics. A new run begins.`);
@@ -283,6 +299,15 @@ export class Game {
 
   private unlockAchievements() {
     for (const a of checkAchievements(this.save)) { this.push(`🏆 Achievement: ${a.name} — ${a.desc} (+${a.points} pts)`); this.emit('achievement'); this.notify(`🏆 ${a.name} (+${a.points} pts)`, 'gold', 5000); }
+  }
+
+  /** Fire one party Pal's skill at the wild Pal if it is charged. */
+  fireSkill(uid: string) {
+    const inst = partyInstances(this.save).find((p) => p.uid === uid);
+    if (!inst || !this.wild || (this.charges[uid] ?? 0) < 20) return;
+    this.charges[uid] = 0;
+    this.emit('skill');
+    this.hit(skillDamage(this.save, inst, this.wild));
   }
 
   private hit(dmg: number, byClick = false) {
@@ -355,6 +380,15 @@ export class Game {
   canEnter(dungeonId: string): boolean { return canEnter(this, dungeonId); }
   enterDungeon(dungeonId: string) { enterDungeon(this, dungeonId); }
   private endRun(why: string) { endRun(this, why); }
+  canDuel(rivalId: string): boolean { return canDuel(this, rivalId); }
+  startDuel(rivalId: string) { startDuel(this, rivalId); }
+
+  // ---- outposts ----------------------------------------------------------
+
+  canFoundOutpost(regionId: string): boolean { return canFound(this.save, regionId); }
+  foundOutpost(regionId: string) { if (found(this.save, regionId)) this.pushT('Outpost founded in {region}.', { region: regionById(regionId).name }); }
+  postToOutpost(regionId: string, uid: string) { const o = this.save.outposts.find((x) => x.regionId === regionId); if (o && post(this.save, o, uid)) this.removeFromParty(uid); }
+  recallFromOutpost(regionId: string, uid: string) { const o = this.save.outposts.find((x) => x.regionId === regionId); if (o) recall(o, uid); }
 
   // ---- party / box -------------------------------------------------------
 

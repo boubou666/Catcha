@@ -1,7 +1,7 @@
 <script lang="ts">
   import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
-  import { defeatsByElement, DEFAULT_STATS_FILTER, filterStats, fmtInt, isStatsFiltering, statsReport, type StatsFilter } from '../engine/stats';
+  import { defeatsByElement, DEFAULT_STATS_FILTER, filterStats, fmtDuration, fmtInt, isStatsFiltering, statsReport, type StatsFilter } from '../engine/stats';
   import { ELEMENT_COLORS } from '../data/elements';
   import type { Element } from '../data/types';
 
@@ -14,6 +14,13 @@
   const all = $derived.by(() => { void tick; return statsReport(game.save, { dps: game.dps, clickDmg: game.clickDmg }); });
   let filter = $state<StatsFilter>({ ...DEFAULT_STATS_FILTER });
   const sections = $derived(filterStats(all, filter));
+  // this session: the difference between the stats now and at load
+  const session = $derived.by(() => {
+    void tick;
+    const a = game.sessionStart, b = game.save.stats;
+    const d = (k: keyof typeof b) => (b[k] as number) - (a[k] as number);
+    return { defeated: d('defeated'), caught: d('caught'), gold: d('goldEarned'), raids: d('baseRaidsRepelled') + d('baseRaidsLost'), duels: d('duelsWon'), hatched: d('hatched'), seconds: d('playSeconds') };
+  });
   const filtering = $derived(isStatsFiltering(filter));
   const rowCount = (xs: typeof all) => xs.reduce((n, sec) => n + sec.rows.length, 0);
   const clear = () => { filter = { ...DEFAULT_STATS_FILTER }; };
@@ -47,6 +54,9 @@
 {/if}
 
 <div class="grid">
+  {#if !filtering && session.seconds >= 60}
+    <div class="session muted small">{tr("This session")} ({fmtDuration(session.seconds)}): {tr("{n} defeated", { n: fmtInt(session.defeated) })} · {tr("{n} caught", { n: fmtInt(session.caught) })} · +{fmtInt(session.gold)} {tr("gold")}{session.hatched ? ` · ${tr("{n} hatched", { n: session.hatched })}` : ''}{session.raids ? ` · ${tr("{n} raids", { n: session.raids })}` : ''}{session.duels ? ` · ${tr("{n} duels won", { n: session.duels })}` : ''}</div>
+  {/if}
   {#each sections as sec (sec.title)}
     <section class="card">
       <h3>{tr(sec.title)}</h3>
@@ -82,6 +92,7 @@
 </div>
 
 <style>
+  .session { margin: 0 0 0.6rem; padding: 0.4rem 0.6rem; background: var(--panel-2); border-radius: var(--radius-sm); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
   .card { background: var(--panel-2); border: 1.5px solid var(--border-soft); border-radius: var(--radius); padding: 0.6rem 0.75rem; }
   h3 { margin: 0 0 0.4rem; }
