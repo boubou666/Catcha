@@ -7,11 +7,11 @@ import { partyDps, spawnWild, type Wild } from '../engine/combat';
 import { catchPreview } from '../engine/catch';
 import { isUnlocked } from '../engine/progress';
 import { addToParty, release, removeFromParty } from '../engine/party';
-import { clickDamage } from '../engine/formulas';
-import { assignWorker, build, cancelCraft, cancelCraftAll, enqueue, unassignWorker } from '../engine/base';
+import { clickDamage, LUCKY_CHANCE, LUCKY_HP_MULT } from '../engine/formulas';
+import { assignWorker, cancelCraft, unassignWorker } from '../engine/base';
 import { tickWorld } from '../engine/tick';
-import { clearPair, setPair } from '../engine/breeding';
-import { research, techMult } from '../engine/tech';
+import { clearPair } from '../engine/breeding';
+import { techMult } from '../engine/tech';
 import { type DungeonRun } from '../engine/dungeon';
 import { dungeonById, dungeonsOf } from '../data/dungeons';
 import { itemName } from '../data/items';
@@ -23,19 +23,18 @@ import { claimAll, claimBonus, claimQuest, rollDaily, describeQuest, BONUS_EFFIG
 import { buyUpgrade, relicsFor } from '../engine/prestige';
 import { ascend } from '../engine/ascend';
 import { prestigeUpgradeById } from '../data/prestige';
-import { techById } from '../data/tech';
-import { recipeById, structureById } from '../data/base';
 import { applyOffline, type OfflineReport } from '../engine/offline';
-import { buy, sell } from '../engine/shop';
 import { classifyLog, fillTemplate, type LogMessage, type LogEntry } from '../engine/logfilter';
 import { resolveDefeat } from './defeat';
 import { canRaid, nextRaidDelay, rollRaid, tickRaid } from '../engine/baseraid';
+import { rematchInfo } from '../engine/rematch';
+import { activeMods, claimChallenge, countChallengeKill, todaysChallenge } from '../engine/challenge';
 import { canEnter, canSummon, endRun, enterDungeon, flee, startAlpha, startTower, summonRaid } from './encounters';
+import { build, buyItem, cancelCraftAll, condense, craft, research, sellItem, setPair, sphereAvailable } from './economy';
 import { applyLoadout, deleteLoadout, renameLoadout, saveLoadout, updateLoadout } from '../engine/loadouts';
 import { bulkAssign, bulkParty, bulkRelease, describeBulk, type BulkResult } from '../engine/bulk';
 import { loadToastPref, NOTICE_CAP, TOAST_PREF_KEY, type Notice, type NoticeKind, type ToastPref } from '../engine/notices';
 import { advanceTutorial, currentStep, finishTutorial } from '../engine/tutorial';
-import { condense } from '../engine/condense';
 import { instanceByUid } from '../engine/party';
 
 const AUTOSAVE_MS = 30_000;
@@ -51,7 +50,7 @@ export type ToastKind = NoticeKind;
 
 export type GameEvent =
   | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
-  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep';
+  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep' | 'raidAlarm';
 
 export class Game {
   save = $state<SaveState>(newState());
@@ -198,6 +197,8 @@ export class Game {
       const out = tickRaid(this.save, base.raid, dtSec);
       if (!out) return;
       const name = palById(base.raid.palId).name;
+      const rec = { at: Date.now(), palId: base.raid.palId, level: base.raid.level, outcome: out.kind, gold: out.kind === 'repelled' ? out.gold : 0, stolen: out.kind === 'failed' ? Object.values(out.stolen).reduce((a, b) => a + b, 0) : 0 };
+      base.raidLog = [rec, ...base.raidLog].slice(0, 10);
       base.raid = null;
       base.nextRaidAt = this.save.stats.playSeconds + nextRaidDelay();
       if (out.kind === 'repelled') {
@@ -208,15 +209,16 @@ export class Game {
         this.emit('bossWin');
         this.notifyT('🛡 Raid repelled — {pal} fled', { pal: name }, 'gold', 5000);
       } else {
-        const stolen = Object.entries(out.stolen).map(([id, n]) => `${n} ${itemName(id)}`).join(', ') || 'nothing';
-        this.pushT('The base fell to {pal}: {stolen} stolen, the workers are shaken.', { pal: name, stolen });
-        this.notifyT('🚨 {pal} raided the base — {stolen} stolen', { pal: name, stolen }, 'warn', 6000);
+        const list = Object.entries(out.stolen).map(([id, n]) => `${n} ${itemName(id)}`).join(', ');
+        if (list) { this.pushT('The base fell to {pal}: {stolen} stolen, the workers are shaken.', { pal: name, stolen: list }); this.notifyT('🚨 {pal} raided the base — {stolen} stolen', { pal: name, stolen: list }, 'warn', 6000); }
+        else { this.pushT('The base fell to {pal} — nothing worth taking, but the workers are shaken.', { pal: name }); this.notifyT('🚨 {pal} raided the base — nothing taken, workers shaken', { pal: name }, 'warn', 6000); }
       }
       return;
     }
     if (this.save.stats.playSeconds >= base.nextRaidAt) {
       if (!canRaid(this.save)) { base.nextRaidAt = this.save.stats.playSeconds + 60; return; }
       base.raid = rollRaid(this.route);
+      this.emit('raidAlarm');
       const name = palById(base.raid.palId).name;
       this.pushT('🚨 {pal} Lv {level} is raiding the base! The workers fight back — rally the party from the Base tab.', { pal: name, level: base.raid.level });
       this.notifyT('🚨 {pal} is raiding the base!', { pal: name }, 'warn', 8000);
@@ -267,7 +269,7 @@ export class Game {
 
   /** Shortcut targets in the current region: next unbeaten Alpha (else the first open one), the tower, the realm, the first summonable raid. */
   get nextAlpha(): string | null {
-    const open = this.region.alphas.filter((a) => isUnlocked(this.save, a.unlock));
+    const open = this.region.alphas.filter((a) => isUnlocked(this.save, a.unlock) && rematchInfo(this.save, a).ready);
     return (open.find((a) => !this.save.progress.alphas.includes(a.id)) ?? open[0])?.id ?? null;
   }
   get nextRealm(): string | null { return dungeonsOf(this.region.id).find((d) => this.canEnter(d.id))?.id ?? null; }
@@ -292,6 +294,11 @@ export class Game {
 
   spawn() {
     this.wild = spawnWild(this.route);
+    const mods = activeMods(this.save);
+    if (mods) {
+      if (!this.wild.lucky && mods.luckyMult > 1 && Math.random() < LUCKY_CHANCE * (mods.luckyMult - 1)) { this.wild.lucky = true; this.wild.maxHp *= LUCKY_HP_MULT; this.wild.hp = this.wild.maxHp; }
+      this.wild.maxHp = Math.round(this.wild.maxHp * mods.hpMult); this.wild.hp = this.wild.maxHp;
+    }
     if (this.wild.lucky) { this.emit('luckySpawn'); this.notifyT('✨ A Lucky {pal} appeared!', { pal: palById(this.wild.palId).name }, 'warn', 5000); }
     else if (this.watched.has(this.wild.palId)) { const pv = catchPreview(this.save, this.wild.palId, this.wild.lucky, this.wild.kind === 'alpha'); this.notify(`👀 ${palById(this.wild.palId).name} is here!${pv.throws ? ` 🎯 ${Math.round(pv.chance * 100)}%` : ''}`, 'info', 3000); }
   }
@@ -387,65 +394,21 @@ export class Game {
   assignWorker(uid: string) { assignWorker(this.save, uid); }
   unassignWorker(uid: string) { unassignWorker(this.save, uid); }
 
-  build(id: string) {
-    if (!build(this.save, id)) return;
-    const level = this.save.base.structures[id];
-    if (level > 1) this.pushT('Built {structure} Lv {level}.', { structure: structureById(id).name, level }); else this.pushT('Built {structure}.', { structure: structureById(id).name });
-  }
-
-  craft(recipeId: string, n: number) {
-    const queued = enqueue(this.save, recipeId, n);
-    if (queued > 0) this.pushT('Queued {n}× {recipe}.', { n: queued, recipe: recipeById(recipeId).name });
-  }
-
+  build(id: string) { build(this, id); }
+  craft(recipeId: string, n: number) { craft(this, recipeId, n); }
   cancelCraft(index: number) { cancelCraft(this.save, index); }
-  cancelCraftAll(recipeId?: string) {
-    const n = cancelCraftAll(this.save, recipeId);
-    if (n) { this.push(`Cancelled ${n} queued craft${n === 1 ? '' : 's'}${recipeId ? ` of ${recipeById(recipeId).name}` : ''} — materials refunded.`); this.notify(`↩ ${n} craft${n === 1 ? '' : 's'} cancelled, materials refunded`, 'info', 3000); }
-  }
-
-  setPair(aUid: string, bUid: string) {
-    if (setPair(this.save, aUid, bUid)) {
-      const a = instanceByUid(this.save, aUid)!; const b = instanceByUid(this.save, bUid)!;
-      this.pushT('{a} and {b} moved to the Breeding Farm.', { a: palById(a.palId).name, b: palById(b.palId).name });
-    }
-  }
-
+  cancelCraftAll(recipeId?: string) { cancelCraftAll(this, recipeId); }
+  setPair(aUid: string, bUid: string) { setPair(this, aUid, bUid); }
   clearPair() { clearPair(this.save); }
+  research(techId: string) { research(this, techId); }
+  condense(uid: string) { condense(this, uid); }
 
-  research(techId: string) {
-    if (research(this.save, techId)) this.pushT('Researched {tech}.', { tech: techById(techId).name });
-  }
+  // ---- merchant / settings (see economy.ts) -----------------------------
 
-  condense(uid: string) {
-    const fed = condense(this.save, uid);
-    const target = instanceByUid(this.save, uid);
-    if (!fed || !target) return;
-    this.push(`${palById(target.palId).name} condensed to ${'★'.repeat(target.stars)} (${fed.length} ${palById(target.palId).name}s consumed).`);
-  }
-
-  // ---- merchant / settings ----------------------------------------------
-
-  sphereAvailable(tier: SphereTier): boolean {
-    const s = SPHERES[tier];
-    return s.price !== null && isUnlocked(this.save, s.unlock);
-  }
-
-  buySphere(tier: SphereTier, n = 1): boolean {
-    return this.buyItem(SPHERES[tier].itemId, n);
-  }
-
-  buyItem(itemId: string, n = 1): boolean {
-    const got = buy(this.save, itemId, n);
-    if (got > 0) this.pushT('Bought {n} {item}.', { n: got, item: itemName(itemId) });
-    return got > 0;
-  }
-
-  sellItem(itemId: string, n = 1): boolean {
-    const gold = sell(this.save, itemId, n);
-    if (gold > 0) { this.pushT('Sold {item} for {gold} gold.', { item: itemName(itemId), gold: gold.toLocaleString() }); this.notifyT('💰 +{gold} gold', { gold: gold.toLocaleString() }, 'gold', 2500); }
-    return gold > 0;
-  }
+  sphereAvailable(tier: SphereTier): boolean { return sphereAvailable(this.save, tier); }
+  buySphere(tier: SphereTier, n = 1): boolean { return buyItem(this, SPHERES[tier].itemId, n); }
+  buyItem(itemId: string, n = 1): boolean { return buyItem(this, itemId, n); }
+  sellItem(itemId: string, n = 1): boolean { return sellItem(this, itemId, n); }
 
   setDailyReset(mode: DailyReset) {
     this.save.settings.dailyReset = mode;

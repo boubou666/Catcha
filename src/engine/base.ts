@@ -11,7 +11,7 @@ import { prestigeMult } from './prestige';
 import { partnerMult, ranchMult } from './partner';
 
 export function newBase(): BaseState {
-  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [], expeditions: [], reports: [], raid: null, nextRaidAt: 20 * 60 };
+  return { slots: BASE_SLOTS, workers: [], structures: {}, queue: [], acc: {}, breeding: null, eggs: [], expeditions: [], reports: [], raid: null, nextRaidAt: 20 * 60, raidLog: [] };
 }
 
 // ---- workers ---------------------------------------------------------------

@@ -11,6 +11,9 @@ import { catchPreview, tryCatch } from '../engine/catch';
 import { bossName, completeRun, describeChest, isBossWave, spawnFor } from '../engine/dungeon';
 import { completeRaid, describeRaidChest } from '../engine/raid';
 import { earnGold } from '../engine/inventory';
+import { recordAlphaWin, rematchInfo } from '../engine/rematch';
+import { activeMods, countChallengeKill, claimChallenge, CHALLENGE_REWARD } from '../engine/challenge';
+import { LUCKY_CHANCE } from '../engine/formulas';
 import type { GameCore } from './core';
 
 export function resolveDefeat(g: GameCore, w: Wild, byClick = false) {
@@ -29,8 +32,16 @@ export function resolveDefeat(g: GameCore, w: Wild, byClick = false) {
     else g.pushT('No sphere thrown at Alpha {pal} — see Settings → Catching.', { pal: def.name });
   }
   if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
-    if (w.kind === 'wild') save.progress.routeKills[g.route.id] = (save.progress.routeKills[g.route.id] ?? 0) + 1;
-    const res = tryCatch(save, w);
+    if (w.kind === 'wild') {
+      save.progress.routeKills[g.route.id] = (save.progress.routeKills[g.route.id] ?? 0) + 1;
+      if (countChallengeKill(save) && claimChallenge(save)) {
+        g.pushT('Daily challenge complete! +{gold} gold, +{effigies} Effigy.', { gold: CHALLENGE_REWARD.gold.toLocaleString(), effigies: CHALLENGE_REWARD.effigies });
+        g.emit('questClaimed');
+        g.notifyT('⭐ Daily challenge complete! +{gold} gold, +1 Effigy', { gold: CHALLENGE_REWARD.gold.toLocaleString() }, 'gold', 6000);
+      }
+    }
+    const loot = w.kind === 'wild' && activeMods(save)?.noCatch;   // loot day: no throw
+    const res = loot ? { outcome: 'skipped' as const } : tryCatch(save, w);
     const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
     if (res.outcome === 'caught') { g.pushT('Caught {label} with a {sphere}!', { label, sphere: SPHERES[res.tier].name }, { chance: res.chance, landed: true }); g.emit('caught'); g.notifyT('Caught {label}', { label }, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
     else if (res.outcome === 'failed') { g.pushT(res.refunded ? '{label} broke free — the sphere came back.' : '{label} broke free.', { label }, { chance: res.chance, landed: false }); g.emit('catchFailed'); }
@@ -55,15 +66,19 @@ export function resolveDefeat(g: GameCore, w: Wild, byClick = false) {
     }
   } else if (w.kind === 'alpha' && w.refId) {
     const alpha = alphaById(w.refId);
-    if (!save.progress.alphas.includes(w.refId)) {
-      save.progress.alphas.push(w.refId);
+    const purse = rematchInfo(save, alpha).gold;   // scaled by the tier that was just fought
+    const win = recordAlphaWin(save, w.refId);
+    if (win.first) {
       earnGold(save, alpha.reward.gold);
       save.player.effigies += alpha.reward.effigies ?? 0;
       g.pushT('Alpha {pal} defeated! +{gold} gold, +{effigies} effigies.', { pal: def.name, gold: alpha.reward.gold, effigies: alpha.reward.effigies ?? 0 });
       g.emit('bossWin');
       g.notifyT('Alpha {pal} defeated! +{gold} gold', { pal: def.name, gold: alpha.reward.gold.toLocaleString() }, 'gold', 5000);
     } else {
-      g.pushT('Alpha {pal} defeated again. +{gold} gold.', { pal: def.name, gold: reward.gold });
+      earnGold(save, purse);
+      g.pushT('Rematch {tier} won — Alpha {pal} pays {gold} gold and will be back stronger in an hour of play.', { tier: win.tier, pal: def.name, gold: purse.toLocaleString() });
+      g.emit('bossWin');
+      g.notifyT('Rematch won — Alpha {pal} +{gold} gold', { pal: def.name, gold: purse.toLocaleString() }, 'gold', 4000);
     }
   } else if (w.kind === 'tower' && w.refId) {
     const tower = towerById(w.refId);

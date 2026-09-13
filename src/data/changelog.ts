@@ -10,6 +10,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.14.0', date: '2026-09-14', title: 'Rematches and challenges',
+    items: [
+      'Alphas come back. A beaten Alpha goes on a one-hour (play time) cooldown, then returns one tier stronger — +2 levels, +50% HP and double, triple… gold — and, being a boss-level wild Pal, a fresh throw each time. The Bosses buttons and the map show the tier or the time left.',
+      'A daily challenge route: one of your open routes gets a modifier for the day — Lucky day (Lucky Pals ×10), Gold rush (double gold), Tough crowd (double HP, double exp) or Loot day (triple drops, no throws). Thirty defeats there pay 2,000 gold and an Effigy. It sits at the top of Daily, is starred in the route list and on the map, and the arena tags it.',
+      'Raids, finished: Defender achievements (1 / 10 / 50 repelled), an alarm sound and buzz when one starts, a Recent raids list in the Base tab, and an honest toast when nothing was worth stealing.',
+      'The Log search now matches the text you see, so it works in French.',
+    ],
+  },
+  {
     version: '0.13.0', date: '2026-09-14', title: 'Base raids',
     items: [
       'Wild Pals now raid your base. Every 15–25 minutes of play (once you have workers and a structure), a Pal from your current route shows up with boss-sized HP and three minutes on the clock. The workers fight back at half attack; Rally the party from the Base tab (or the 🚨 button in the arena) to add its damage. Production pauses meanwhile.',

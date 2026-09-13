@@ -52,8 +52,8 @@ export function isLogFiltering(f: LogFilter): boolean {
   return f.query.trim() !== '' || f.kind !== 'any';
 }
 
-/** Entries (newest first, as stored) matching the kind and every search word. */
-export function filterLog(entries: LogEntry[], f: LogFilter): LogEntry[] {
+/** Entries (newest first, as stored) matching the kind and every search word; `render` gives the text as shown (the translated one). */
+export function filterLog(entries: LogEntry[], f: LogFilter, render: (e: LogEntry) => string = (e) => e.text): LogEntry[] {
   const words = f.query.toLowerCase().split(/\s+/).filter(Boolean);
-  return entries.filter((e) => (f.kind === 'any' || e.kind === f.kind) && words.every((w) => e.text.toLowerCase().includes(w)));
+  return entries.filter((e) => (f.kind === 'any' || e.kind === f.kind) && words.every((w) => render(e).toLowerCase().includes(w)));
 }

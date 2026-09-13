@@ -117,6 +117,13 @@ adds the party. Production pauses during a raid. Repelling pays `RAID_GOLD_MULT`
 and a throw at the raider; failing steals `STEAL_FRACTION` of two stacks (never spheres or slabs) and costs
 workers `STEAL_SAN`. Deploys apply themselves when the tab is hidden or idle (`update.autoApply`).
 
+Alpha rematches (`src/engine/rematch.ts`): a beaten Alpha is on a `REMATCH_COOLDOWN_SEC` play-time cooldown and
+returns at tier n with +`REMATCH_LEVEL_STEP`·n levels, ×(1 + `REMATCH_HP_STEP`·n) HP and ×(1 + n) gold; state in
+`progress.alphaRematch` (v24). Daily challenge (`src/engine/challenge.ts`): route and modifier are hashed from
+the day key over the open routes (`MODS`: lucky / gold / tough / loot); `activeMods(save)` feeds combat and the
+spawn, `countChallengeKill` / `claimChallenge` track the `CHALLENGE_GOAL` and pay `CHALLENGE_REWARD`. Raids keep a
+`base.raidLog` and have Defender achievements and a `raidAlarm` sound event.
+
 Partner skills (`src/data/partner.ts`) are read off each species' Palworld skill name: mounts and gliders
 give exp, diggers and anglers gold, helpers and harvest blessings base output (while the Pal works at the base),
 senses, webs and glares catch odds; the rest are fighting skills and add damage for party members sharing the
@@ -131,8 +138,9 @@ views use gettext-style keys (the English string itself, wrapped in `tr("…")`)
 the current language. English is the fallback; data names stay as on the wiki. A test asserts every `tr()` key
 has a French entry. Save codes (`encodeSaveCode` / `decodeSaveCode`, gzip + base64url, prefix `catcha1.`)
 are the way to move a save between devices; plain export strings still load. The store delegates defeat
-resolution to `src/state/defeat.ts` and boss / realm / raid starts to `src/state/encounters.ts` through the
-`GameCore` interface in `src/state/core.ts`. `src/engine/progression.test.ts` plays the whole world by data
+resolution to `src/state/defeat.ts`, boss / realm / raid starts to `src/state/encounters.ts` and building /
+crafting / research / merchant actions to `src/state/economy.ts`, through the `GameCore` interface in
+`src/state/core.ts`. `src/engine/progression.test.ts` plays the whole world by data
 and asserts every route, Alpha, tower, realm and raid opens in order, every requirement points at something real,
 and every species can be obtained.
 

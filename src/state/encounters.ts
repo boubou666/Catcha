@@ -8,6 +8,7 @@ import { wildHp } from '../engine/formulas';
 import { catchPreview } from '../engine/catch';
 import { clockMult } from '../engine/partner';
 import { isUnlocked } from '../engine/progress';
+import { rematchInfo } from '../engine/rematch';
 import { bossName, dungeonUnlocked, spawnFor, startRun } from '../engine/dungeon';
 import { summon, summonBlocker } from '../engine/raid';
 import type { GameCore } from './core';
@@ -15,8 +16,13 @@ import type { GameCore } from './core';
 export function startAlpha(g: GameCore, id: string) {
   const a = alphaById(id);
   if (!isUnlocked(g.save, a.unlock)) return;
-  g.wild = spawnBoss(a.palId, a.level, wildHp(a.level) * a.hpMult, 'alpha', id, Date.now() + ALPHA_TIME_LIMIT_SEC * 1000 * clockMult(g.save));
-  { const pv = catchPreview(g.save, a.palId, false, true); g.pushT('Alpha {pal} appears — {minutes} minutes on the clock.', { pal: palById(a.palId).name, minutes: Math.round(ALPHA_TIME_LIMIT_SEC * clockMult(g.save) / 60) }, pv.throws ? { chance: pv.chance } : {}); }
+  const rm = rematchInfo(g.save, a);
+  if (!rm.ready) return;   // still on cooldown
+  g.wild = spawnBoss(a.palId, rm.level, rm.hp, 'alpha', id, Date.now() + ALPHA_TIME_LIMIT_SEC * 1000 * clockMult(g.save));
+  const pv = catchPreview(g.save, a.palId, false, true);
+  const extra = pv.throws ? { chance: pv.chance } : {};
+  if (rm.tier > 0) g.pushT('Alpha {pal} is back for rematch {tier} — Lv {level}, {minutes} minutes on the clock.', { pal: palById(a.palId).name, tier: rm.tier, level: rm.level, minutes: Math.round(ALPHA_TIME_LIMIT_SEC * clockMult(g.save) / 60) }, extra);
+  else g.pushT('Alpha {pal} appears — {minutes} minutes on the clock.', { pal: palById(a.palId).name, minutes: Math.round(ALPHA_TIME_LIMIT_SEC * clockMult(g.save) / 60) }, extra);
 }
 
 export function startTower(g: GameCore, id: string) {

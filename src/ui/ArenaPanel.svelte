@@ -10,6 +10,7 @@
   import { catchText, pct } from './catchText';
   import { t, t as tr } from '../i18n/index.svelte';
   import { raidById } from '../data/raids';
+  import { activeMods, todaysChallenge, MOD_LABEL } from '../engine/challenge';
   import { ui } from '../state/ui.svelte';
 
   /** compact: the sticky mobile bar (smaller art, one-line stats) */
@@ -31,6 +32,7 @@
   const secondsLeft = $derived(wild?.deadlineAt ? Math.max(0, Math.ceil((wild.deadlineAt - now) / 1000)) : null);
   const preview = $derived(isCatchable(wild) ? catchPreview(game.save, wild.palId, wild.lucky, wild.kind === 'alpha') : null);
   const catchLine = $derived(preview ? catchText(preview) : '');
+  const challenge = $derived(wild?.kind === 'wild' && activeMods(game.save) ? todaysChallenge(game.save) : null);
   // towers and raids never throw a sphere: say so where the odds would be
   const raid = $derived(wild?.kind === 'raid' && wild.refId ? raidById(wild.refId) : null);
   const noCatchLine = $derived(wild?.kind === 'tower' ? 'not catchable — a tower boss is a human and their Pal' : raid ? `no sphere — win for a ${raid.name} egg (✨ ${pct(raid.luckyChance)} Lucky)` : '');
@@ -51,6 +53,7 @@
           {#if wild.kind === 'dungeon' && run && runDef}<span class="tag realm">W{run.wave + 1}/{runDef.waves}</span>{/if}
           {#if wild.kind === 'dungeonBoss'}<span class="tag realm">{tr("GUARDIAN")}</span>{/if}
           {#if wild.kind === 'raid'}<span class="tag raid">{tr("RAID")}</span>{/if}
+          {#if challenge}<span class="tag challenge" title={tr(MOD_LABEL[challenge.mod])}>⭐ {challenge.kills}/{challenge.goal}</span>{/if}
           {#if wild.lucky}<span class="tag lucky">{tr("LUCKY")}</span>{/if}
           {def.name} <span class="muted">Lv {wild.level}</span>
         </div>
@@ -117,6 +120,7 @@
   .tag.lucky { background: var(--accent); color: var(--on-accent); }
   .tag.realm { background: var(--accent-2); }
   .tag.raid { background: #7b2cbf; }
+  .tag.challenge { background: var(--accent); color: var(--on-accent); }
   .bar.hp { margin: 0.35rem 0; }
   .catch { color: var(--accent-2); margin-top: 0.15rem; font-size: 0.85rem; background: none; border: none; padding: 0; clip-path: none; text-align: left; cursor: pointer; font-weight: 700; }
   .catch:hover { text-decoration: underline; background: none; }

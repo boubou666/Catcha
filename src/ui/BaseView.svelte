@@ -68,6 +68,16 @@
     <p class="muted small">{tr("Production pauses until it is over. Repel it for triple drops, bonus gold and a throw at the raider; lose and it takes a tenth of two stacks and shakes the workers.")}</p>
   </div>
 {/if}
+{#if save.base.raidLog.length}
+  <details class="raidlog">
+    <summary class="muted small">🛡 {tr("Recent raids")} · {save.stats.baseRaidsRepelled} {tr("repelled")} · {save.stats.baseRaidsLost} {tr("lost")}</summary>
+    <ul class="small">
+      {#each save.base.raidLog as r (r.at)}
+        <li class:lost={r.outcome === 'failed'}>{r.outcome === 'repelled' ? '🛡' : '🚨'} {palById(r.palId).name} Lv {r.level} — {r.outcome === 'repelled' ? tr("repelled, +{gold} gold", { gold: r.gold }) : tr("lost, {n} items stolen", { n: r.stolen })} <span class="muted">{new Date(r.at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span></li>
+      {/each}
+    </ul>
+  </details>
+{/if}
 {#if partnerLines.length}<p class="partners small" title={tr("Work-flavoured partner skills of the workers, added up")}>{tr("🤝 Partner skills:")} {partnerLines.join(' · ')}</p>{/if}
 
 <div class="status row">
@@ -196,6 +206,10 @@
   .raid .hp { margin: 0.25rem 0; }
   .raid .hp span { background: var(--danger); }
   .raid p { margin: 0.4rem 0 0; }
+  .raidlog { margin: 0 0 0.5rem; }
+  .raidlog summary { cursor: pointer; }
+  .raidlog ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }
+  .raidlog .lost { color: var(--danger); }
   .partners { color: var(--accent); font-size: 0.85rem; margin: -0.3rem 0 0.5rem; }
   section { margin-top: 1.25rem; }
   .status { padding: 0.5rem 0.75rem; background: var(--panel-2); border-radius: var(--radius-sm); }

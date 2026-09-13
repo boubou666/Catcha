@@ -8,7 +8,8 @@
   let filter = $state<LogFilter>({ ...DEFAULT_LOG_FILTER });
   let expanded = $state(false);
   const filtering = $derived(isLogFiltering(filter));
-  const matches = $derived(filterLog(game.log, filter));
+  const shownText = (e: (typeof game.log)[number]) => (e.msg ? tr(e.msg.key, e.msg.vars) : e.text);
+  const matches = $derived(filterLog(game.log, filter, shownText));
   // filtering shows everything that matches; otherwise the recent dozen unless expanded
   const shown = $derived(filtering || expanded ? matches : matches.slice(0, COMPACT));
   // realized vs expected odds over the throws in view, shown when the Catching category is picked
@@ -36,7 +37,7 @@
   {/if}
   <div class="lines" class:tall={filtering || expanded}>
     {#each shown as e, i (e.at + e.text + i)}
-      <div class="line" class:latest={i === 0 && !filtering}><span class="t muted">{time(e.at)}</span> <span class="k muted">{tr(LOG_KIND_LABEL[e.kind])}</span> {e.msg ? tr(e.msg.key, e.msg.vars) : e.text}{#if e.chance !== undefined} <span class="odds" class:hit={e.landed === true} class:miss={e.landed === false} title={e.landed === undefined ? 'Catch odds with the sphere your policy picks' : e.landed ? 'Landed at these odds' : 'Missed at these odds'}>🎯 {pct(e.chance)}</span>{/if}</div>
+      <div class="line" class:latest={i === 0 && !filtering}><span class="t muted">{time(e.at)}</span> <span class="k muted">{tr(LOG_KIND_LABEL[e.kind])}</span> {shownText(e)}{#if e.chance !== undefined} <span class="odds" class:hit={e.landed === true} class:miss={e.landed === false} title={e.landed === undefined ? 'Catch odds with the sphere your policy picks' : e.landed ? 'Landed at these odds' : 'Missed at these odds'}>🎯 {pct(e.chance)}</span>{/if}</div>
     {/each}
   </div>
   {#if !filtering && game.log.length > COMPACT}

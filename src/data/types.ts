@@ -161,7 +161,10 @@ export interface BaseState {
   reports: ExpeditionReport[];           // newest first, capped
   raid: import('../engine/baseraid').BaseRaid | null;   // a wild Pal attacking the base right now
   nextRaidAt: number;                    // stats.playSeconds at which the next raid arrives
+  raidLog: RaidRecord[];                 // recent raids, newest first, capped
 }
+
+export interface RaidRecord { at: number; palId: number; level: number; outcome: 'repelled' | 'failed'; gold: number; stolen: number }
 
 export interface SaveState {
   version: number;
@@ -186,6 +189,8 @@ export interface SaveState {
     towers: string[];
     dungeons: Record<string, number>;    // dungeonId -> clears
     raids: Record<string, number>;       // raidId -> wins
+    alphaRematch: Record<string, import('../engine/rematch').RematchState>;   // per beaten Alpha: next tier and when
+    challenge: { day: string; kills: number; claimed: boolean } | null;      // today's challenge route progress
   };
   settings: {
     sphereForNew: SpherePolicy;          // sphere to throw at a Pal not yet in the Paldeck

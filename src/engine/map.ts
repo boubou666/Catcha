@@ -8,6 +8,8 @@ import { dungeonClears, dungeonUnlocked } from './dungeon';
 import { routeQuota } from './prestige';
 import { ALTAR, RAIDS } from '../data/raids';
 import { REGION_MAPS } from '../data/map';
+import { fmtCooldown, rematchInfo } from './rematch';
+import { todaysChallenge } from './challenge';
 import { alphaById, routeById, towerById } from '../data/regions';
 import { dungeonById } from '../data/dungeons';
 
@@ -37,14 +39,16 @@ export interface MapRegion {
 
 /** Every region with its pins placed on its island and coloured by the save's progress. */
 export function worldMap(save: SaveState): MapRegion[] {
+  const challengeId = todaysChallenge(save)?.route.id ?? null;
   return REGIONS.map((region) => {
     const pins: MapPin[] = [];
     region.routes.forEach((r) => {
       const open = isUnlocked(save, r.unlock);
       const [x, y] = spotOf(region.id, r.id);
       const cleared = open && routeCleared(save, r);
+      const star = challengeId === r.id ? '⭐ ' : '';
       pins.push({
-        kind: 'route', id: r.id, regionId: region.id, name: r.name, level: r.level, x, y,
+        kind: 'route', id: r.id, regionId: region.id, name: star + r.name, level: r.level, x, y,
         status: !open ? 'locked' : cleared ? 'cleared' : 'open',
         current: save.progress.route === r.id,
         detail: open ? `${routeKills(save, r.id)} / ${routeQuota(save, r)} defeated` : describeRequirement(r.unlock),
@@ -54,10 +58,11 @@ export function worldMap(save: SaveState): MapRegion[] {
       const open = isUnlocked(save, a.unlock);
       const [x, y] = spotOf(region.id, a.id);
       const done = save.progress.alphas.includes(a.id);
+      const rm = rematchInfo(save, a);
       pins.push({
-        kind: 'alpha', id: a.id, regionId: region.id, name: `Alpha ${palById(a.palId).name}`, level: a.level, x, y,
-        status: !open ? 'locked' : done ? 'cleared' : 'open', current: false,
-        detail: open ? (done ? 'Defeated — fight again for gold' : `${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time`) : describeRequirement(a.unlock),
+        kind: 'alpha', id: a.id, regionId: region.id, name: `Alpha ${palById(a.palId).name}`, level: rm.level, x, y,
+        status: !open ? 'locked' : done && !rm.ready ? 'cleared' : 'open', current: false,
+        detail: open ? (done ? (rm.ready ? `Rematch ${rm.tier} — ${rm.gold.toLocaleString()} gold, a fresh throw` : `Beaten — back in ${fmtCooldown(rm.secondsLeft)} of play`) : `${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time`) : describeRequirement(a.unlock),
       });
     });
     {

@@ -7,6 +7,7 @@ import { achievementGoldMult } from './achievements';
 import { prestigeMult } from './prestige';
 import { techMult } from './tech';
 import { partnerAttackMult, partnerMult, scavengeChance } from './partner';
+import { activeMods } from './challenge';
 import { expReward, goldReward, instanceAttack, LUCKY_CHANCE, LUCKY_HP_MULT, wildHp } from './formulas';
 
 export type Rng = () => number;
@@ -67,9 +68,10 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
   const def = palById(wild.palId);
   const bossMult = { wild: 1, dungeon: 2, alpha: 10, dungeonBoss: 12, tower: 25, raid: 40 }[wild.kind];
   const luckyMult = wild.lucky ? 5 : 1;
+  const mods = wild.kind === 'wild' ? activeMods(save) : null;   // today's challenge route
 
-  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold') * achievementGoldMult(save) * prestigeMult(save, 'gold') * partnerMult(save, 'gold'));
-  const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp') * prestigeMult(save, 'exp') * partnerMult(save, 'exp'));
+  const gold = Math.round(goldReward(wild.level) * bossMult * luckyMult * techMult(save, 'gold') * achievementGoldMult(save) * prestigeMult(save, 'gold') * partnerMult(save, 'gold') * (mods?.goldMult ?? 1));
+  const exp = Math.round(expReward(wild.level) * bossMult * luckyMult * techMult(save, 'exp') * prestigeMult(save, 'exp') * partnerMult(save, 'exp') * (mods?.expMult ?? 1));
   earnGold(save, gold);
   save.stats.defeated += 1;
   if (wild.lucky) save.stats.luckyDefeated += 1;
@@ -80,7 +82,7 @@ export function applyDefeat(save: SaveState, wild: Wild, rand: Rng = Math.random
   const drops: Record<string, number> = {};
   for (const drop of def.drops) {
     if (rand() < drop.chance) {
-      const n = drop.min + Math.floor(rand() * (drop.max - drop.min + 1));
+      const n = (drop.min + Math.floor(rand() * (drop.max - drop.min + 1))) * (mods?.dropMult ?? 1);
       drops[drop.itemId] = (drops[drop.itemId] ?? 0) + n;
       addItem(save, drop.itemId, n);
     }

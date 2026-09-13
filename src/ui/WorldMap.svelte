@@ -63,7 +63,7 @@
     selected = pin;
   });
 
-  const canAct = (p: MapPin) => p.kind === 'base' || (p.status !== 'locked' && !game.inBossFight && !(p.kind === 'route' && p.current) && !(p.kind === 'realm' && !game.canEnter(p.id)) && p.kind !== 'altar');
+  const canAct = (p: MapPin) => p.kind === 'base' || (p.status !== 'locked' && !(p.kind === 'alpha' && p.status === 'cleared') && !game.inBossFight && !(p.kind === 'route' && p.current) && !(p.kind === 'realm' && !game.canEnter(p.id)) && p.kind !== 'altar');
   function act(p: MapPin) {
     if (!canAct(p)) return;
     if (p.kind === 'base') ui.requestTab = 'base';

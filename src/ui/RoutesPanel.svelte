@@ -7,6 +7,8 @@
   import { DEFAULT_ROUTE_FILTER, filterRoutes, isRouteFiltering, ROUTE_STATUS_LABEL, type RouteFilter } from '../engine/routefilter';
   import { prefs } from '../state/prefs.svelte';
   import { ui } from '../state/ui.svelte';
+  import { todaysChallenge } from '../engine/challenge';
+  const challengeId = $derived(todaysChallenge(game.save)?.route.id ?? null);
   import WorldMap from './WorldMap.svelte';
   import { t, t as tr } from '../i18n/index.svelte';
 
@@ -83,7 +85,7 @@
             onclick={() => game.travel(r.id)}
             title={status !== 'locked' ? `${routeKills(game.save, r.id)} / ${routeQuota(game.save, r)} defeated. Catch: ${tableOddsText(game.save, r.spawns)}.` : describeRequirement(r.unlock)}
           >
-            <span>{r.name}</span>
+            <span>{r.id === challengeId ? '⭐ ' : ''}{r.name}</span>
             <span class="muted">Lv {r.level}{status === 'cleared' ? ' ✓' : status === 'locked' ? ' 🔒' : ''}</span>
           </button>
         {/each}
@@ -101,7 +103,7 @@
           onclick={() => game.travel(r.id)}
           title={unlocked ? `${routeKills(game.save, r.id)} / ${routeQuota(game.save, r)} defeated. Catch: ${tableOddsText(game.save, r.spawns)}.` : describeRequirement(r.unlock)}
         >
-          <span>{r.name}</span>
+          <span>{r.id === challengeId ? '⭐ ' : ''}{r.name}</span>
           <span class="muted">Lv {r.level}{cleared ? ' ✓' : ''}</span>
         </button>
       {/each}

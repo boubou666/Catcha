@@ -1,6 +1,9 @@
 <script lang="ts">
   import { t as tr } from '../i18n/index.svelte';
   import { game } from '../state/game.svelte';
+  import { todaysChallenge, MOD_LABEL } from '../engine/challenge';
+  import { ui } from '../state/ui.svelte';
+  const challenge = $derived(todaysChallenge(game.save));
   import { routeById } from '../data/regions';
   import { itemName } from '../data/items';
   import { bonusReady, describeQuest, msUntilRollover, progressTier, questDone, questProgress, BONUS_EFFIGIES, DEFAULT_QUEST_FILTER, filterHistory, filterQuests, historySummary, isQuestFiltering, QUEST_KIND_LABEL, QUEST_STATUS_LABEL, type QuestFilter } from '../engine/daily';
@@ -33,6 +36,23 @@
   const pct = (n: number, d: number) => Math.round((n / d) * 100);
 </script>
 
+{#if challenge}
+  <div class="challenge panel-2" class:done={challenge.claimed}>
+    <div class="row">
+      <div class="grow">
+        <b>⭐ {tr("Today's challenge")}: {challenge.route.name}</b> <span class="muted small">Lv {challenge.route.level}</span>
+        <div class="small">{tr(MOD_LABEL[challenge.mod])}</div>
+        <div class="bar"><span style:width="{Math.min(100, (challenge.kills / challenge.goal) * 100)}%"></span></div>
+        <div class="muted small">{tr("{n} / {goal} defeats there today", { n: Math.min(challenge.kills, challenge.goal), goal: challenge.goal })}{challenge.claimed ? ` · ${tr("reward claimed")}` : ` · ${tr("+2,000 gold and an Effigy on completion")}`}</div>
+      </div>
+      {#if !challenge.claimed}
+        {#if game.route.id === challenge.route.id}<span class="small here">{tr("You are here")}</span>
+        {:else}<button class="small primary" disabled={game.inBossFight || !game.canTravel(challenge.route.id)} onclick={() => game.travel(challenge.route.id)}>{tr("Go")}</button>{/if}
+      {/if}
+      <button class="small" onclick={() => ui.showOnMap('route', challenge.route.id)} title={tr("Show on the map")}>🗺</button>
+    </div>
+  </div>
+{/if}
 <div class="row">
   <h2 class="grow">{tr("Daily Quests")} <span class="muted">{claimedCount} / {daily?.quests.length ?? 0}</span></h2>
   <span class="muted small">{tr("Resets in {eta} ({mode} midnight · Settings) · tier {tier}", { eta: untilReset, mode: mode === 'utc' ? 'UTC' : tr('local'), tier })}</span>
@@ -124,6 +144,10 @@
 </section>
 
 <style>
+  .challenge { padding: 0.6rem; margin-bottom: 0.6rem; border: 1.5px solid var(--accent); border-radius: var(--radius-sm); }
+  .challenge.done { border-color: var(--ok); opacity: 0.85; }
+  .challenge .bar { margin: 0.3rem 0; }
+  .challenge .here { color: var(--accent-2); font-weight: 700; }
   .small { font-size: 0.8rem; }
   .list { display: flex; flex-direction: column; gap: 0.5rem; }
   .quest { border: 1.5px solid var(--border-soft); border-radius: var(--radius-sm); padding: 0.6rem; background: var(--panel-2); display: flex; flex-direction: column; gap: 0.35rem; }

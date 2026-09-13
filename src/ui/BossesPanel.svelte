@@ -3,6 +3,7 @@
   import { palById } from '../data/pals';
   import { ALPHA_TIME_LIMIT_SEC } from '../data/regions';
   import { catchPreview } from '../engine/catch';
+  import { fmtCooldown, rematchInfo } from '../engine/rematch';
   import { ui } from '../state/ui.svelte';
   import { t, t as tr } from '../i18n/index.svelte';
   import { spawnTable } from '../engine/arenafilter';
@@ -88,9 +89,10 @@
       {@const unlocked = isUnlocked(game.save, a.unlock)}
       {@const done = game.save.progress.alphas.includes(a.id)}
       {@const pv = catchPreview(game.save, a.palId, false, true)}
-      <button disabled={!unlocked || game.inBossFight} onclick={() => game.startAlpha(a.id)}
+      {@const rm = rematchInfo(game.save, a)}
+      <button disabled={!unlocked || game.inBossFight || !rm.ready} onclick={() => game.startAlpha(a.id)}
         title={unlocked ? `${ALPHA_TIME_LIMIT_SEC / 60} minutes to win. ${a.reward.gold.toLocaleString()} gold${a.reward.effigies ? `, ${a.reward.effigies} Effigies` : ''} the first time. Catch: ${catchText(pv)}.` : describeRequirement(a.unlock)}>
-        Alpha {palById(a.palId).name} Lv {a.level}{done ? ' ✓' : ''}{#if unlocked} <span class="odds" class:no={!pv.throws}>🎯 {pv.throws ? `${pct(pv.chance)}` : '—'}</span>{/if}
+        Alpha {palById(a.palId).name} Lv {rm.level}{done ? ' ✓' : ''}{#if done}<span class="muted"> · {rm.ready ? tr("rematch {tier}", { tier: rm.tier }) : `⏳ ${fmtCooldown(rm.secondsLeft)}`}</span>{/if}{#if unlocked && rm.ready} <span class="odds" class:no={!pv.throws}>🎯 {pv.throws ? `${pct(pv.chance)}` : '—'}</span>{/if}
       </button>
     {/each}
     <button class:primary={towerUnlocked && !towerDone}

@@ -2,7 +2,7 @@
 
 export type Sfx =
   | 'click' | 'defeat' | 'caught' | 'catchFailed' | 'levelUp' | 'bossWin' | 'towerWin' | 'hatched'
-  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep';
+  | 'achievement' | 'questClaimed' | 'luckySpawn' | 'summon' | 'realmClear' | 'ascend' | 'craftDone' | 'tutorialStep' | 'raidAlarm';
 
 const PREF_KEY = 'catcha.sound';
 
@@ -94,6 +94,7 @@ const SOUNDS: Record<Sfx, (a: { ctx: AudioContext; master: GainNode }, t: number
   achievement: (a, t) => { tone(a, 880, t, 0.18, { gain: 0.14 }); tone(a, 1320, t + 0.14, 0.3, { gain: 0.14 }); },
   questClaimed: (a, t) => { tone(a, 1568, t, 0.06, { gain: 0.14 }); tone(a, 2093, t + 0.07, 0.2, { gain: 0.14 }); },
   luckySpawn: (a, t) => [1760, 2217, 2637, 3520].forEach((f, i) => tone(a, f, t + i * 0.06, 0.25, { gain: 0.08 })),
+  raidAlarm: (a, t) => [0, 0.3, 0.6].forEach((d) => { tone(a, 880, t + d, 0.14, { type: 'square', gain: 0.1, to: 660 }); tone(a, 660, t + d + 0.15, 0.14, { type: 'square', gain: 0.1, to: 880 }); }),
   summon: (a, t) => { tone(a, 55, t, 0.9, { type: 'sawtooth', gain: 0.12, to: 40 }); noise(a, t, 0.5, 0.05, 400); },
   realmClear: (a, t) => [659, 784, 1047].forEach((f, i) => tone(a, f, t + i * 0.1, 0.3, { type: 'triangle', gain: 0.14 })),
   ascend: (a, t) => { tone(a, 220, t, 1.6, { type: 'sine', gain: 0.14, to: 1760 }); [523, 659, 784, 1047, 1319].forEach((f, i) => tone(a, f, t + 0.8 + i * 0.1, 0.5, { type: 'triangle', gain: 0.1 })); },
@@ -131,6 +132,7 @@ const PATTERNS: Partial<Record<Sfx, number | number[]>> = {
   achievement: [40, 50, 90],
   questClaimed: [20, 20, 20],
   luckySpawn: [15, 30, 15, 30, 15, 30, 60],
+  raidAlarm: [120, 80, 120, 80, 120],
   summon: 250,
   realmClear: [40, 40, 90],
   ascend: [80, 60, 80, 60, 80, 60, 300],
