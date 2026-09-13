@@ -1,8 +1,11 @@
 /** Small per-device display preferences (localStorage), separate from the save. */
 const KEY = 'catcha.prefs';
 
-interface Prefs { showOdds: boolean }   // the 🎯 chips in Pal lists, cards and spawn tables
-const DEFAULTS: Prefs = { showOdds: true };
+interface Prefs {
+  showOdds: boolean;             // the 🎯 chips in Pal lists, cards and spawn tables
+  routesView: 'list' | 'map';    // how the Routes panel shows the world
+}
+const DEFAULTS: Prefs = { showOdds: true, routesView: 'map' };
 
 function load(): Prefs {
   try {
@@ -13,11 +16,13 @@ function load(): Prefs {
 
 class PrefStore {
   showOdds = $state(load().showOdds);
+  routesView = $state<Prefs['routesView']>(load().routesView);
 
-  setShowOdds(on: boolean) {
-    this.showOdds = on;
-    try { localStorage.setItem(KEY, JSON.stringify({ showOdds: on } satisfies Prefs)); } catch { /* ignore */ }
+  private persist() {
+    try { localStorage.setItem(KEY, JSON.stringify({ showOdds: this.showOdds, routesView: this.routesView } satisfies Prefs)); } catch { /* ignore */ }
   }
+  setShowOdds(on: boolean) { this.showOdds = on; this.persist(); }
+  setRoutesView(v: Prefs['routesView']) { this.routesView = v; this.persist(); }
 }
 
 export const prefs = new PrefStore();

@@ -101,6 +101,13 @@ or a legendary catch takes. The Paldeck sorts by "Easiest to catch", and a Pal's
 hunt it (spawn share × odds, with a Go button). Settings → Catching has a per-device switch that hides the 🎯
 chips in lists; the arena line and Pal pages keep theirs.
 
+The Routes panel opens as a map: the official Palpagos map from palworld.wiki.gg (`public/map/`, fetched by
+`npm run fetch-map` at 1024 and 2048 px) with a pin per route, tower, Alpha and Sealed Realm, placed by hand
+in `src/data/map.ts`. Tap a pin for its status, odds and a Travel / Fight / Enter button; tap it again to go.
+The world view frames the seven regions (locked ones say what opens them) and zooms to one on tap; the
+current route pulses, cleared spots tick, and the ☰ List button brings the old list back (remembered per
+device). Searching always uses the list.
+
 Partner skills (`src/data/partner.ts`) are read off each species' Palworld skill name: mounts and gliders
 give exp, diggers and anglers gold, helpers and harvest blessings base output (while the Pal works at the base),
 senses, webs and glares catch odds; the rest are fighting skills and add damage for party members sharing the

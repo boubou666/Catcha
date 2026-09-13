@@ -5,6 +5,8 @@
   import { tableOddsText } from './catchText';
   import { ELEMENTS } from '../data/types';
   import { DEFAULT_ROUTE_FILTER, filterRoutes, isRouteFiltering, ROUTE_STATUS_LABEL, type RouteFilter } from '../engine/routefilter';
+  import { prefs } from '../state/prefs.svelte';
+  import WorldMap from './WorldMap.svelte';
 
   let filter = $state<RouteFilter>({ ...DEFAULT_ROUTE_FILTER });
   let open = $state(false);
@@ -21,6 +23,13 @@
 </script>
 
 <div class="panel">
+  {#if prefs.routesView === 'map' && !filtering}
+    <div class="row head">
+      <h3 class="grow">Map — {game.region.name}</h3>
+      <input type="search" placeholder="Search routes, Pals…" bind:value={filter.query} aria-label="Search routes" />
+    </div>
+    <WorldMap />
+  {:else}
   {#if game.regions.length > 1 && !filtering}
     <div class="regions row">
       {#each game.regions as r (r.id)}
@@ -32,6 +41,7 @@
     <h3 class="grow">{filtering ? `Routes — ${rows.length} of ${total}` : `Routes — ${game.region.name}`}</h3>
     <input type="search" placeholder="Search routes, Pals…" bind:value={filter.query} aria-label="Search routes" />
     <button class="small" class:active={open || filtering} onclick={() => (open = !open)} aria-expanded={open}>Filters{filtering ? ' •' : ''}</button>
+    {#if !filtering}<button class="small" onclick={() => prefs.setRoutesView('map')} title="Show the map">🗺 Map</button>{/if}
   </div>
   {#if open}
     <div class="filters">
@@ -84,6 +94,7 @@
         </button>
       {/each}
     </div>
+  {/if}
   {/if}
 </div>
 

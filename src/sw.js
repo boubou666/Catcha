@@ -34,7 +34,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  const bucket = /\/(pals|items)\/[^/]+\.png$/.test(new URL(req.url).pathname) ? ART : VERSION;
+  const bucket = /\/(pals|items|map)\/[^/]+\.(png|webp)$/.test(new URL(req.url).pathname) ? ART : VERSION;
   event.respondWith(
     caches.match(req).then((hit) => hit || fetch(req).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(bucket).then((c) => c.put(req, copy)); }
