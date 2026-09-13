@@ -92,7 +92,8 @@ wild instead — on the preview, the active pair, each candidate's would-be chil
 Elsewhere: route tooltips list each species' odds; sphere rows in the Merchant, Items, Craft and the header
 chips say what that sphere would do on the Pal in front of you; Capture Technique techs show the before →
 after on it; global search species results, base workers, the Compare picker and the watch toast carry the
-figure; catch log lines include the odds that landed.
+figure. Log lines carry a 🎯 badge — green when a throw landed, grey when it broke free, cyan on a
+boss's arrival — and filtering the Log on Catching sums it up: throws landed vs the average odds.
 
 ## Data
 

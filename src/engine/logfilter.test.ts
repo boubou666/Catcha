@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyLog, DEFAULT_LOG_FILTER, filterLog, isLogFiltering, type LogEntry } from './logfilter';
+import { catchSummary, classifyLog, DEFAULT_LOG_FILTER, filterLog, isLogFiltering, type LogEntry } from './logfilter';
 
 describe('log classification', () => {
   it('sorts the game\'s messages into categories', () => {
@@ -39,5 +39,17 @@ describe('log filter', () => {
     expect(filterLog(entries, { query: 'gold', kind: 'shop' }).map((e) => e.at)).toEqual([1]);
     expect(filterLog(entries, { query: 'alpha gold', kind: 'any' }).map((e) => e.at)).toEqual([2]);
     expect(filterLog(entries, { query: 'zzz', kind: 'any' })).toEqual([]);
+  });
+});
+
+describe('catch summary', () => {
+  const e = (text: string, chance?: number, landed?: boolean): LogEntry => ({ at: 0, kind: 'catch', text, chance, landed });
+  it('counts only throws, and averages the odds they were thrown at', () => {
+    expect(catchSummary([])).toBeNull();
+    expect(catchSummary([e('Alpha Chillet appears', 0.13)])).toBeNull();          // a boss arrival is not a throw
+    const s = catchSummary([e('Caught Lamball', 0.6, true), e('Cattiva broke free', 0.6, false), e('Caught Penking', 0.15, true), e('Wave 2 / 5')])!;
+    expect(s).toMatchObject({ throws: 3, caught: 2 });
+    expect(s.rate).toBeCloseTo(2 / 3);
+    expect(s.expected).toBeCloseTo((0.6 + 0.6 + 0.15) / 3);
   });
 });

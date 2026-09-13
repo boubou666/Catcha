@@ -1,6 +1,20 @@
 export type LogKind = 'combat' | 'catch' | 'base' | 'breeding' | 'quest' | 'world' | 'shop' | 'system';
 
-export interface LogEntry { at: number; kind: LogKind; text: string }
+export interface LogEntry {
+  at: number;
+  kind: LogKind;
+  text: string;
+  chance?: number;             // catch odds attached to this line (a throw's, or a boss's on arrival)
+  landed?: boolean;            // for a throw: did it catch
+}
+
+/** Realized vs expected odds over the throws among these entries (lines with a chance and a landed flag). */
+export function catchSummary(entries: LogEntry[]): { throws: number; caught: number; rate: number; expected: number } | null {
+  const throws = entries.filter((e) => e.chance !== undefined && e.landed !== undefined);
+  if (throws.length === 0) return null;
+  const caught = throws.filter((e) => e.landed).length;
+  return { throws: throws.length, caught, rate: caught / throws.length, expected: throws.reduce((s, e) => s + e.chance!, 0) / throws.length };
+}
 
 export const LOG_KIND_LABEL: Record<LogKind, string> = {
   combat: 'Combat', catch: 'Catching', base: 'Base', breeding: 'Breeding', quest: 'Quests & achievements',

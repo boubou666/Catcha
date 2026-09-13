@@ -257,16 +257,16 @@ export class Game {
     if (w.kind === 'alpha') {
       // Alphas can be caught, at a reduced rate; the throw uses the same sphere policy
       const res = tryCatch(save, w);
-      if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name} (${Math.round(res.chance * 100)}%)!`); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
-      else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
+      if (res.outcome === 'caught') { this.push(`Caught Alpha ${def.name} Lv ${w.level} with a ${SPHERES[res.tier].name}!`, { chance: res.chance, landed: true }); this.emit('caught'); this.notify(`⚔ Caught Alpha ${def.name}!`, 'gold', 6000); }
+      else if (res.outcome === 'failed') { this.push(`Alpha ${def.name} broke free.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
       else this.push(`No sphere thrown at Alpha ${def.name} — see Settings → Catching.`);
     }
     if (w.kind === 'wild' || w.kind === 'dungeon' || w.kind === 'dungeonBoss') {
       if (w.kind === 'wild') save.progress.routeKills[this.route.id] = (save.progress.routeKills[this.route.id] ?? 0) + 1;
       const res = tryCatch(save, w);
       const label = `${w.lucky ? '✨ Lucky ' : ''}${def.name} Lv ${w.level}`;
-      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name} (${Math.round(res.chance * 100)}%)!`); this.emit('caught'); this.notify(`Caught ${label}`, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
-      else if (res.outcome === 'failed') { this.push(`${label} broke free (${Math.round(res.chance * 100)}%).`); this.emit('catchFailed'); }
+      if (res.outcome === 'caught') { this.push(`Caught ${label} with a ${SPHERES[res.tier].name}!`, { chance: res.chance, landed: true }); this.emit('caught'); this.notify(`Caught ${label}`, w.lucky ? 'gold' : 'success', w.lucky ? 6000 : 2500); }
+      else if (res.outcome === 'failed') { this.push(`${label} broke free.`, { chance: res.chance, landed: false }); this.emit('catchFailed'); }
       else if (w.lucky) this.push(`A Lucky ${def.name} got away — no sphere thrown.`);
       if (this.run && w.kind !== 'wild') {
         this.run.gold += reward.gold;
@@ -281,7 +281,8 @@ export class Game {
         } else {
           this.run.wave += 1;
           this.wild = spawnFor(this.run);
-          this.push(isBossWave(this.run) ? `The realm's guardian ${bossName(this.run.id)} appears!` : `Wave ${this.run.wave + 1} / ${dungeonById(this.run.id).waves}`);
+          if (isBossWave(this.run)) { const pv = catchPreview(this.save, this.wild.palId); this.push(`The realm's guardian ${bossName(this.run.id)} appears!`, pv.throws ? { chance: pv.chance } : {}); }
+          else this.push(`Wave ${this.run.wave + 1} / ${dungeonById(this.run.id).waves}`);
         }
         return;
       }
@@ -352,7 +353,7 @@ export class Game {
     const a = alphaById(id);
     if (!isUnlocked(this.save, a.unlock)) return;
     this.wild = spawnBoss(a.palId, a.level, wildHp(a.level) * a.hpMult, 'alpha', id, Date.now() + ALPHA_TIME_LIMIT_SEC * 1000);
-    this.push(`Alpha ${palById(a.palId).name} appears — ${ALPHA_TIME_LIMIT_SEC / 60} minutes on the clock.`);
+    { const pv = catchPreview(this.save, a.palId, false, true); this.push(`Alpha ${palById(a.palId).name} appears — ${ALPHA_TIME_LIMIT_SEC / 60} minutes on the clock.`, pv.throws ? { chance: pv.chance } : {}); }
   }
 
   startTower(id: string) {
@@ -550,8 +551,8 @@ export class Game {
     this.push('New game.');
   }
 
-  private push(text: string) {
-    this.log = [{ at: Date.now(), kind: classifyLog(text), text }, ...this.log].slice(0, LOG_LINES);
+  private push(text: string, extra: { chance?: number; landed?: boolean } = {}) {
+    this.log = [{ at: Date.now(), kind: classifyLog(text), text, ...extra }, ...this.log].slice(0, LOG_LINES);
   }
 }
 
